@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SensorCat</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_section1">Hall Effect</string>
+    <string name="title_section2">Proximity</string>
+    <string name="title_section3">Magnetic</string>
+    <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
+
+</resources>
