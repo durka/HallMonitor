@@ -5,8 +5,10 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="17"
         android:targetSdkVersion="17" />
+    
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -24,6 +26,16 @@
         </activity>
         
         <service android:name=".ViewCoverService" />
+        
+        <receiver android:name=".DeviceLocker"
+                  android:label="SensorCat Device Locker"
+                  android:permission="android.permission.BIND_DEVICE_ADMIN">
+    		<meta-data android:name="android.app.device_admin"
+                       android:resource="@xml/device_admin" />
+    		<intent-filter>
+        		<action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+    		</intent-filter>
+		</receiver>
     </application>
 
 </manifest>

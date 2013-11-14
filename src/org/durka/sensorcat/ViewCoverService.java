@@ -5,12 +5,18 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import android.app.Service;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
 import android.util.Log;
 
 
@@ -19,17 +25,12 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	static final String TAG = "ViewCoverService";
 	
 	private SensorManager mSensorManager;
-	private HallMonitor mHall;
 
 	private boolean mClosed;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "service started");
-		
-		mHall = HallMonitor.get();
-		mHall.register(this);
-		Log.d(TAG, Integer.toString(mHall.getClass().getSuperclass().getMethods().length));
 		
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_NORMAL);
@@ -47,7 +48,6 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		Log.d(TAG, "service stopped");
 		
 		mSensorManager.unregisterListener(this);
-		mHall.unregister(this);
 	}
 
 	@Override
@@ -63,12 +63,18 @@ public class ViewCoverService extends Service implements SensorEventListener {
 				if (mClosed) {
 					if (!hall_is_closed()) {
 						mClosed  = false;
+						PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+						PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, TAG);
+			            wl.acquire();
+			            wl.release();
 					}
 				}
 			} else {
 				if (!mClosed) {
 					if (hall_is_closed()) {
 						mClosed = true;
+						DevicePolicyManager dpm = (DevicePolicyManager) getApplicationContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
+						dpm.lockNow();
 					}
 				}
 			}

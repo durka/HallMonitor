@@ -3,7 +3,12 @@ package org.durka.sensorcat;
 import java.util.Locale;
 
 import android.app.ActionBar;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.FragmentTransaction;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -85,8 +90,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             .setTabListener(this));
         }
         
-     // Get an instance of the SensorManager
+        // Get an instance of the SensorManager
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
     }
 
     @Override
@@ -212,9 +218,49 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	public void onClick(View view) {
 		if (view == findViewById(R.id.button_start)) {
-			startService(new Intent(this, ViewCoverService.class));
+	        
+	        // Become device admin
+			Intent coup = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+			coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, new ComponentName(this, DeviceLocker.class));
+			coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "SensorCat needs to be able to lock the screen.");
+			startActivityForResult(coup, 42);
+			
 		} else if (view == findViewById(R.id.button_stop)) {
 			stopService(new Intent(this, ViewCoverService.class));
+			checkService();
+			
+			// Relinquish device admin
+			DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+			dpm.removeActiveAdmin(new ComponentName(this, DeviceLocker.class));
+			
+		} else if (view == findViewById(R.id.button_check)) {
+		    
+			checkService();
+		}
+	}
+	
+	private void checkService() {
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (ViewCoverService.class.getName().equals(service.service.getClassName())) {
+				// the service is running
+				((View)findViewById(R.id.button_start)).setEnabled(false);
+				((View)findViewById(R.id.button_stop)).setEnabled(true);
+				return;
+			}
+		}
+		// the service must not be running
+		((View)findViewById(R.id.button_start)).setEnabled(true);
+		((View)findViewById(R.id.button_stop)).setEnabled(false);
+	}
+	
+	@Override
+	public void onActivityResult(int request, int result, Intent data) {
+		switch (request) {
+		case 42:
+			startService(new Intent(this, ViewCoverService.class));
+			checkService();
+			break;
 		}
 	}
 
