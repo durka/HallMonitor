@@ -19,12 +19,17 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	static final String TAG = "ViewCoverService";
 	
 	private SensorManager mSensorManager;
+	private HallMonitor mHall;
 
 	private boolean mClosed;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "service started");
+		
+		mHall = HallMonitor.get();
+		mHall.register(this);
+		Log.d(TAG, Integer.toString(mHall.getClass().getSuperclass().getMethods().length));
 		
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_NORMAL);
@@ -42,6 +47,7 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		Log.d(TAG, "service stopped");
 		
 		mSensorManager.unregisterListener(this);
+		mHall.unregister(this);
 	}
 
 	@Override
