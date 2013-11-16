@@ -4,14 +4,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 public class Functions {
@@ -31,17 +35,29 @@ public class Functions {
 					dpm.lockNow();
 				}
 
-				// step 2: turn the screen back on (with low brightness), for two seconds
-				PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
-				wl.acquire(2000);
-
-				// step 3: after two seconds, if the cover is still closed, turn the screen off again
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						dpm.lockNow();
+				// are we supposed to show the lock screen?
+				int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 0);
+				if (delay > 0) {
+				
+					// step 2: turn the screen back on (optionally with low brightness)
+					int flags = PowerManager.ACQUIRE_CAUSES_WAKEUP;
+					if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_dim", false)) {
+						flags |= PowerManager.SCREEN_DIM_WAKE_LOCK;
+					} else {
+						flags |= PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
 					}
-				}, 2000);
+					PowerManager.WakeLock wl = pm.newWakeLock(flags, ctx.getString(R.string.app_name));
+					wl.acquire(delay);
+	
+					// step 3: after the delay, if the cover is still closed, turn the screen off again
+					handler.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							dpm.lockNow();
+						}
+					}, delay);
+				
+				}
 
 			}
 		}
@@ -126,6 +142,19 @@ public class Functions {
 			}
 			
 			return status.equals("CLOSE");
+		}
+		
+		public static boolean service_running(Context ctx) {
+			
+			ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+			for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+				if (ViewCoverService.class.getName().equals(service.service.getClassName())) {
+					// the service is running
+					return true;
+				}
+			}
+			// the service must not be running
+			return false;
 		}
 	}
 

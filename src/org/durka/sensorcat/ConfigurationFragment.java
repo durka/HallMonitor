@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,6 +24,11 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    //Toast.makeText(getActivity(), "resuming", Toast.LENGTH_SHORT).show();
 	    getPreferenceManager().getSharedPreferences()
 	            .registerOnSharedPreferenceChangeListener(this);
+	    
+	    getPreferenceManager().getSharedPreferences()
+	    		.edit()
+	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
+	    		.commit();
 	}
 
 	@Override
@@ -34,6 +40,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+		
 		if (key.equals("pref_enabled")) {
 			
 			if (prefs.getBoolean(key, false)) {
@@ -41,6 +48,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 			} else {
 				Functions.Actions.stop_service(getActivity());
 			}
+			
 		}
 	}
 
