@@ -108,4 +108,9 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
       mSeekBar.setProgress(progress); 
   }
   public int getProgress() { return mValue; }
+  
+  @Override
+  public boolean shouldDisableDependents() {
+	  return mValue == 0;
+  }
 }

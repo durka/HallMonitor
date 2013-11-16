@@ -12,6 +12,7 @@
         android:key="pref_delay"
         android:title="@string/pref_delay"
 	    android:summary="@string/pref_delay_summary"
+	    android:dependency="pref_enabled"
 	    android:dialogMessage="@string/pref_delay_summary"
         android:defaultValue="2000"
         android:max="5000"/>
@@ -20,6 +21,7 @@
         android:key="pref_dim"
         android:title="@string/pref_dim"
         android:summary="@string/pref_dim_summary"
+        android:dependency="pref_delay"
         android:defaultValue="true" />
 
 </PreferenceScreen>
