@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:robobunny="http://robobunny.com" >
+
+    <CheckBoxPreference
+        android:key="pref_enabled"
+        android:title="@string/pref_enabled"
+        android:summary="@string/pref_enabled_summary"
+        android:defaultValue="false" />
+    
+    <com.hlidskialf.android.preference.SeekBarPreference
+        android:key="pref_delay"
+        android:title="@string/pref_delay"
+	    android:summary="@string/pref_delay_summary"
+	    android:dialogMessage="@string/pref_delay_summary"
+        android:defaultValue="2000"
+        android:max="5000"/>
+    
+    <CheckBoxPreference
+        android:key="pref_dim"
+        android:title="@string/pref_dim"
+        android:summary="@string/pref_dim_summary"
+        android:defaultValue="true" />
+
+</PreferenceScreen>

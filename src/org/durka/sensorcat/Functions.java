@@ -6,7 +6,9 @@ import java.util.Scanner;
 
 import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.util.Log;
@@ -54,6 +56,23 @@ public class Functions {
 			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
 	        wl.acquire();
 	        wl.release();
+		}
+
+		public static void start_service(Context ctx) {
+			// Become device admin
+			Intent coup = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+			coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, new ComponentName(ctx, AdminReceiver.class));
+			coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "SensorCat needs to be able to lock the screen.");
+			ctx.startActivity(coup);
+			ctx.startService(new Intent(ctx, ViewCoverService.class));
+		}
+		
+		public static void stop_service(Context ctx) {
+			ctx.stopService(new Intent(ctx, ViewCoverService.class));
+			
+			// Relinquish device admin
+			DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
+			dpm.removeActiveAdmin(new ComponentName(ctx, AdminReceiver.class));
 		}
 
 	}
