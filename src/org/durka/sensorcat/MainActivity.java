@@ -221,7 +221,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	        
 	        // Become device admin
 			Intent coup = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-			coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, new ComponentName(this, DeviceLocker.class));
+			coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, new ComponentName(this, AdminReceiver.class));
 			coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "SensorCat needs to be able to lock the screen.");
 			startActivityForResult(coup, 42);
 			
@@ -231,7 +231,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			
 			// Relinquish device admin
 			DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-			dpm.removeActiveAdmin(new ComponentName(this, DeviceLocker.class));
+			dpm.removeActiveAdmin(new ComponentName(this, AdminReceiver.class));
 			
 		} else if (view == findViewById(R.id.button_check)) {
 		    

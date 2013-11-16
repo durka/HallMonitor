@@ -27,8 +27,8 @@
         
         <service android:name=".ViewCoverService" />
         
-        <receiver android:name=".DeviceLocker"
-                  android:label="SensorCat Device Locker"
+        <receiver android:name=".AdminReceiver"
+                  android:label="SensorCat Admin Receiver"
                   android:permission="android.permission.BIND_DEVICE_ADMIN">
     		<meta-data android:name="android.app.device_admin"
                        android:resource="@xml/device_admin" />
