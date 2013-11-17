@@ -47,29 +47,30 @@ public class Functions {
 				}
 
 				// are we supposed to show the lock screen?
-				int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 0);
-				if (delay > 0) {
-				
-					// step 2: turn the screen back on (optionally with low brightness)
-					int flags = PowerManager.ACQUIRE_CAUSES_WAKEUP;
-					if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_dim", false)) {
-						flags |= PowerManager.SCREEN_DIM_WAKE_LOCK;
-					} else {
-						flags |= PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
-					}
-					PowerManager.WakeLock wl = pm.newWakeLock(flags, ctx.getString(R.string.app_name));
-					wl.acquire(delay);
-	
-					// step 3: after the delay, if the cover is still closed, turn the screen off again
-					handler.postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							dpm.lockNow();
+				if (kgm.isKeyguardSecure()) {
+					int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 0);
+					if (delay > 0) {
+					
+						// step 2: turn the screen back on (optionally with low brightness)
+						int flags = PowerManager.ACQUIRE_CAUSES_WAKEUP;
+						if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_dim", false)) {
+							flags |= PowerManager.SCREEN_DIM_WAKE_LOCK;
+						} else {
+							flags |= PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
 						}
-					}, delay);
-				
+						PowerManager.WakeLock wl = pm.newWakeLock(flags, ctx.getString(R.string.app_name));
+						wl.acquire(delay);
+		
+						// step 3: after the delay, if the cover is still closed, turn the screen off again
+						handler.postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								dpm.lockNow();
+							}
+						}, delay);
+					
+					}
 				}
-
 			}
 		}
 		
@@ -141,6 +142,8 @@ public class Functions {
 						.putBoolean("pref_enabled", false)
 						.commit();
 			}
+			
+			
 		}
 		
 		public static void set_cover(boolean closed) {

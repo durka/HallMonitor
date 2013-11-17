@@ -39,7 +39,11 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(getString(R.string.app_name), "service started");
 		
-		Functions.Events.set_cover(Functions.Is.cover_closed(this));
+		if (Functions.Is.cover_closed(this)) {
+			Functions.Actions.close_cover(this);
+		} else {
+			Functions.Actions.open_cover(this);
+		}
 		
 		mSensorManager       = (SensorManager)       getSystemService(SENSOR_SERVICE);
 		

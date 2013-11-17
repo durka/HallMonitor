@@ -3,6 +3,7 @@ package org.durka.sensorcat;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -41,6 +42,12 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 		
+		// update display
+		if (findPreference(key) instanceof CheckBoxPreference) {
+			((CheckBoxPreference)findPreference(key)).setChecked(prefs.getBoolean(key, false));
+		}
+		
+		// perform actions
 		if (key.equals("pref_enabled")) {
 			
 			if (prefs.getBoolean(key, false)) {
