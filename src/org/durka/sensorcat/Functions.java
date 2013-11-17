@@ -11,6 +11,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
@@ -24,8 +25,18 @@ public class Functions {
 		
 		private static Handler handler = new Handler();
 		
-		public static void close_cover(Context ctx, PowerManager pm, KeyguardManager kgm, final DevicePolicyManager dpm) {
+		public static void close_cover(Context ctx) {
 			Events.set_cover(true);
+			
+			KeyguardManager           kgm = (KeyguardManager)     ctx.getSystemService(Context.KEYGUARD_SERVICE);
+			PowerManager              pm  = (PowerManager)        ctx.getSystemService(Context.POWER_SERVICE);
+			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
+			
+			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
+			if (!dpm.isAdminActive(me)) {
+				// if we're not an admin, we can't do anything
+				return;
+			}
 			
 			// lock the screen, but keep it on for two seconds (but not if it was already off)
 			if (pm.isScreenOn()) {
@@ -62,8 +73,10 @@ public class Functions {
 			}
 		}
 		
-		public static void open_cover(Context ctx, PowerManager pm) {
+		public static void open_cover(Context ctx) {
 			Events.set_cover(false);
+			
+			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
 			
 			// step 1: if we were going to turn the screen off, cancel that
 			handler.removeCallbacksAndMessages(null);
@@ -76,10 +89,15 @@ public class Functions {
 
 		public static void start_service(Context ctx) {
 			// Become device admin
-			Intent coup = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-			coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, new ComponentName(ctx, AdminReceiver.class));
-			coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "SensorCat needs to be able to lock the screen.");
-			ctx.startActivity(coup);
+			DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
+			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
+			if (!dpm.isAdminActive(me)) {
+				Intent coup = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+				coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, me);
+				coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "SensorCat needs to be able to lock the screen.");
+				ctx.startActivity(coup);
+			}
+			
 			ctx.startService(new Intent(ctx, ViewCoverService.class));
 		}
 		
@@ -88,7 +106,8 @@ public class Functions {
 			
 			// Relinquish device admin
 			DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
-			dpm.removeActiveAdmin(new ComponentName(ctx, AdminReceiver.class));
+			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
+			if (dpm.isAdminActive(me)) dpm.removeActiveAdmin(me);
 		}
 
 	}
@@ -97,31 +116,50 @@ public class Functions {
 		
 		private static boolean cover_closed;
 		
+		public static void boot(Context ctx) {
+			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_enabled", false)) {
+	    		Intent startServiceIntent = new Intent(ctx, ViewCoverService.class);
+	    		ctx.startService(startServiceIntent);
+	    	}
+		}
+		
 		public static void device_admin_status(Context ctx, boolean admin) {
 			Toast.makeText(ctx, ctx.getString(R.string.app_name)
 					            + " admin status "
 					            + (admin ? "granted" : "revoked")
 					            + "!",
 					       Toast.LENGTH_SHORT).show();
+			
+			if (admin) {
+				if (Is.cover_closed(ctx)) {
+					Actions.close_cover(ctx);
+				}
+			} else {
+				Actions.stop_service(ctx);
+				PreferenceManager.getDefaultSharedPreferences(ctx)
+						.edit()
+						.putBoolean("pref_enabled", false)
+						.commit();
+			}
 		}
 		
 		public static void set_cover(boolean closed) {
 			cover_closed = closed;
 		}
 		
-		public static void proximity(Context ctx, PowerManager pm, KeyguardManager kgm, final DevicePolicyManager dpm, float value) {
+		public static void proximity(Context ctx, float value) {
 			if (value > 0) {
 				if (cover_closed) {
 					if (!Functions.Is.cover_closed(ctx)) {
 						
-						Actions.open_cover(ctx, pm);
+						Actions.open_cover(ctx);
 					}
 				}
 			} else {
 				if (!cover_closed) {
 					if (Functions.Is.cover_closed(ctx)) {
 						
-						Actions.close_cover(ctx, pm, kgm, dpm);
+						Actions.close_cover(ctx);
 					}
 				}
 			}

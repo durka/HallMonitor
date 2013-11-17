@@ -19,9 +19,6 @@ import android.util.Log;
 public class ViewCoverService extends Service implements SensorEventListener {
 	
 	private SensorManager       mSensorManager;
-	private KeyguardManager     mKeyguardManager;
-	private PowerManager        mPowerManager;
-	private DevicePolicyManager mDevicePolicyManager;
 	
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
@@ -32,7 +29,7 @@ public class ViewCoverService extends Service implements SensorEventListener {
 					// if the screen is turned on with the cover closed, treat it as a close event
 					// (mainly, turn off after 2 seconds instead of waiting the full timeout)
 					
-					Functions.Actions.close_cover(context, mPowerManager, mKeyguardManager, mDevicePolicyManager);
+					Functions.Actions.close_cover(context);
 				}
 			} 
 		}
@@ -45,9 +42,6 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		Functions.Events.set_cover(Functions.Is.cover_closed(this));
 		
 		mSensorManager       = (SensorManager)       getSystemService(SENSOR_SERVICE);
-		mKeyguardManager     = (KeyguardManager)     getSystemService(KEYGUARD_SERVICE);
-		mPowerManager        = (PowerManager)        getSystemService(POWER_SERVICE);
-		mDevicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
 		
 		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_NORMAL);
 		
@@ -80,7 +74,7 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	public void onSensorChanged(SensorEvent event) {
 		
 		if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {	
-			Functions.Events.proximity(this, mPowerManager, mKeyguardManager, mDevicePolicyManager, event.values[0]);
+			Functions.Events.proximity(this, event.values[0]);
 		}
 	}
 
