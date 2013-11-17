@@ -7,6 +7,7 @@ package com.hlidskialf.android.preference;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +73,18 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
     mSeekBar.setProgress(mValue);
     return layout;
   }
+  
+  @Override
+  protected void onDialogClosed(boolean positiveResult) {
+	  if (positiveResult) {
+		  if (shouldPersist()) {
+			  mValue = mSeekBar.getProgress();
+			  persistInt(mValue);
+		  }
+		  notifyDependencyChange(shouldDisableDependents());
+	  }
+  }
+  
   @Override 
   protected void onBindDialogView(View v) {
     super.onBindDialogView(v);
@@ -111,6 +124,7 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
   
   @Override
   public boolean shouldDisableDependents() {
-	  return mValue == 0;
+	  Log.d("SKP", "SDD called, mValue = " + Integer.toString(mValue) + ", super = " + Boolean.toString(super.shouldDisableDependents()));
+	  return mValue == 0 || super.shouldDisableDependents();
   }
 }
