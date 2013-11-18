@@ -1,6 +1,7 @@
-package org.durka.sensorcat;
+package org.durka.hallmonitor;
 
 import java.util.Locale;
+import org.durka.hallmonitor.R;
 
 import android.app.ActionBar;
 import android.app.ActivityManager;

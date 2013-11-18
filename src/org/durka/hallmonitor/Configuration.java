@@ -1,10 +1,11 @@
-package org.durka.sensorcat;
+package org.durka.hallmonitor;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.view.Menu;
+import org.durka.hallmonitor.R;
 
 public class Configuration extends Activity {
 

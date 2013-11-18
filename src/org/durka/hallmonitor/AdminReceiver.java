@@ -1,4 +1,4 @@
-package org.durka.sensorcat;
+package org.durka.hallmonitor;
 
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;

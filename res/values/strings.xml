@@ -2,7 +2,7 @@
 <resources>
 
     <!-- random stuff -->
-    <string name="app_name">SensorCat</string>
+    <string name="app_name">Hall Monitor</string>
     <string name="action_settings">Settings</string>
     <string name="title_section1">Hall Effect</string>
     <string name="title_section2">Proximity</string>

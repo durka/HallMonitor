@@ -1,4 +1,4 @@
-package org.durka.sensorcat;
+package org.durka.hallmonitor;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -8,6 +8,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+import org.durka.hallmonitor.R;
 
 public class ConfigurationFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
 	

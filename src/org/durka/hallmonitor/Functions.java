@@ -1,8 +1,9 @@
-package org.durka.sensorcat;
+package org.durka.hallmonitor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import org.durka.hallmonitor.R;
 
 import android.app.ActivityManager;
 import android.app.KeyguardManager;

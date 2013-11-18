@@ -1,4 +1,4 @@
-package org.durka.sensorcat;
+package org.durka.hallmonitor;
 
 import android.app.KeyguardManager;
 import android.app.Service;
@@ -14,6 +14,7 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+import org.durka.hallmonitor.R;
 
 
 public class ViewCoverService extends Service implements SensorEventListener {
