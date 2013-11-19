@@ -13,7 +13,7 @@ This app is a "clean room" implementation. I'm not extracting Samsung's binaries
 
 Screenshots:
 
-![Configuration screen (okay, it's the only screen)](https://github.com/durka/hallmonitor/raw/master/src/Screenshot_2013-11-18-21-16-25.png "Configuration screen (okay, it's the only screen)") ![GIF of opening and closing the cover](https://github.com/durka/hallmonitor/raw/master/src/Screenshot_2013-11-18-21-16-25.png "GIF of opening and closing the cover")
+![Configuration screen (okay, it's the only screen)](https://raw.github.com/durka/HallMonitor/master/Screenshot_2013-11-18-21-16-25.png "Configuration screen (okay, it's the only screen)") ![GIF of opening and closing the cover](https://github.com/durka/hallmonitor/raw/master/src/Screenshot_2013-11-18-21-16-25.png "GIF of opening and closing the cover")
 
 **Important**: I have **ONLY** personally tested this under the following configuration(s):
 
