@@ -26,7 +26,7 @@
     <string name="title_section3">Magnetic</string>
     <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
     <string name="title_activity_configuration">Configuration</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="admin_excuse">Hall Monitor needs to be able to lock the screen.</string>
     
     <!-- preferences -->
     <string name="pref_enabled">Enable</string>
