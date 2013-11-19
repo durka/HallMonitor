@@ -27,8 +27,10 @@ If you test this on something other than the above (including another carrier's 
 
 Installation / Usage
 --------------------
+The current release is: [0.0.1](https://github.com/durka/HallMonitor/tree/0.0.1)
+
 - I will be submitting the app to F-Droid. This should be by far the easiest way to install. I'll update here once there is a link.
-- You can download bin/HallMonitor.apk from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
+- You can download [`bin/HallMonitor.apk`](https://github.com/durka/HallMonitor/blob/0.0.1/bin/HallMonitor.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
 - You can clone the repository at a tagged version and build from source. It's configured as an Eclipse project, but I haven't even used any external libraries yet, so it "should" be "simple" to build with another system such as Android Studio or ant.
 
 Limitations / Known Issues
@@ -49,7 +51,7 @@ Future Plans
     - Make the lockscreen, or just a fullscreen activity, come up immediately when you close the cover instead of turning the screen off and back on (this could supersede the previous point)
 4. Add options to support other S4-specific things:
     - Keep the screen on while the camera can see your eyes
-    - Air gestures? I never used them myself and don't know exactly how they work, but maybe people want them…
+    - Air gestures? I never used them myself and don't know exactly how they work, but maybe people want themâ¦
     - Smart scroll/pause? (see above point)
     - Other cool features that Samsung HASN'T thought of! If you have a good idea, file a feature request or, better yet, a pull request.
 
