@@ -56,18 +56,18 @@ Hacking
 -------
 This should serve as quick guide if you're trying to find your way around my code.
 
-- All the real functionality is in [`Functions.java`](). The various activities and intent receivers forward everything to functions in there, along with whatever references to Contexts or Activities are necessary. I am experimenting this design, as it seems cleaner to not have the logic scattered among all the Android and Java boilerplate.
+- All the real functionality is in [`Functions.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/Functions.java). The various activities and intent receivers forward everything to functions in there, along with whatever references to Contexts or Activities are necessary. I am experimenting this design, as it seems cleaner to not have the logic scattered among all the Android and Java boilerplate.
 - Activities:
-    - Configuration: this is the configuration screen. It's defined in [`Configuration.java`]() and [`activity_configuration.xml`](). It contains only a preferences screen, using [`ConfigurationFragment.java`]() and [`preferences.xml`]().
-        - I used one custom preference widget, not written by me (but slightly enhanced by me), in [`SeekBarPreference.java`]().
+    - Configuration: this is the configuration screen. It's defined in [`Configuration.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/Configuration.java) and [`activity_configuration.xml`](https://github.com/durka/HallMonitor/blob/master/res/layout/activity_configuration.xml). It contains only a preferences screen, using [`ConfigurationFragment.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/ConfigurationFragment.java) and [`preferences.xml`](https://github.com/durka/HallMonitor/blob/master/res/xml/preferences.xml).
+        - I used one custom preference widget, not written by me (but slightly enhanced by me), in [`SeekBarPreference.java`](https://github.com/durka/HallMonitor/blob/master/src/com/hlidskialf/android/preference/SeekBarPreference.java).
 - Intent receivers:
-    - BootReceiver: the service needs to be started at boot; this is implemented by [`BootReceiver.java`]() (though again, that just delegates to a function in [`Functions.java`]()).
-    - DeviceAdminReceiver: the service needs device admin permissions in order to lock the screen, and we can't really start the service until that happens, so we need a receiver for the event.
+    - BootReceiver: the service needs to be started at boot; this is implemented by [`BootReceiver.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/BootReceiver.java) (though again, that just delegates to a function in [`Functions.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/Functions.java)).
+    - DeviceAdminReceiver: the service needs device admin permissions in order to lock the screen, and we can't really start the service until that happens, so we need a receiver for the event. This is implemented in [`AdminReceiver.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/AdminReceiver.java) and configured in [`device_admin.xml`](https://github.com/durka/HallMonitor/blob/master/res/xml/device_admin.xml).
 - Services:
-    - ViewCoverService: the most important file, really, outside of [`Functions.java`](), is [`ViewCoverService.java`](). This is the service that runs all the time and receives events from the proximity sensor, so it can check the hall effect sensor state, and react to view cover events.
+    - ViewCoverService: the most important file, really, outside of [`Functions.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/Functions.java), is [`ViewCoverService.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/ViewCoverService.java). This is the service that runs all the time and receives events from the proximity sensor, so it can check the hall effect sensor state, and react to view cover events.
 - XML files:
-    - Obviously, [`AndroidManifest.xml`]().
-    - The strings are all in [`strings.xml`]().
-    - As mentioned above, the preference screen is described by [`preferences.xml`]().
+    - Obviously, [`AndroidManifest.xml`](https://github.com/durka/HallMonitor/blob/master/AndroidManifest.xml).
+    - The strings are all in [`strings.xml`](https://github.com/durka/HallMonitor/blob/master/res/values/strings.xml).
+    - As mentioned above, the preference screen is described by [`preferences.xml`](https://github.com/durka/HallMonitor/blob/master/res/xml/preferences.xml).
 
 Happy hacking! File an issue or contact me at [android@alexburka.com](mailto:android@alexburka.com) with any questions.
