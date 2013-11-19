@@ -5,15 +5,15 @@ About
 -----
 This is an Android app that reimplements some of the behaviors specific to the Samsung Galaxy S4, so that they can be used with alternative ROMs, such as CyanogenMod, where the proprietary Samsung components are not available. At this time, these behaviors are:
 
-1. Support the S View Cover. There is a magnet in the cover, and a hall effect sensor built in to the S4, so that when you close the cover, we can automatically display the lock screen for a few seconds before putting the phone to sleep, and when you open the cover the phone wakes up.
+1. Support the [S View Cover](http://www.theverge.com/2013/3/14/4104134/samsung-announces-galaxy-s4-s-view-cover). There is a magnet in the cover, and a [hall effect sensor](https://en.wikipedia.org/wiki/Hall_effect_sensor) built in to the S4, so that when you close the cover, we can automatically display the lock screen for a few seconds before putting the phone to sleep, and when you open the cover the phone wakes up.
 
-Why use Hall Monitor instead of one of the other apps that locks the screen when you close the cover? As far as I can tell, they all use the proximity sensor to detect when the cover closes. Well, the S4 has a hall effect sensor, which is a much more accurate way to detect when the cover closes, which is what this app uses (but see below).
+Why use Hall Monitor instead of one of the other apps that locks the screen when you close the cover? As far as I can tell, they all use the proximity sensor to detect when the cover closes. Well, the S4 has a hall effect sensor, which is a much more accurate way to detect when the cover closes, and is what this app uses (but see below).
 
 This app is a "clean room" implementation. I'm not extracting Samsung's binaries from the stock ROM, or anything like that, just attempting to reimplement the functionality that I like.
 
 Screenshots:
 
-![Configuration screen (okay, it's the only screen)](https://raw.github.com/durka/HallMonitor/master/Screenshot_2013-11-18-21-16-25.png "Configuration screen (okay, it's the only screen)") ![GIF of opening and closing the cover](https://github.com/durka/hallmonitor/raw/master/src/Screenshot_2013-11-18-21-16-25.png "GIF of opening and closing the cover")
+![Configuration screen (okay, it's the only screen)](https://raw.github.com/durka/HallMonitor/master/Screenshot_2013-11-18-21-16-25.png "Configuration screen (okay, it's the only screen)") ![GIF of opening and closing the cover](https://raw.github.com/durka/HallMonitor/master/animation_trimmed.gif "GIF of opening and closing the cover")
 
 **Important**: I have **ONLY** personally tested this under the following configuration(s):
 
@@ -42,11 +42,12 @@ Limitations / Known Issues
 
 Future Plans
 ------------
-1. Remove the above limitations
-2. Enhance the view cover lockscreen:
+1. Comment the code more
+2. Remove the above limitations
+3. Enhance the view cover lockscreen:
     - Either modify cLock, or make a new lockscreen widget, that crams more information into the space you can see through the view cover
     - Make the lockscreen, or just a fullscreen activity, come up immediately when you close the cover instead of turning the screen off and back on (this could supersede the previous point)
-3. Add options to support other S4-specific things:
+4. Add options to support other S4-specific things:
     - Keep the screen on while the camera can see your eyes
     - Air gestures? I never used them myself and don't know exactly how they work, but maybe people want them…
     - Smart scroll/pause? (see above point)
@@ -65,9 +66,5 @@ This should serve as quick guide if you're trying to find your way around my cod
     - DeviceAdminReceiver: the service needs device admin permissions in order to lock the screen, and we can't really start the service until that happens, so we need a receiver for the event. This is implemented in [`AdminReceiver.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/AdminReceiver.java) and configured in [`device_admin.xml`](https://github.com/durka/HallMonitor/blob/master/res/xml/device_admin.xml).
 - Services:
     - ViewCoverService: the most important file, really, outside of [`Functions.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/Functions.java), is [`ViewCoverService.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/ViewCoverService.java). This is the service that runs all the time and receives events from the proximity sensor, so it can check the hall effect sensor state, and react to view cover events.
-- XML files:
-    - Obviously, [`AndroidManifest.xml`](https://github.com/durka/HallMonitor/blob/master/AndroidManifest.xml).
-    - The strings are all in [`strings.xml`](https://github.com/durka/HallMonitor/blob/master/res/values/strings.xml).
-    - As mentioned above, the preference screen is described by [`preferences.xml`](https://github.com/durka/HallMonitor/blob/master/res/xml/preferences.xml).
 
 Happy hacking! File an issue or contact me at [android@alexburka.com](mailto:android@alexburka.com) with any questions.
