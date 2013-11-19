@@ -110,7 +110,7 @@ public class Functions {
 			if (!dpm.isAdminActive(me)) {
 				Intent coup = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
 				coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, me);
-				coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "SensorCat needs to be able to lock the screen.");
+				coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, ctx.getString(R.string.admin_excuse));
 				ctx.startActivity(coup);
 			}
 			

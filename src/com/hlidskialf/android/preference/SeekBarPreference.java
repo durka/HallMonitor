@@ -2,6 +2,10 @@
  * and is released under the APACHE 2.0 license 
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Slightly modified by Alex Burka
+ *   - support dependent preference widgets
+ *   - correctly track the seekbar value internally
  */
 package com.hlidskialf.android.preference;
 
