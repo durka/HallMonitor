@@ -40,5 +40,10 @@
         android:summary="@string/pref_dim_summary"
         android:dependency="pref_delay"
         android:defaultValue="true" />
+    
+    <Preference
+        android:title="@string/pref_about"
+        android:summary="@string/pref_about_summary"
+        android:enabled="false" />
 
 </PreferenceScreen>

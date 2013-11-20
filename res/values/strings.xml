@@ -37,5 +37,7 @@
     <string name="pref_delay_summary">When the cover is closed, the lock screen shows for this many milliseconds. If set to 0, or if you have no screen lock, the screen turns off immediately.</string>
 	<string name="pref_dim">Dim covered lock screen</string>
 	<string name="pref_dim_summary">When the cover is closed and the lock screen displays (see above), should the screen dim?</string>
+	<string name="pref_about">About Hall Monitor</string>
+	<string name="pref_about_summary">Hall Monitor version 0.0.1.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     
 </resources>
