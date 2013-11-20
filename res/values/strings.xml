@@ -26,6 +26,9 @@
     
     <!--  admin receiver -->
     <string name="admin_excuse">Hall Monitor needs to be able to lock the screen.</string>
+    <string name="admin_granted">Hall Monitor admin status granted!</string>
+    <string name="admin_revoked">Hall Monitor admin status revoked!</string>
+    <string name="admin_refused">View cover service requires admin status</string>
     
     <!-- preferences -->
     <string name="pref_enabled">Enable</string>

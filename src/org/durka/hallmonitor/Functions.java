@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import org.durka.hallmonitor.R;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -35,6 +36,8 @@ import android.view.View;
 import android.widget.Toast;
 
 public class Functions {
+	
+	public static final int DEVICE_ADMIN_WAITING = 42;
 
 	public static class Actions {
 		
@@ -103,18 +106,16 @@ public class Functions {
 	        wl.release();
 		}
 
-		public static void start_service(Context ctx) {
+		public static void start_service(Activity act) {
 			// Become device admin
-			DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
-			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
+			DevicePolicyManager dpm = (DevicePolicyManager) act.getSystemService(Context.DEVICE_POLICY_SERVICE);
+			ComponentName me = new ComponentName(act, AdminReceiver.class);
 			if (!dpm.isAdminActive(me)) {
 				Intent coup = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
 				coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, me);
-				coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, ctx.getString(R.string.admin_excuse));
-				ctx.startActivity(coup);
+				coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, act.getString(R.string.admin_excuse));
+				act.startActivityForResult(coup, DEVICE_ADMIN_WAITING);
 			}
-			
-			ctx.startService(new Intent(ctx, ViewCoverService.class));
 		}
 		
 		public static void stop_service(Context ctx) {
@@ -139,15 +140,35 @@ public class Functions {
 	    	}
 		}
 		
+		public static void activity_result(Context ctx, int request, int result, Intent data) {
+			Log.d("F-a_r", "request=" + Integer.toString(request) + ", result=" + Integer.toString(result));
+			switch (request) {
+			case DEVICE_ADMIN_WAITING:
+				if (result == Activity.RESULT_OK) {
+					// we asked to be an admin and the user clicked Activate
+					// (the intent receiver takes care of showing a toast)
+					// go ahead and start the service
+					ctx.startService(new Intent(ctx, ViewCoverService.class));
+				} else {
+					// we asked to be an admin and the user clicked Cancel (why?)
+					// complain, and un-check pref_enabled
+					Toast.makeText(ctx, ctx.getString(R.string.admin_refused), Toast.LENGTH_SHORT).show();
+					Log.d("F-a_r", "pref_enabled = " + Boolean.toString(PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_enabled", true)));
+					PreferenceManager.getDefaultSharedPreferences(ctx)
+							.edit()
+							.putBoolean("pref_enabled", false)
+							.commit();
+					Log.d("F-a_r", "pref_enabled = " + Boolean.toString(PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_enabled", true)));
+				}
+				break;
+			}
+		}
+		
 		public static void device_admin_status(Context ctx, boolean admin) {
-			Toast.makeText(ctx, ctx.getString(R.string.app_name)
-					            + " admin status "
-					            + (admin ? "granted" : "revoked")
-					            + "!",
-					       Toast.LENGTH_SHORT).show();
+			Toast.makeText(ctx, ctx.getString(admin ? R.string.admin_granted : R.string.admin_revoked), Toast.LENGTH_SHORT).show();
 			
 			if (admin) {
-				if (Is.cover_closed(ctx)) {
+				if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_enabled", false) && Is.cover_closed(ctx)) {
 					Actions.close_cover(ctx);
 				}
 			} else {

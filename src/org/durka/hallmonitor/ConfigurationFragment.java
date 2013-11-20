@@ -37,7 +37,6 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onResume() {
 	    super.onResume();
-	    //Toast.makeText(getActivity(), "resuming", Toast.LENGTH_SHORT).show();
 	    getPreferenceManager().getSharedPreferences()
 	            .registerOnSharedPreferenceChangeListener(this);
 	    
@@ -50,12 +49,17 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onPause() {
 	    super.onPause();
-	    getPreferenceManager().getSharedPreferences()
-	            .unregisterOnSharedPreferenceChangeListener(this);
+	    // don't unregister, because we still want to receive the notification when
+	    // pref_enabled is changed in onActivityResult
+	    // FIXME is it okay to just never unregister??
+	    //getPreferenceManager().getSharedPreferences()
+	    //        .unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+		
+		Log.d("CF-oSPC", "changed key " + key);
 		
 		// update display
 		if (findPreference(key) instanceof CheckBoxPreference) {

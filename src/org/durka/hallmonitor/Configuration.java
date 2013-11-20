@@ -17,6 +17,7 @@ package org.durka.hallmonitor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import org.durka.hallmonitor.R;
@@ -36,6 +37,11 @@ public class Configuration extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.configuration, menu);
 		return true;
+	}
+	
+	@Override
+	public void onActivityResult(int request, int result, Intent data) {
+		Functions.Events.activity_result(this, request, result, data);
 	}
 
 }
