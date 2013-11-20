@@ -17,22 +17,19 @@ package org.durka.hallmonitor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import org.durka.hallmonitor.R;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.KeyguardManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 public class Functions {
