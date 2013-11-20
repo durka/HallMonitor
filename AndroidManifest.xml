@@ -54,7 +54,7 @@
 
         <receiver
             android:name="org.durka.hallmonitor.AdminReceiver"
-            android:label="SensorCat Admin Receiver"
+            android:label="@string/app_name"
             android:permission="android.permission.BIND_DEVICE_ADMIN" >
             <meta-data
                 android:name="android.app.device_admin"
