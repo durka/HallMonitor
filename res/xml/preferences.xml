@@ -42,6 +42,11 @@
         android:defaultValue="true" />
     
     <Preference
+        android:title=""
+        android:summary=""
+        android:enabled="false" />
+    
+    <Preference
         android:title="@string/pref_about"
         android:summary="@string/pref_about_summary"
         android:enabled="false" />
