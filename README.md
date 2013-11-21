@@ -52,7 +52,7 @@ Future Plans
     - Make the lockscreen, or just a fullscreen activity, come up immediately when you close the cover instead of turning the screen off and back on (this could supersede the previous point)
 4. Add options to support other S4-specific things:
     - Keep the screen on while the camera can see your eyes
-    - Air gestures? I never used them myself and don't know exactly how they work, but maybe people want themâ¦
+    - Air gestures? I never used them myself and don't know exactly how they work, but maybe people want them?
     - Smart scroll/pause? (see above point)
     - Other cool features that Samsung HASN'T thought of! If you have a good idea, file a feature request or, better yet, a pull request.
 
