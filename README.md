@@ -13,7 +13,7 @@ This app is a "clean room" implementation. I'm not extracting Samsung's binaries
 
 Screenshots:
 
-![Configuration screen (okay, it's the only screen)](https://raw.github.com/durka/HallMonitor/master/Screenshot_2013-11-18-21-16-25.png "Configuration screen (okay, it's the only screen)") ![GIF of opening and closing the cover](https://raw.github.com/durka/HallMonitor/master/animation_trimmed.gif "GIF of opening and closing the cover")
+![Configuration screen (okay, it's the only screen)](https://raw.github.com/durka/HallMonitor/master/screenshot.png "Configuration screen (okay, it's the only screen)") ![GIF of opening and closing the cover](https://raw.github.com/durka/HallMonitor/master/animation_trimmed.gif "GIF of opening and closing the cover")
 
 **Important**: I have **ONLY** personally tested this under the following configuration(s):
 
@@ -28,10 +28,10 @@ If you test this on something other than the above (including another carrier's 
 
 Installation / Usage
 --------------------
-The current release is: [0.0.1](https://github.com/durka/HallMonitor/tree/0.0.1)
+The current release is: [0.0.2](https://github.com/durka/HallMonitor/tree/0.0.2) (see [changelog](https://github.com/durka/HallMonitor/blob/master/CHANGELOG.md))
 
 - I will be submitting the app to F-Droid. This should be by far the easiest way to install. I'll update here once there is a link.
-- You can download [`bin/HallMonitor.apk`](https://github.com/durka/HallMonitor/blob/0.0.1/bin/HallMonitor.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
+- You can download [`bin/HallMonitor.apk`](https://github.com/durka/HallMonitor/blob/0.0.2/bin/HallMonitor.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
 - You can clone the repository at a tagged version and build from source. It's configured as an Eclipse project, but I haven't even used any external libraries yet, so it "should" be "simple" to build with another system such as Android Studio or ant.
 
 Limitations / Known Issues
