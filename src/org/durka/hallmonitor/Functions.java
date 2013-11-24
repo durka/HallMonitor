@@ -56,10 +56,10 @@ public class Functions {
 			// lock the screen, but keep it on for two seconds (but not if it was already off)
 			if (pm.isScreenOn()) {
 				
-				// step 1: lock the screen (and turn it off, FIXME seemingly unavoidable side effect)
-				if (!kgm.isKeyguardLocked()) {
-					dpm.lockNow();
-				}
+				// step 1: bring up the fullscreen activity
+				ctx.startActivity(new Intent(ctx, FullscreenActivity.class)
+										.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+												| Intent.FLAG_ACTIVITY_NO_ANIMATION));
 
 				// are we supposed to show the lock screen?
 				if (kgm.isKeyguardSecure()) {

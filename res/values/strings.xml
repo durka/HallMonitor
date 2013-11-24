@@ -23,21 +23,25 @@
     <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
     <string name="title_activity_configuration">Configuration</string>
     <string name="action_settings">Settings</string>
-    
-    <!--  admin receiver -->
+
+    <!-- admin receiver -->
     <string name="admin_excuse">Hall Monitor needs to be able to lock the screen.</string>
     <string name="admin_granted">Hall Monitor admin status granted!</string>
     <string name="admin_revoked">Hall Monitor admin status revoked!</string>
     <string name="admin_refused">View cover service requires admin status</string>
-    
+
     <!-- preferences -->
     <string name="pref_enabled">Enable</string>
     <string name="pref_enabled_summary">Whether the view cover service is enabled and runs at boot</string>
     <string name="pref_delay">Covered lock screen timeout</string>
     <string name="pref_delay_summary">When the cover is closed, the lock screen shows for this many milliseconds. If set to 0, or if you have no screen lock, the screen turns off immediately.</string>
-	<string name="pref_dim">Dim covered lock screen</string>
-	<string name="pref_dim_summary">When the cover is closed and the lock screen displays (see above), should the screen dim?</string>
-	<string name="pref_about">About Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor version 0.0.1.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+    <string name="pref_dim">Dim covered lock screen</string>
+    <string name="pref_dim_summary">When the cover is closed and the lock screen displays (see above), should the screen dim?</string>
+    <string name="pref_about">About Hall Monitor</string>
+    <string name="pref_about_summary">Hall Monitor version 0.0.1.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     
+    <!--  fullscreen activity -->
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
 </resources>
