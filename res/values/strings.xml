@@ -38,6 +38,6 @@
 	<string name="pref_dim">Dim covered lock screen</string>
 	<string name="pref_dim_summary">When the cover is closed and the lock screen displays (see above), should the screen dim?</string>
 	<string name="pref_about">About Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor version 0.0.1.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     
 </resources>

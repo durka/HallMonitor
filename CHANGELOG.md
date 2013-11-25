@@ -1,3 +1,9 @@
+- 0.0.2a
+    - Features
+        - Release checklist
+    - Fixes
+        - Forgot to update the strings for 0.0.2
+    - I'm new at this "shipping software" thing...
 - 0.0.2
     - Features
         - Icon (I made it myself, so it's libre)
