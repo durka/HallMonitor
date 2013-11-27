@@ -28,8 +28,11 @@ public class DefaultActivity extends Activity {
 				
 				Log.d("DA.onReceive", "Screen on event received.");
 				
-				if (!Functions.Is.cover_closed(context)) {
-					
+				if (Functions.Is.cover_closed(context)) {
+					Log.d("DA.onReceive", "Cover is closed, display Default Activity.");
+					//easiest way to do this is actually just to invoke the close_cover action as it does what we want
+					Functions.Actions.close_cover(getApplicationContext());
+				} else {
 					Log.d("DA.onReceive", "Cover is open, stopping Default Activity.");
 					
 					// when the cover opens, the fullscreen activity goes poof				

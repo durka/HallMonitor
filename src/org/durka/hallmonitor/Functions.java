@@ -27,8 +27,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 public class Functions {
@@ -57,6 +59,7 @@ public class Functions {
 			
 			//need this to let us lock the phone
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
+			//final PowerManager pm = (PowerManager)ctx.getSystemService(Context.POWER_SERVICE);
 
 			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 			if (!dpm.isAdminActive(me)) {
@@ -66,10 +69,11 @@ public class Functions {
 			}
 			
 		    // step 1: bring up the default activity window
+			//we are using the show when locked flag as we'll re-use this method to show the screen on power button press
             ctx.startActivity(new Intent(ctx, DefaultActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                            | Intent.FLAG_ACTIVITY_NO_ANIMATION));
-		    
+                            | Intent.FLAG_ACTIVITY_NO_ANIMATION
+                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED));
             
             //step 2: wait for the delay period and turn the screen off
             int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 2000);
@@ -80,7 +84,10 @@ public class Functions {
 				@Override
 				public void run() {	
 					Log.d("F.Act.close_cover", "Locking screen now.");
-					dpm.lockNow();	
+					dpm.lockNow();
+					//FIXME Would it be better to turn the screen off rather than actually locking
+					//presumably then it will auto lock as per phone configuration
+					//I can't work out how to do it though!
 				}
 			}, delay);
             
