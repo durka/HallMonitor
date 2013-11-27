@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -54,7 +57,9 @@ public class Functions {
 	
 	public static class Actions {
 		
-		private static Handler handler = new Handler();
+		//used for the timer to turn off the screen on a delay
+        private static Timer timer = new Timer();
+        private static TimerTask timerTask;
 		
 		public static void close_cover(Context ctx) {
 			
@@ -90,11 +95,16 @@ public class Functions {
                             | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED));
             
             //step 2: wait for the delay period and turn the screen off
-            int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 2000);
+            //FIXME Boosted the time delay to help with debugging, revert default to 2000 at some point
+            //(it needs to match the default on the UI as pref_delay isn't set to start with)
+            int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 20000);
             
             Log.d("F.Act.close_cover", "Delay set to: " + delay);
             
-			handler.postDelayed(new Runnable() {
+            
+            //using the handler is causing a problem, seems to lock up the app, hence replaced with a Timer
+            timer.schedule(timerTask = new TimerTask() {
+			//handler.postDelayed(new Runnable() {
 				@Override
 				public void run() {	
 					Log.d("F.Act.close_cover", "Locking screen now.");
@@ -126,7 +136,7 @@ public class Functions {
 			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
 			
 			// step 1: if we were going to turn the screen off, cancel that
-			handler.removeCallbacksAndMessages(null);
+			if (timerTask != null) timerTask.cancel();
 			
 			// step 2: wake the screen
 			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
