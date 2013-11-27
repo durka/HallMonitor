@@ -17,12 +17,12 @@ package org.durka.hallmonitor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
+import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -35,12 +35,24 @@ import android.widget.Toast;
 public class Functions {
 	
 	public static final int DEVICE_ADMIN_WAITING = 42;
-
+	
+	//needed for the call backs from the widget picker
+	//pick is the call back after picking a widget, configure is the call back after
+	//widget configuration
+	public static final int REQUEST_PICK_APPWIDGET = 9;
+	public static final int REQUEST_CONFIGURE_APPWIDGET = 5;
+	
+	//Class that handles interaction with 3rd party App Widgets
+	public static final HMAppWidgetManager hmAppWidgetManager = new HMAppWidgetManager();
+	
 	public static class Actions {
 		
 		private static Handler handler = new Handler();
 		
 		public static void close_cover(Context ctx) {
+			
+			Log.d("nw", "COVER CLOSE EVENT");
+			
 			Events.set_cover(true);
 			
 			KeyguardManager           kgm = (KeyguardManager)     ctx.getSystemService(Context.KEYGUARD_SERVICE);
@@ -53,19 +65,25 @@ public class Functions {
 				return;
 			}
 			
+		    // step 1: bring up the default activity window
+            ctx.startActivity(new Intent(ctx, DefaultActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_NO_ANIMATION));
+		    
+		    
 			// lock the screen, but keep it on for two seconds (but not if it was already off)
 			if (pm.isScreenOn()) {
 				
-				// step 1: bring up the fullscreen activity
-				ctx.startActivity(new Intent(ctx, FullscreenActivity.class)
-										.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-												| Intent.FLAG_ACTIVITY_NO_ANIMATION));
+				/*// step 1: lock the screen (and turn it off, FIXME seemingly unavoidable side effect)
+				if (!kgm.isKeyguardLocked()) {
+					dpm.lockNow();
+				}*/
 
 				// are we supposed to show the lock screen?
 				if (kgm.isKeyguardSecure()) {
 					int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 0);
 					if (delay > 0) {
-					
+					/*
 						// step 2: turn the screen back on (optionally with low brightness)
 						int flags = PowerManager.ACQUIRE_CAUSES_WAKEUP;
 						if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_dim", false)) {
@@ -75,12 +93,13 @@ public class Functions {
 						}
 						PowerManager.WakeLock wl = pm.newWakeLock(flags, ctx.getString(R.string.app_name));
 						wl.acquire(delay);
-		
+						*/
+					
 						// step 3: after the delay, if the cover is still closed, turn the screen off again
 						handler.postDelayed(new Runnable() {
 							@Override
-							public void run() {
-								dpm.lockNow();
+							public void run() {	
+								dpm.lockNow();	
 							}
 						}, delay);
 					
@@ -123,6 +142,29 @@ public class Functions {
 			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 			if (dpm.isAdminActive(me)) dpm.removeActiveAdmin(me);
 		}
+		
+		
+		/**
+		 * Hand off to the HMAppWidgetManager to deal with
+		 * @param act The Activity to use as the context for these actions
+		 * @param widgetType The type of widget (e.g. 'default', 'media', 'notification' etc.)
+		 */
+		public static void register_widget(Activity act, String widgetType) {
+			//hand off to the HM App Widget Manager for processing
+			hmAppWidgetManager.register_widget(act, widgetType);
+		}
+		
+		/**
+		 * Hand off to the HMAppWidgetManager to deal with
+		 * @param act The Activity to use as the context for these actions
+		 * @param widgetType The type of widget (e.g. 'default', 'media', 'notification' etc.)
+		 */
+		public static void unregister_widget(Activity act, String widgetType) {
+			//hand off to the HM App Widget Manager for processing
+			hmAppWidgetManager.unregister_widget(act, widgetType);
+		}
+		
+		
 
 	}
 
@@ -158,8 +200,48 @@ public class Functions {
 					Log.d("F-a_r", "pref_enabled = " + Boolean.toString(PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_enabled", true)));
 				}
 				break;
+
+			case REQUEST_PICK_APPWIDGET:
+				//widget picked
+				if (result == Activity.RESULT_OK) {
+					//widget chosen so launch configurator
+					hmAppWidgetManager.configureWidget(data, ctx);
+				} else {
+					//choose dialog cancelled so clean up
+					int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+			        if (appWidgetId != -1) {
+			        	hmAppWidgetManager.deleteAppWidgetId(appWidgetId);
+					}
+				}
+				break;		
+			case REQUEST_CONFIGURE_APPWIDGET:
+				//widget configured
+				if (result == Activity.RESULT_OK) {
+					//widget configured successfully so create it
+					hmAppWidgetManager.createWidget(data, ctx);
+				} else {
+					//configure dialog cancelled so clean up
+					int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+			        if (appWidgetId != -1) {
+			        	hmAppWidgetManager.deleteAppWidgetId(appWidgetId);
+					}
+				break;			
+			    }
+				
 			}
 		}
+			
+			
+			
+
+			
+			
+			
+			
+			
+				
+			
+			
 		
 		public static void device_admin_status(Context ctx, boolean admin) {
 			Toast.makeText(ctx, ctx.getString(admin ? R.string.admin_granted : R.string.admin_revoked), Toast.LENGTH_SHORT).show();
@@ -230,6 +312,18 @@ public class Functions {
 			// the service must not be running
 			return false;
 		}
+		
+		
+		/**
+		 * Is the default widget enabled
+		 * @param ctx Application context
+		 * @return True if it is, False if not
+		 */
+		public static boolean default_widget_enabled(Context ctx) {
+			return (Functions.hmAppWidgetManager.getAppWidgetHostViewByType("default") != null);
+		}
+		
+		
 	}
 
 }

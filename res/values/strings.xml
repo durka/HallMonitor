@@ -13,7 +13,7 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License.
 -->
 
 <resources>
@@ -37,10 +37,13 @@
     <string name="pref_delay_summary">When the cover is closed, the lock screen shows for this many milliseconds. If set to 0, or if you have no screen lock, the screen turns off immediately.</string>
     <string name="pref_dim">Dim covered lock screen</string>
     <string name="pref_dim_summary">When the cover is closed and the lock screen displays (see above), should the screen dim?</string>
+    <string name="pref_default_widget">Widget Enable</string>
+    <string name="pref_default_widget_summary">Whether to use a 3rd party widget inside the cover window as the default view</string>
     <string name="pref_about">About Hall Monitor</string>
     <string name="pref_about_summary">Hall Monitor version 0.0.1.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
-    
-    <!--  fullscreen activity -->
+    <string name="title_activity_window">WindowActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
