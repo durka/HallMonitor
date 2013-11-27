@@ -51,17 +51,21 @@ public class Functions {
 		
 		public static void close_cover(Context ctx) {
 			
-			Log.d("nw", "COVER CLOSE EVENT");
+			Log.d("F.Act.close_cover", "Close cover event receieved.");
 			
+			//save the cover state
 			Events.set_cover(true);
 			
-			KeyguardManager           kgm = (KeyguardManager)     ctx.getSystemService(Context.KEYGUARD_SERVICE);
+			//some objects we need to interact with the phone state
+			//KeyguardManager           kgm = (KeyguardManager)     ctx.getSystemService(Context.KEYGUARD_SERVICE);
 			PowerManager              pm  = (PowerManager)        ctx.getSystemService(Context.POWER_SERVICE);
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
+			
 			
 			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 			if (!dpm.isAdminActive(me)) {
 				// if we're not an admin, we can't do anything
+				Log.d("F.Act.close_cover", "We are not an admin so cannot do anything.");
 				return;
 			}
 			
@@ -70,47 +74,30 @@ public class Functions {
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                             | Intent.FLAG_ACTIVITY_NO_ANIMATION));
 		    
-		    
-			// lock the screen, but keep it on for two seconds (but not if it was already off)
-			if (pm.isScreenOn()) {
-				
-				/*// step 1: lock the screen (and turn it off, FIXME seemingly unavoidable side effect)
-				if (!kgm.isKeyguardLocked()) {
-					dpm.lockNow();
-				}*/
-
-				// are we supposed to show the lock screen?
-				if (kgm.isKeyguardSecure()) {
-					int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 0);
-					if (delay > 0) {
-					/*
-						// step 2: turn the screen back on (optionally with low brightness)
-						int flags = PowerManager.ACQUIRE_CAUSES_WAKEUP;
-						if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_dim", false)) {
-							flags |= PowerManager.SCREEN_DIM_WAKE_LOCK;
-						} else {
-							flags |= PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
-						}
-						PowerManager.WakeLock wl = pm.newWakeLock(flags, ctx.getString(R.string.app_name));
-						wl.acquire(delay);
-						*/
-					
-						// step 3: after the delay, if the cover is still closed, turn the screen off again
-						handler.postDelayed(new Runnable() {
-							@Override
-							public void run() {	
-								dpm.lockNow();	
-							}
-						}, delay);
-					
-					}
+            
+            //step 2: wait for the delay period and turn the screen off
+            int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 2000);
+            
+            Log.d("F.Act.close_cover", "Delay set to: " + delay);
+            
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {	
+					Log.d("F.Act.close_cover", "Locking screen now.");
+					dpm.lockNow();	
 				}
-			}
+			}, delay);
+            
 		}
 		
 		public static void open_cover(Context ctx) {
+			
+			Log.d("F.Act.open_cover", "Open cover event receieved.");
+			
+			//save the cover state
 			Events.set_cover(false);
 			
+			//needed to let us wake the screen
 			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
 			
 			// step 1: if we were going to turn the screen off, cancel that
@@ -320,7 +307,12 @@ public class Functions {
 		 * @return True if it is, False if not
 		 */
 		public static boolean default_widget_enabled(Context ctx) {
-			return (Functions.hmAppWidgetManager.getAppWidgetHostViewByType("default") != null);
+			
+			boolean widgetEnabled = (Functions.hmAppWidgetManager.getAppWidgetHostViewByType("default") != null);
+			
+			Log.d("F.Is.def_wid_enabled","Default widget enabled state is: " + widgetEnabled);
+			
+			return widgetEnabled;
 		}
 		
 		

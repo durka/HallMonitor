@@ -41,11 +41,11 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    		.edit()
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
 	    		.commit();
-	    /*
+	    
 	    getPreferenceManager().getSharedPreferences()
 				.edit()
 				.putBoolean("pref_default_widget_enabled", Functions.Is.default_widget_enabled(getActivity()))
-				.commit();*/
+				.commit();
 	}
 
 	@Override
