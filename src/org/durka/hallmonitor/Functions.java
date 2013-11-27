@@ -14,8 +14,14 @@
  */
 package org.durka.hallmonitor;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -57,10 +63,18 @@ public class Functions {
 			//save the cover state
 			Events.set_cover(true);
 			
+			//if we are running in root enabled mode then lets up the sensitivity on the view screen
+			//so we can use the screen through the window
+			 if (Functions.Events.rootEnabled) {
+				 Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
+				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,1 > cmd"});
+				 Log.d("F.Act.close_cover", "...Sensitivity boosted, hold onto your hats!");
+			 }
+			
 			//need this to let us lock the phone
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
 			//final PowerManager pm = (PowerManager)ctx.getSystemService(Context.POWER_SERVICE);
-
+			
 			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 			if (!dpm.isAdminActive(me)) {
 				// if we're not an admin, we can't do anything
@@ -99,6 +113,14 @@ public class Functions {
 			
 			//save the cover state
 			Events.set_cover(false);
+			
+			//if we are running in root enabled mode then lets revert the sensitivity on the view screen
+			//so we can use the device as normal
+			 if (Functions.Events.rootEnabled) {
+				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
+				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd"});
+				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
+			 }
 			
 			//needed to let us wake the screen
 			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
@@ -155,12 +177,64 @@ public class Functions {
 		}
 		
 		
+		/**
+		 * Execute shell commands
+		 * @param cmds Commands to execute
+		 */
+		public static void run_commands_as_root(String[] cmds) {
+	        try {
+	        	Process p = Runtime.getRuntime().exec("su");
+	        	
+	        	//create output stream for running commands
+	            DataOutputStream os = new DataOutputStream(p.getOutputStream());  
+	            
+	            //tap into the output
+	            InputStream is = p.getInputStream();
+	            BufferedReader isBr = new BufferedReader(new InputStreamReader(is));
+	            
+	            //tap into the error output
+	            InputStream es = p.getErrorStream();
+	            BufferedReader esBr = new BufferedReader(new InputStreamReader(es));
+	            
+	            //use this for collating the output
+	            String currentLine;
+	            
+	            //run commands
+	            for (String tmpCmd : cmds) {
+	            	Log.d("F.Act.run_comm_as_root", "Running command: " + tmpCmd);
+                    os.writeBytes(tmpCmd+"\n");
+	            }      
+	            os.writeBytes("exit\n");  
+	            os.flush();
+	            
+	            //log out the output
+	            String output = "";
+	            while ((currentLine = isBr.readLine()) != null) {
+	              output += currentLine + "\n";
+	            } 
+	            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
+           
+	            //log out the error output
+	            String error = "";
+	            currentLine = "";
+	            while ((currentLine = esBr.readLine()) != null) {
+	              error += currentLine + "\n";
+	            }	           
+	            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
+
+	        } catch (IOException ioe) {
+	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
+	        }
+		}
+		
+		
 
 	}
 
 	public static class Events {
 		
 		private static boolean cover_closed;
+		public static boolean rootEnabled = false;
 		
 		public static void boot(Context ctx) {
 			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_enabled", false)) {
@@ -276,6 +350,9 @@ public class Functions {
 	}
 	
 	public static class Is {
+		
+		
+		
 		public static boolean cover_closed(Context ctx) {
 			
 			String status = "";

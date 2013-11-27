@@ -46,6 +46,11 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				.edit()
 				.putBoolean("pref_default_widget_enabled", Functions.Is.default_widget_enabled(getActivity()))
 				.commit();
+	    
+	    getPreferenceManager().getSharedPreferences()
+				.edit()
+				.putBoolean("pref_runasroot_enabled", Functions.Events.rootEnabled)
+				.commit();
 	}
 
 	@Override
@@ -88,6 +93,17 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				Functions.Actions.register_widget(getActivity(), "default");
 			} else {
 				Functions.Actions.unregister_widget(getActivity(), "default");
+			}
+				
+			// if the default screen widget is being enabled/disabled the key will be pref_widget	
+		} else if (key.equals("pref_runasroot")) {
+				
+			if (prefs.getBoolean(key, false)) {
+				Functions.Actions.run_commands_as_root(new String[]{"whoami"});
+				Functions.Events.rootEnabled = true;
+			} else {
+				//Functions.Actions.unregister_widget(getActivity(), "default");
+				Functions.Events.rootEnabled = false;
 			}
 				
 		}

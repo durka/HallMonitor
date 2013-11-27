@@ -42,6 +42,12 @@
         android:defaultValue="true" />
     
     <CheckBoxPreference
+        android:key="pref_runasroot"
+        android:title="@string/pref_runasroot"
+        android:summary="@string/pref_runasroot_summary"
+        android:defaultValue="false" />
+    
+    <CheckBoxPreference
         android:key="pref_default_widget"
         android:title="@string/pref_default_widget"
         android:summary="@string/pref_default_widget_summary"
