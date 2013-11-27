@@ -41,6 +41,11 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    		.edit()
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
 	    		.commit();
+	    /*
+	    getPreferenceManager().getSharedPreferences()
+				.edit()
+				.putBoolean("pref_default_widget_enabled", Functions.Is.default_widget_enabled(getActivity()))
+				.commit();*/
 	}
 
 	@Override
@@ -53,6 +58,10 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    //        .unregisterOnSharedPreferenceChangeListener(this);
 	}
 
+	/**
+	 * Call back handler for when a change is detected in one of the preferences
+	 * Note that all actions aere delegated into the Functions.Actions Class.
+	 */
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 		
@@ -63,7 +72,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 			((CheckBoxPreference)findPreference(key)).setChecked(prefs.getBoolean(key, false));
 		}
 		
-		// perform actions
+		// if the service is being enabled/disabled the key will be pref_enabled 
 		if (key.equals("pref_enabled")) {
 			
 			if (prefs.getBoolean(key, false)) {
@@ -72,6 +81,15 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				Functions.Actions.stop_service(getActivity());
 			}
 			
+		// if the default screen widget is being enabled/disabled the key will be pref_widget	
+		} else if (key.equals("pref_default_widget")) {
+				
+			if (prefs.getBoolean(key, false)) {
+				Functions.Actions.register_widget(getActivity(), "default");
+			} else {
+				Functions.Actions.unregister_widget(getActivity(), "default");
+			}
+				
 		}
 	}
 

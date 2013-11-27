@@ -41,6 +41,12 @@
         android:dependency="pref_delay"
         android:defaultValue="true" />
     
+    <CheckBoxPreference
+        android:key="pref_default_widget"
+        android:title="@string/pref_default_widget"
+        android:summary="@string/pref_default_widget_summary"
+        android:defaultValue="false" />
+    
     <Preference
         android:title=""
         android:summary=""
