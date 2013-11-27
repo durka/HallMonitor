@@ -28,16 +28,15 @@ If you test this on something other than the above (including another carrier's 
 
 Installation / Usage
 --------------------
-The current release is: [0.0.2](https://github.com/durka/HallMonitor/tree/0.0.2) (see [changelog](https://github.com/durka/HallMonitor/blob/master/CHANGELOG.md))
+The current release is: [0.0.2a](https://github.com/durka/HallMonitor/tree/0.0.2a) (see [changelog](https://github.com/durka/HallMonitor/blob/master/CHANGELOG.md))
 
 - I will be submitting the app to F-Droid. This should be by far the easiest way to install. I'll update here once there is a link.
-- You can download [`bin/HallMonitor.apk`](https://github.com/durka/HallMonitor/blob/0.0.2/bin/HallMonitor.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
+- You can download [`bin/HallMonitor.apk`](https://github.com/durka/HallMonitor/blob/0.0.2a/bin/HallMonitor.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
 - You can clone the repository at a tagged version and build from source. It's configured as an Eclipse project, but I haven't even used any external libraries yet, so it "should" be "simple" to build with another system such as Android Studio or ant.
 
 Limitations / Known Issues
 --------------------------
 - Little Things
-    - When you activate the view cover service, Hall Monitor asks for admin permissions. But if you click Cancel, it doesn't notice, and it will crash when you close the cover. This is easy to fix and will be in 0.0.2.
     - I don't know how to make the lockscreen come up without turning the screen off and back on. So, currently, I turn the screen off and back on.
     - If you don't have any security turned on (i.e. pattern or PIN), then there is no lockscreen and so my only choice is to turn off the screen as soon as you close the cover (by the way, you can configure this behavior even if you do have a lockscreen set up).
 - Bigger Things
