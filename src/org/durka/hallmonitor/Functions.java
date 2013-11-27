@@ -20,7 +20,6 @@ import java.util.Scanner;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -56,12 +55,9 @@ public class Functions {
 			//save the cover state
 			Events.set_cover(true);
 			
-			//some objects we need to interact with the phone state
-			//KeyguardManager           kgm = (KeyguardManager)     ctx.getSystemService(Context.KEYGUARD_SERVICE);
-			PowerManager              pm  = (PowerManager)        ctx.getSystemService(Context.POWER_SERVICE);
+			//need this to let us lock the phone
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
-			
-			
+
 			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 			if (!dpm.isAdminActive(me)) {
 				// if we're not an admin, we can't do anything
@@ -308,7 +304,7 @@ public class Functions {
 		 */
 		public static boolean default_widget_enabled(Context ctx) {
 			
-			boolean widgetEnabled = (Functions.hmAppWidgetManager.getAppWidgetHostViewByType("default") != null);
+			boolean widgetEnabled = Functions.hmAppWidgetManager.doesWidgetExist("default");
 			
 			Log.d("F.Is.def_wid_enabled","Default widget enabled state is: " + widgetEnabled);
 			

@@ -200,7 +200,7 @@ public class HMAppWidgetManager {
 		
 		Log.d("HMAWM.doesWidgetExist","Checking for Widget of type: " + widgetType);
 		
-		return (widgetsMap.get(widgetType) == null);
+		return (widgetsMap.get(widgetType) != null);
 	}
 	
 }

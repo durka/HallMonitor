@@ -61,31 +61,40 @@ public class DefaultActivity extends Activity {
 
 	    RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
 	    
-	    AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType("default");
-	    
-	    //if the view already has a parent then we need to detach it
-	    ViewGroup parent = (ViewGroup)hostView.getParent();
-	    if ( parent != null) {
-
-	    	Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
+	    //if we have a default app widget to use then display that, if not then display our default clock screen
+	    //(which is part of the default layout so will show anyway)
+	    if (hmAppWidgetManager.doesWidgetExist("default")) {
 	    	
-	    	parent.removeView(hostView);
-	    } 
-	    
-	    contentView.addView(hostView);
+	    	//remove the TextClock from the contentview
+		    contentView.removeAllViews();
+	    	
+	    	//get the widget
+		    AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType("default");
+		    
+		    //if the widget host view already has a parent then we need to detach it
+		    ViewGroup parent = (ViewGroup)hostView.getParent();
+		    if ( parent != null) {
+		    	Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
+		    
+		    	parent.removeView(hostView);
+		    }    
+		    
+		    //add the widget to the view
+		    contentView.addView(hostView);
+	    }
 	}  
 
 	@Override
 	protected void onStart() {
 	    super.onStart();
 	    //start our widget listening - FIXME this might need sorting out once using multiple app widgets
-	    hmAppWidgetManager.mAppWidgetHost.startListening();
+	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.startListening();
 	}
 	@Override
 	protected void onStop() {
 	    super.onStop();
 	    //stop our widget listening - FIXME this might need sorting out once using multiple app widgets
-	    hmAppWidgetManager.mAppWidgetHost.stopListening();
+	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.stopListening();
 	}
 	
 	@Override
