@@ -1,5 +1,7 @@
 package org.durka.hallmonitor;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
@@ -7,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -40,7 +44,35 @@ public class DefaultActivity extends Activity {
 					// when the cover opens, the fullscreen activity goes poof				
 					moveTaskToBack(true);
 				}
-			} 
+			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
+				if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+					Log.d("VCS", "call from " + intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
+					if (Functions.Is.cover_closed(context)) {
+						Log.d("VCS", "but the screen is closed. screen my calls");
+						
+						new Handler().postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								Process process;
+								try {
+									process = Runtime.getRuntime().exec(new String[]{ "su","-c","input keyevent 5"});
+									process.waitFor();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							    
+							}
+						}, 500);
+						
+					}
+				} else {
+					Log.d("VCS", "phone state changed to " + intent.getStringExtra(TelephonyManager.EXTRA_STATE));
+				}
+			}
 		}
 	};
 

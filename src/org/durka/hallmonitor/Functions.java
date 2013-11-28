@@ -202,6 +202,7 @@ public class Functions {
 			Log.d("F.Act.stop_service", "Stop service called.");
 			
 			ctx.stopService(new Intent(ctx, ViewCoverService.class));
+			ctx.stopService(new Intent(ctx, NotificationService.class));
 			
 			// Relinquish device admin
 			DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
