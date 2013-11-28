@@ -25,6 +25,9 @@ public class Configuration extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+        Functions.configurationActivity = this;
+        
 		setContentView(R.layout.activity_configuration);
 		
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);

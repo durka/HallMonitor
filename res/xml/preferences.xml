@@ -31,8 +31,8 @@
 	    android:summary="@string/pref_delay_summary"
 	    android:dependency="pref_enabled"
 	    android:dialogMessage="@string/pref_delay_summary"
-        android:defaultValue="2000"
-        android:max="5000"/>
+        android:defaultValue="10000"
+        android:max="30000"/>
     
     <CheckBoxPreference
         android:key="pref_dim"
