@@ -103,10 +103,12 @@ public class Functions {
 			
 		    // step 1: bring up the default activity window
 			//we are using the show when locked flag as we'll re-use this method to show the screen on power button press
-            ctx.startActivity(new Intent(ctx, DefaultActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                            | Intent.FLAG_ACTIVITY_NO_ANIMATION
-                            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED));
+			if (!DefaultActivity.on_screen) {
+				ctx.startActivity(new Intent(ctx, DefaultActivity.class)
+										.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+												| Intent.FLAG_ACTIVITY_NO_ANIMATION
+												| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED));
+			}
             
             //step 2: wait for the delay period and turn the screen off
             int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000);

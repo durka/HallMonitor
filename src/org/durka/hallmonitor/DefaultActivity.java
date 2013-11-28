@@ -20,6 +20,8 @@ import android.widget.RelativeLayout;
 public class DefaultActivity extends Activity {
 	private HMAppWidgetManager hmAppWidgetManager = Functions.hmAppWidgetManager;
 	
+	public static boolean on_screen;
+	
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
@@ -94,12 +96,14 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onStart() {
 	    super.onStart();
+	    on_screen = true;
 	    //start our widget listening - FIXME this might need sorting out once using multiple app widgets
 	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.startListening();
 	}
 	@Override
 	protected void onStop() {
 	    super.onStop();
+	    on_screen = false;
 	    //stop our widget listening - FIXME this might need sorting out once using multiple app widgets
 	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.stopListening();
 	}
