@@ -56,6 +56,7 @@ public class Functions {
 	public static final HMAppWidgetManager hmAppWidgetManager = new HMAppWidgetManager();
 	
 	public static DefaultActivity defaultActivity;
+	public static Configuration configurationActivity;
 	
 	/**
 	 * Provides methods for performing actions. (e.g. what to do when the cover is opened and closed etc.)
@@ -140,6 +141,9 @@ public class Functions {
 			
 			Log.d("F.Act.open_cover", "Open cover event receieved.");
 			
+			//we don't want the configuration screen displaying when we wake back up
+			if (configurationActivity != null) configurationActivity.moveTaskToBack(true);
+			
 			//save the cover state
 			Events.set_cover(false);
 			
@@ -164,7 +168,7 @@ public class Functions {
 	        wl.release();
 	        
 	        //kill the default activity
-	        if (defaultActivity != null)  defaultActivity.finish();
+	        if (defaultActivity != null)  defaultActivity.moveTaskToBack(true);;
 		}
 
 		

@@ -25,7 +25,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);      
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
@@ -61,8 +61,8 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    // don't unregister, because we still want to receive the notification when
 	    // pref_enabled is changed in onActivityResult
 	    // FIXME is it okay to just never unregister??
-	    //getPreferenceManager().getSharedPreferences()
-	    //        .unregisterOnSharedPreferenceChangeListener(this);
+	    getPreferenceManager().getSharedPreferences()
+	            .unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	/**

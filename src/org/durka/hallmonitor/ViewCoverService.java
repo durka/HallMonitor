@@ -32,11 +32,13 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d("VCS.onStartCommand", "View cover service started");
 		
-		if (Functions.Is.cover_closed(this)) {
+		//We don't want to do this - almost by defninition the cover can't be closed, and we don't actually want to do any open cover functionality
+		//until the cover is closed and then opened again
+		/*if (Functions.Is.cover_closed(this)) {
 			Functions.Actions.close_cover(this);
 		} else {
 			Functions.Actions.open_cover(this);
-		}
+		} */
 		
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		

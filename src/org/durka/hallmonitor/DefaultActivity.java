@@ -36,7 +36,7 @@ public class DefaultActivity extends Activity {
 					Log.d("DA.onReceive", "Cover is open, stopping Default Activity.");
 					
 					// when the cover opens, the fullscreen activity goes poof				
-					finish();
+					moveTaskToBack(true);
 				}
 			} 
 		}
@@ -48,7 +48,7 @@ public class DefaultActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		//pass a reference back to the Functions class so it can finish us when it wants to
-		//FIXME Presumably there is a more 'proper' way to do this!
+		//FIXME Presumably there is a 
 		Functions.defaultActivity = this;
 		
 		Log.d("DA.onCreate", "onCreate of DefaultView.");
