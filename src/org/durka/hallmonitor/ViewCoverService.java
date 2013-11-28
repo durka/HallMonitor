@@ -15,10 +15,7 @@
 package org.durka.hallmonitor;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -31,24 +28,9 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	
 	private SensorManager       mSensorManager;
 	
-	private final BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-				if (Functions.Is.cover_closed(context)) {
-					
-					// if the screen is turned on with the cover closed, treat it as a close event
-					// (mainly, turn off after 2 seconds instead of waiting the full timeout)
-					
-					Functions.Actions.close_cover(context);
-				}
-			} 
-		}
-	};
-	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d(getString(R.string.app_name), "service started");
+		Log.d("VCS.onStartCommand", "View cover service started");
 		
 		if (Functions.Is.cover_closed(this)) {
 			Functions.Actions.close_cover(this);
@@ -56,14 +38,10 @@ public class ViewCoverService extends Service implements SensorEventListener {
 			Functions.Actions.open_cover(this);
 		}
 		
-		mSensorManager       = (SensorManager)       getSystemService(SENSOR_SERVICE);
+		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		
 		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_NORMAL);
-		
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_SCREEN_ON);
-		registerReceiver(receiver, filter);
-		
+
 		return START_STICKY;
 	}
 	
@@ -74,21 +52,23 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	
 	@Override
 	public void onDestroy() {
-		Log.d(getString(R.string.app_name), "service stopped");
+		Log.d("VCS.onStartCommand", "View cover service stopped");
 		
-		unregisterReceiver(receiver);
+		//unregisterReceiver(receiver);
 		mSensorManager.unregisterListener(this);
 	}
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// I don't care
+		Log.d("VCS.onAccuracyChanged", "OnAccuracyChanged: Sensor=" + sensor.getName() + ", accuracy=" + accuracy);
 	}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		
 		if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {	
+			Log.d("VCS.onSensorChanged", "Proximity sensor changed, value=" + event.values[0]);
 			Functions.Events.proximity(this, event.values[0]);
 		}
 	}

@@ -47,6 +47,10 @@ public class DefaultActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		//pass a reference back to the Functions class so it can finish us when it wants to
+		//FIXME Presumably there is a more 'proper' way to do this!
+		Functions.defaultActivity = this;
+		
 		Log.d("DA.onCreate", "onCreate of DefaultView.");
 		
 		//Remove title bar

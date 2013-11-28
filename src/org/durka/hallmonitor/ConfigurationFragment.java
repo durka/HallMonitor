@@ -34,8 +34,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onResume() {
 	    super.onResume();
-	    getPreferenceManager().getSharedPreferences()
-	            .registerOnSharedPreferenceChangeListener(this);
+	    
 	    
 	    getPreferenceManager().getSharedPreferences()
 	    		.edit()
@@ -51,6 +50,9 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				.edit()
 				.putBoolean("pref_runasroot_enabled", Functions.Events.rootEnabled)
 				.commit();
+	    
+	    getPreferenceManager().getSharedPreferences()
+        	.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
