@@ -118,8 +118,7 @@ public class DefaultActivity extends Activity {
 		    ViewGroup parent = (ViewGroup)hostView.getParent();
 		    if ( parent != null) {
 		    	Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
-		    
-		    	parent.removeView(hostView);
+		       	parent.removeView(hostView);
 		    }    
 		    
 		    //add the widget to the view
@@ -134,14 +133,14 @@ public class DefaultActivity extends Activity {
 	    super.onStart();
 	    on_screen = true;
 	    //start our widget listening - FIXME this might need sorting out once using multiple app widgets
-	    if (hmAppWidgetManager.doesWidgetExist("default")  || hmAppWidgetManager.doesWidgetExist("media")) hmAppWidgetManager.mAppWidgetHost.startListening();
+	    //if (hmAppWidgetManager.doesWidgetExist("default")  || hmAppWidgetManager.doesWidgetExist("media")) hmAppWidgetManager.mAppWidgetHost.startListening();
 	}
 	@Override
 	protected void onStop() {
 	    super.onStop();
 	    on_screen = false;
 	    //stop our widget listening - FIXME this might need sorting out once using multiple app widgets
-	    if (hmAppWidgetManager.doesWidgetExist("default")  || hmAppWidgetManager.doesWidgetExist("media")) hmAppWidgetManager.mAppWidgetHost.stopListening();
+	    //if (hmAppWidgetManager.doesWidgetExist("default")  || hmAppWidgetManager.doesWidgetExist("media")) hmAppWidgetManager.mAppWidgetHost.stopListening();
 	}
 	
 	@Override
