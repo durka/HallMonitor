@@ -53,6 +53,12 @@
         android:summary="@string/pref_default_widget_summary"
         android:defaultValue="false" />
     
+    <CheckBoxPreference
+        android:key="pref_do_notifications"
+        android:title="When closed: notifications"
+        android:summary="TODO"
+        android:defaultValue="false" />
+    
     <Preference
         android:title=""
         android:summary=""

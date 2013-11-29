@@ -8,13 +8,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources.NotFoundException;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
+import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 
 /**
@@ -128,13 +137,66 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onStart() {
 	    super.onStart();
+	    Log.d("DA-oS", "starting");
 	    on_screen = true;
 	    //start our widget listening - FIXME this might need sorting out once using multiple app widgets
 	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.startListening();
+	    
+	    if (NotificationService.that != null) {
+	    	// notification listener service is running, show the current notifications
+	    	// TODO move this to Functions.java
+	    	final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
+	    	Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
+	    	final GridView grid = (GridView)findViewById(R.id.default_icon_container);
+	    	final Context that = this;
+	    	grid.setNumColumns(notifs.length);
+	    	grid.setAdapter(new BaseAdapter() {
+
+				@Override
+				public int getCount() {
+					return notifs.length;
+				}
+
+				@Override
+				public Object getItem(int position) {
+					return null;
+				}
+
+				@Override
+				public long getItemId(int position) {
+					return 0;
+				}
+				
+				@Override
+				public View getView(int position, View convert, ViewGroup parent) {
+					ImageView view;
+					if (convert != null) {
+						view = (ImageView)convert;
+					} else {
+						view = new ImageView(that);
+						view.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT));
+						view.setScaleType(ImageView.ScaleType.FIT_CENTER);
+			            view.setPadding(0, 0, 0, 0);
+			            try {
+							view.setImageDrawable(that.createPackageContext(notifs[position].getPackageName(), 0).getResources().getDrawable(notifs[position].getNotification().icon));
+						} catch (NotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (NameNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+					return view;
+				}	    		
+	    	});
+	    }
 	}
 	@Override
 	protected void onStop() {
 	    super.onStop();
+	    Log.d("DA-oS", "stopping");
 	    on_screen = false;
 	    //stop our widget listening - FIXME this might need sorting out once using multiple app widgets
 	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.stopListening();

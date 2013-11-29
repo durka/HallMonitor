@@ -19,19 +19,30 @@
         android:textColor="#33b5e5"
         android:textSize="50sp"
         android:textStyle="bold">
-    
+
        <TextClock
-        android:id="@+id/default_text_clock"
-        android:background="@drawable/rounded"
+           android:id="@+id/default_text_clock"
+           android:layout_width="310dp"
+           android:layout_height="75dp"
+           android:layout_alignParentTop="true"
+           android:layout_centerHorizontal="true"
+           android:background="@drawable/rounded"
+           android:gravity="center"
+           android:keepScreenOn="true"
+           android:textColor="#33b5e5"
+           android:textSize="50sp"
+           android:textStyle="bold" />
+              
+       <GridView
+        android:id="@+id/default_icon_container"
         android:layout_width="310dp"
-        android:layout_height="125dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold" />
+        android:layout_height="50dp"
+        android:layout_below="@id/default_text_clock"
+        android:padding="0dp"
+        android:layout_margin="0dp"
+		android:horizontalSpacing="4dp"
+		android:columnWidth="24dp"
+		android:numColumns="0" />
+
 	</RelativeLayout>
 </RelativeLayout>

@@ -14,6 +14,9 @@
  */
 package org.durka.hallmonitor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -27,7 +30,21 @@ import android.service.notification.StatusBarNotification;
 
 
 public class NotificationService extends NotificationListenerService {
-
+	
+	public static NotificationService that = null;
+	
+	@Override
+	public void onCreate() {
+		Log.d("NS-oC", "ohai");
+		that = this;
+	}
+	
+	@Override
+	public void onDestroy() {
+		Log.d("NS-oD", "kthxbai");
+		that = null;
+	}
+	
 	@Override
 	public void onNotificationPosted(StatusBarNotification sbn) {
 		Log.d("NS-oNP", "notification posted: " + sbn.toString());
@@ -35,8 +52,7 @@ public class NotificationService extends NotificationListenerService {
 
 	@Override
 	public void onNotificationRemoved(StatusBarNotification sbn) {
-		// TODO Auto-generated method stub
-		
+		Log.d("NS-oNR", "notification removed: " + sbn.toString());
 	}
 	
 	

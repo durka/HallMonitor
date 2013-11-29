@@ -14,12 +14,14 @@
  */
 package org.durka.hallmonitor;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
+import android.widget.Toast;
 
 public class ConfigurationFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
 	
@@ -108,6 +110,15 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				Functions.Events.rootEnabled = false;
 			}
 				
+		} else if (key.equals("pref_do_notifications")) {
+			startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+			if (prefs.getBoolean(key, false)) {
+				Toast.makeText(getActivity(), "check this box then", Toast.LENGTH_SHORT).show();
+				//getActivity().startService(new Intent(getActivity(), NotificationService.class));
+			} else {
+				Toast.makeText(getActivity(), "okay uncheck the box", Toast.LENGTH_SHORT).show();
+				//getActivity().startService(new Intent(getActivity(), NotificationService.class));
+			}
 		}
 	}
 
