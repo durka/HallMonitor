@@ -14,6 +14,9 @@
  */
 package org.durka.hallmonitor;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -72,6 +75,17 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {	
 			Log.d("VCS.onSensorChanged", "Proximity sensor changed, value=" + event.values[0]);
 			Functions.Events.proximity(this, event.values[0]);
+			
+			//improve reliability by refiring the event 200ms afterwards
+			final float val = event.values[0];
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {	
+					Functions.Events.proximity(getApplicationContext(), val);
+				}
+			}, 200);
+			
 		}
 	}
 
