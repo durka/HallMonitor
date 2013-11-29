@@ -109,7 +109,7 @@ public class DefaultActivity extends Activity {
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		registerReceiver(receiver, filter);
 
-	    RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
+	    RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
 	    
 	    //if we have a default app widget to use then display that, if not then display our default clock screen
 	    //(which is part of the default layout so will show anyway)
