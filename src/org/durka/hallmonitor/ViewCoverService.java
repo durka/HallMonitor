@@ -86,6 +86,13 @@ public class ViewCoverService extends Service implements SensorEventListener {
 				}
 			}, 200);
 			
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {	
+					Functions.Events.proximity(getApplicationContext(), val);
+				}
+			}, 500);
+			
 		}
 	}
 
