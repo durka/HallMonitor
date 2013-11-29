@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -21,6 +22,9 @@ public class DefaultActivity extends Activity {
 	private HMAppWidgetManager hmAppWidgetManager = Functions.hmAppWidgetManager;
 	
 	public static boolean on_screen;
+	
+	//audio manager to detect media state
+	private AudioManager audioManager;
 	
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -40,7 +44,14 @@ public class DefaultActivity extends Activity {
 					// when the cover opens, the fullscreen activity goes poof				
 					moveTaskToBack(true);
 				}
-			} 
+			}/* else if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
+				
+				Log.d("DA.onReceive", "Headphone plug event detected with state: " + intent.getIntsExtra("state",-1));
+				if (intent.getIntExtra("state",0) == 0) isHeadphonesConnected = false;
+				else isHeadphonesConnected = true;
+				
+			}*/
+			
 		}
 	};
 
@@ -48,9 +59,12 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		//get the audio manager
+		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 		
 		//pass a reference back to the Functions class so it can finish us when it wants to
-		//FIXME Presumably there is a 
+		//FIXME Presumably there is a better way to do this
 		Functions.defaultActivity = this;
 		
 		Log.d("DA.onCreate", "onCreate of DefaultView.");
@@ -61,24 +75,44 @@ public class DefaultActivity extends Activity {
 		//Remove notification bar
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+		//set default view
 		setContentView(R.layout.activity_default);
 		
+		//add screen on intent receiver
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		registerReceiver(receiver, filter);
 
+	}  
+
+	@SuppressWarnings("deprecation")
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		Log.d("DA.onResume", "On resume called.");
+
+		//get the layout for the windowed view
 	    RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
 	    
+	    //if we have a media app widget and media is playing or headphones are connected then display that, otherwise
 	    //if we have a default app widget to use then display that, if not then display our default clock screen
 	    //(which is part of the default layout so will show anyway)
-	    if (hmAppWidgetManager.doesWidgetExist("default")) {
+	    //will do this simply by setting the widgetType
+	    String widgetType = "default";
+	    if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
+	    	widgetType = "media";
+	    }
+	    
+	    //add the required widget based on the widgetType
+	    if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
 	    	
 	    	//remove the TextClock from the contentview
 		    contentView.removeAllViews();
 	    	
 	    	//get the widget
-		    AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType("default");
+		    AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
 		    
 		    //if the widget host view already has a parent then we need to detach it
 		    ViewGroup parent = (ViewGroup)hostView.getParent();
@@ -91,21 +125,23 @@ public class DefaultActivity extends Activity {
 		    //add the widget to the view
 		    contentView.addView(hostView);
 	    }
-	}  
-
+		
+		
+	}
+	
 	@Override
 	protected void onStart() {
 	    super.onStart();
 	    on_screen = true;
 	    //start our widget listening - FIXME this might need sorting out once using multiple app widgets
-	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.startListening();
+	    if (hmAppWidgetManager.doesWidgetExist("default")  || hmAppWidgetManager.doesWidgetExist("media")) hmAppWidgetManager.mAppWidgetHost.startListening();
 	}
 	@Override
 	protected void onStop() {
 	    super.onStop();
 	    on_screen = false;
 	    //stop our widget listening - FIXME this might need sorting out once using multiple app widgets
-	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.stopListening();
+	    if (hmAppWidgetManager.doesWidgetExist("default")  || hmAppWidgetManager.doesWidgetExist("media")) hmAppWidgetManager.mAppWidgetHost.stopListening();
 	}
 	
 	@Override

@@ -53,6 +53,12 @@
         android:summary="@string/pref_default_widget_summary"
         android:defaultValue="false" />
     
+    <CheckBoxPreference
+        android:key="pref_media_widget"
+        android:title="@string/pref_media_widget"
+        android:summary="@string/pref_media_widget_summary"
+        android:defaultValue="false" />
+    
     <Preference
         android:title=""
         android:summary=""

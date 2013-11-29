@@ -82,6 +82,17 @@ public class Functions {
 			//save the cover state
 			Events.set_cover(true);
 			
+			
+		    // step 1: bring up the default activity window
+			//we are using the show when locked flag as we'll re-use this method to show the screen on power button press
+			if (!DefaultActivity.on_screen) {
+				ctx.startActivity(new Intent(ctx, DefaultActivity.class)
+										.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+												| Intent.FLAG_ACTIVITY_NO_ANIMATION
+												| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED));
+			}
+            
+			
 			//if we are running in root enabled mode then lets up the sensitivity on the view screen
 			//so we can use the screen through the window
 			 if (Functions.Events.rootEnabled) {
@@ -101,15 +112,8 @@ public class Functions {
 				return;
 			}
 			
-		    // step 1: bring up the default activity window
-			//we are using the show when locked flag as we'll re-use this method to show the screen on power button press
-			if (!DefaultActivity.on_screen) {
-				ctx.startActivity(new Intent(ctx, DefaultActivity.class)
-										.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-												| Intent.FLAG_ACTIVITY_NO_ANIMATION
-												| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED));
-			}
-            
+			
+			
             //step 2: wait for the delay period and turn the screen off
             int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000);
             
@@ -145,18 +149,9 @@ public class Functions {
 			
 			//we don't want the configuration screen displaying when we wake back up
 			if (configurationActivity != null) configurationActivity.moveTaskToBack(true);
-			
-			//save the cover state
-			Events.set_cover(false);
-			
-			//if we are running in root enabled mode then lets revert the sensitivity on the view screen
-			//so we can use the device as normal
-			 if (Functions.Events.rootEnabled) {
-				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
-				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd"});
-				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
-			 }
-			
+	        //we also don't want to see the default activity
+	        if (defaultActivity != null)  defaultActivity.moveTaskToBack(true);
+	        
 			//needed to let us wake the screen
 			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
 			
@@ -168,9 +163,17 @@ public class Functions {
 			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
 	        wl.acquire();
 	        wl.release();
-	        
-	        //kill the default activity
-	        if (defaultActivity != null)  defaultActivity.moveTaskToBack(true);;
+			
+			//save the cover state
+			Events.set_cover(false);
+			
+			//if we are running in root enabled mode then lets revert the sensitivity on the view screen
+			//so we can use the device as normal
+			 if (Functions.Events.rootEnabled) {
+				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
+				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd"});
+				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
+			 }
 		}
 
 		
@@ -496,20 +499,24 @@ public class Functions {
 		
 		
 		/**
-		 * Is the default widget enabled
+		 * Is the specified widget enabled
 		 * @param ctx Application context
+		 * @param widgetType Widget type to check for
 		 * @return True if it is, False if not
 		 */
-		public static boolean default_widget_enabled(Context ctx) {
+		public static boolean widget_enabled(Context ctx, String widgetType) {
 			
-			Log.d("F.Is.def_wid_enabled", "Is default widget enabled called.");
+			Log.d("F.Is.wid_enabled", "Is default widget enabled called with widgetType: " + widgetType);
 			
-			boolean widgetEnabled = Functions.hmAppWidgetManager.doesWidgetExist("default");
+			boolean widgetEnabled = Functions.hmAppWidgetManager.doesWidgetExist(widgetType);
 			
-			Log.d("F.Is.def_wid_enabled","Default widget enabled state is: " + widgetEnabled);
+			Log.d("F.Is.wid_enabled", widgetType + " widget enabled state is: " + widgetEnabled);
 			
 			return widgetEnabled;
 		}
+		
+		
+		
 		
 		
 	}
