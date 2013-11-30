@@ -41,17 +41,9 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    getPreferenceManager().getSharedPreferences()
 	    		.edit()
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
+	    		.putBoolean("pref_default_widget_enabled", Functions.Is.default_widget_enabled(getActivity()))
+	    		.putBoolean("pref_runasroot_enabled", Functions.Events.rootEnabled)
 	    		.commit();
-	    
-	    getPreferenceManager().getSharedPreferences()
-				.edit()
-				.putBoolean("pref_default_widget_enabled", Functions.Is.default_widget_enabled(getActivity()))
-				.commit();
-	    
-	    getPreferenceManager().getSharedPreferences()
-				.edit()
-				.putBoolean("pref_runasroot_enabled", Functions.Events.rootEnabled)
-				.commit();
 	    
 	    getPreferenceManager().getSharedPreferences()
         	.registerOnSharedPreferenceChangeListener(this);

@@ -51,7 +51,21 @@
         android:key="pref_default_widget"
         android:title="@string/pref_default_widget"
         android:summary="@string/pref_default_widget_summary"
-        android:defaultValue="false" />
+        android:defaultValue="false"
+        android:disableDependentsState="true" />
+    
+    <afzkl.development.colorpickerview.preference.ColorPickerPreference
+        android:key="pref_default_bgcolor"
+        android:title="@string/pref_default_bgcolor"
+        android:summary="@string/pref_default_bgcolor_summary"
+        android:defaultValue="0xFFA5C8F2"
+        android:dependency="pref_default_widget" />
+    <afzkl.development.colorpickerview.preference.ColorPickerPreference
+        android:key="pref_default_fgcolor"
+        android:title="@string/pref_default_fgcolor"
+        android:summary="@string/pref_default_fgcolor_summary"
+        android:defaultValue="0xFF33B5E5"
+        android:dependency="pref_default_widget" />
     
     <CheckBoxPreference
         android:key="pref_do_notifications"

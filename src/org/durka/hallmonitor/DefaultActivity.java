@@ -11,8 +11,12 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
 import android.database.DataSetObserver;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -24,6 +28,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.TextClock;
 import android.widget.RelativeLayout;
 
 /**
@@ -131,6 +136,11 @@ public class DefaultActivity extends Activity {
 		    
 		    //add the widget to the view
 		    contentView.addView(hostView);
+	    } else {
+	    	Drawable rounded = getResources().getDrawable(R.drawable.rounded);
+	    	rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
+	    	((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
+	    	((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
 	    }
 	}  
 

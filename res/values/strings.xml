@@ -41,6 +41,10 @@
     <string name="pref_runasroot_summary">Should the app run with root permissions (required for through screen activities) - allow permanent root access for best results.</string>
     <string name="pref_default_widget">Widget Enable</string>
     <string name="pref_default_widget_summary">Whether to use a 3rd party widget inside the cover window as the default view</string>
+    <string name="pref_default_bgcolor">Background color</string>
+    <string name="pref_default_bgcolor_summary">Background of the view you will see through the closed cover</string>
+    <string name="pref_default_fgcolor">Foreground color</string>
+    <string name="pref_default_fgcolor_summary">Text color for the clock you will see through the closed cover</string>
     <string name="pref_about">About Hall Monitor</string>
 	<string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="title_activity_window">WindowActivity</string>
