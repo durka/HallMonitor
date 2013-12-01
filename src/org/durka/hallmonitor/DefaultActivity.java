@@ -14,6 +14,7 @@ import android.database.DataSetObserver;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -151,6 +152,17 @@ public class DefaultActivity extends Activity {
 	    on_screen = true;
 	    //start our widget listening - FIXME this might need sorting out once using multiple app widgets
 	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.startListening();
+	    
+	    if (findViewById(R.id.default_battery) != null) {
+	    	Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+	    	if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
+	    		|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
+	    		((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
+	    	} else {
+	    		((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
+	    	}
+	    	((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
+	    }
 	    
 	    if (NotificationService.that != null) {
 	    	// notification listener service is running, show the current notifications
