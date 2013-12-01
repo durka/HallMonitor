@@ -10,28 +10,22 @@
         android:background="@drawable/rounded"
         android:layout_width="310dp"
         android:layout_height="125dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
+        android:layout_centerHorizontal="true"
         android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold">
+        android:keepScreenOn="true" >
 
        <RelativeLayout
            android:id="@+id/default_widget"
            android:layout_width="310dp"
            android:layout_height="75dp"
-           android:layout_alignParentTop="true"
-           android:layout_centerHorizontal="true"
-           android:gravity="center" >
+           android:layout_centerHorizontal="true" >
        
 	       <TextClock
 	           android:id="@+id/default_text_clock"
 	           android:layout_width="match_parent"
 	           android:layout_height="match_parent"
+	           android:gravity="center"
 	           android:keepScreenOn="true"
 	           android:textColor="#33b5e5"
 	           android:textSize="50sp"
