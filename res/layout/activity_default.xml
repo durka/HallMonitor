@@ -32,6 +32,34 @@
         android:keepScreenOn="true"
         android:textColor="#33b5e5"
         android:textSize="50sp"
-        android:textStyle="bold" />
+        android:textStyle="bold" 
+        android:visibility="invisible"/>
+       
+       
+       <Button
+           android:id="@+id/snoozebutton"
+           style="?android:attr/buttonStyleSmall"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignTop="@+id/dismissbutton"
+           android:layout_toLeftOf="@+id/dismissbutton"
+           android:text="@string/snooze"
+           android:onClick="sendSnooze" 
+           android:visibility="invisible" />
+
+       <Button
+           android:id="@+id/dismissbutton"
+           style="?android:attr/buttonStyleSmall"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignParentBottom="true"
+           android:layout_alignParentRight="true"
+           android:layout_marginBottom="20dp"
+           android:layout_marginRight="46dp"
+           android:text="@string/dismiss"
+           android:onClick="sendDismiss"
+           android:visibility="invisible" />
+       
+       
 	</RelativeLayout>
 </RelativeLayout>

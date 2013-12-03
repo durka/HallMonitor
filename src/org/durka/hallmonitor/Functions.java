@@ -299,6 +299,8 @@ public class Functions {
 		private static boolean cover_closed;
 		//has root been enabled
 		public static boolean rootEnabled = false;
+		//have alarm controls been enabled
+		public static boolean alarmControlsEnabled = false;
 		
 		/**
 		 * Invoked from the BootReceiver, allows for start on boot, as is registered in the manifest as listening for:

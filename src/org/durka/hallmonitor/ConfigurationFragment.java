@@ -57,6 +57,11 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				.commit();
 	    
 	    getPreferenceManager().getSharedPreferences()
+				.edit()
+				.putBoolean("pref_alarm_controls_enabled", Functions.Events.alarmControlsEnabled)
+				.commit();
+	    
+	    getPreferenceManager().getSharedPreferences()
         	.registerOnSharedPreferenceChangeListener(this);
 	}
 
@@ -122,6 +127,16 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				Functions.Events.rootEnabled = false;
 			}
 				
+		// if the default screen widget is being enabled/disabled the key will be pref_alarm_controls	
+		} else if (key.equals("pref_alarm_controls")) {
+			
+			if (prefs.getBoolean(key, false)) {
+				Functions.Events.alarmControlsEnabled = true;
+			} else {
+				//Functions.Actions.unregister_widget(getActivity(), "default");
+				Functions.Events.alarmControlsEnabled = false;
+			}
+			
 		}
 	}
 
