@@ -43,7 +43,7 @@
     <string name="pref_default_widget_summary">Whether to use a 3rd party widget inside the cover window as the default view</string>
     <string name="pref_media_widget">Media Widget Enable</string>
     <string name="pref_media_widget_summary">Whether to use a 3rd party widget inside the cover window to show when media is playing / headphones are connected</string>
-    <string name="pref_alarm_controls">Akarm Controls Enable</string>
+    <string name="pref_alarm_controls">Alarm Controls Enable</string>
     <string name="pref_alarm_controls_summary">Whether to show alarm dismiss and snooze buttons in the cover window if the alarm goes off whilst the cover is closed</string>
     <string name="pref_default_bgcolor">Background color</string>
     <string name="pref_default_bgcolor_summary">Background of the view you will see through the closed cover</string>

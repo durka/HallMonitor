@@ -1,3 +1,5 @@
+
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,29 +17,28 @@
         android:gravity="center"
         android:keepScreenOn="true" >
         
-        <Button
+         <Button
            android:id="@+id/snoozebutton"
            style="?android:attr/buttonStyleSmall"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_alignTop="@+id/dismissbutton"
-           android:layout_toLeftOf="@+id/dismissbutton"
-           android:text="@string/snooze"
-           android:onClick="sendSnooze" 
-           android:visibility="invisible" />
+           android:layout_alignBaseline="@+id/dismissbutton"
+           android:layout_alignBottom="@+id/dismissbutton"
+           android:layout_alignParentLeft="true"
+           android:background="@drawable/snooze_button"
+           android:onClick="sendSnooze"
+           android:visibility="visible" />
 
-       <Button
-           android:id="@+id/dismissbutton"
-           style="?android:attr/buttonStyleSmall"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_alignParentBottom="true"
-           android:layout_alignParentRight="true"
-           android:layout_marginBottom="20dp"
-           android:layout_marginRight="46dp"
-           android:text="@string/dismiss"
-           android:onClick="sendDismiss"
-           android:visibility="invisible" />
+       	<Button
+       	    android:id="@+id/dismissbutton"
+       	    style="?android:attr/buttonStyleSmall"
+       	    android:layout_width="wrap_content"
+       	    android:layout_height="wrap_content"
+       	    android:layout_alignParentRight="true"
+       	    android:layout_centerVertical="true"
+       	    android:background="@drawable/dismiss_button"
+       	    android:onClick="sendDismiss"
+       	    android:visibility="visible" />
 
        <RelativeLayout
            android:id="@+id/default_widget"
