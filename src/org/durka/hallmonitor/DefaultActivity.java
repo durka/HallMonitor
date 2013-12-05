@@ -1,13 +1,17 @@
 package org.durka.hallmonitor;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,6 +25,19 @@ public class DefaultActivity extends Activity {
 	private HMAppWidgetManager hmAppWidgetManager = Functions.hmAppWidgetManager;
 	
 	public static boolean on_screen;
+	
+	//state for whether alarm is firing
+	public static boolean alarm_firing = false;
+	
+	//audio manager to detect media state
+	private AudioManager audioManager;
+	
+	//Action fired when alarm goes off
+    public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
+    //Action to trigger snooze of the alarm
+    public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
+    //Action to trigger dismiss of the alarm
+    public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
 	
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -40,7 +57,43 @@ public class DefaultActivity extends Activity {
 					// when the cover opens, the fullscreen activity goes poof				
 					moveTaskToBack(true);
 				}
-			} 
+			}if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
+				
+				Log.d("DA.onReceive", "Alarm on event received.");
+				
+				//only take action if alarm controls are enabled
+				if (Functions.Events.alarmControlsEnabled) {
+					
+					Log.d("DA.onReceive", "Alarm controls are enabled, taking action.");
+					
+					//set the alarm firing state
+					alarm_firing=true;
+				
+					//if the cover is closed then
+					//we want to pop this activity up over the top of the alarm activity
+					//to guarantee that we need to hold off until the alarm activity is running
+					//a 1 second delay seems to allow this
+					if (Functions.Is.cover_closed(context)) {
+						Timer timer = new Timer();
+						timer.schedule(new TimerTask() {
+							@Override
+							public void run() {	
+								Intent myIntent = new Intent(getApplicationContext(),DefaultActivity.class);
+								myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK 
+												| Intent.FLAG_ACTIVITY_CLEAR_TOP
+												| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+								myIntent.setAction(Intent.ACTION_MAIN);
+							    startActivity(myIntent);
+								
+							}
+						}, 1000);	
+					}
+				}
+				else {
+					Log.d("DA.onReceive", "Alarm controls are not enabled.");
+				}
+			}
+			
 		}
 	};
 
@@ -48,9 +101,12 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		//get the audio manager
+		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 		
 		//pass a reference back to the Functions class so it can finish us when it wants to
-		//FIXME Presumably there is a 
+		//FIXME Presumably there is a better way to do this
 		Functions.defaultActivity = this;
 		
 		Log.d("DA.onCreate", "onCreate of DefaultView.");
@@ -61,51 +117,114 @@ public class DefaultActivity extends Activity {
 		//Remove notification bar
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+		//set default view
 		setContentView(R.layout.activity_default);
 		
+		//add screen on and alarm fired intent receiver
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
+		filter.addAction(ALARM_ALERT_ACTION);
 		registerReceiver(receiver, filter);
 
-	    RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
-	    
-	    //if we have a default app widget to use then display that, if not then display our default clock screen
-	    //(which is part of the default layout so will show anyway)
-	    if (hmAppWidgetManager.doesWidgetExist("default")) {
-	    	
-	    	//remove the TextClock from the contentview
-		    contentView.removeAllViews();
-	    	
-	    	//get the widget
-		    AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType("default");
-		    
-		    //if the widget host view already has a parent then we need to detach it
-		    ViewGroup parent = (ViewGroup)hostView.getParent();
-		    if ( parent != null) {
-		    	Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
-		    
-		    	parent.removeView(hostView);
-		    }    
-		    
-		    //add the widget to the view
-		    contentView.addView(hostView);
-	    }
 	}  
 
+	@SuppressWarnings("deprecation")
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		Log.d("DA.onResume", "On resume called.");
+
+		refreshDisplay();
+				
+	}
+	
+	/**
+	 * Refresh the display taking account of device and application state
+	 */
+	private void refreshDisplay() {
+
+		//get the layout for the windowed view
+	    RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
+	    
+	    //if the alarm is firing then show the alarm controls, otherwise
+	    //if we have a media app widget and media is playing or headphones are connected then display that, otherwise
+	    //if we have a default app widget to use then display that, if not then display our default clock screen
+	    //(which is part of the default layout so will show anyway)
+	    //will do this simply by setting the widgetType
+	    String widgetType = "default";
+	    if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
+	    	widgetType = "media";
+	    }
+	    
+	    if (alarm_firing) {
+	    	//show the alarm controls
+	    	findViewById(R.id.dismissbutton).setVisibility(View.VISIBLE);
+	    	findViewById(R.id.snoozebutton).setVisibility(View.VISIBLE);
+	    	findViewById(R.id.default_text_clock).setVisibility(View.INVISIBLE);
+	    } else {
+		    
+		    
+		    //add the required widget based on the widgetType
+		    if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
+		    	
+		    	//remove the TextClock from the contentview
+			    contentView.removeAllViews();
+		    	
+		    	//get the widget
+			    AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
+			    
+			    //if the widget host view already has a parent then we need to detach it
+			    ViewGroup parent = (ViewGroup)hostView.getParent();
+			    if ( parent != null) {
+			    	Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
+			       	parent.removeView(hostView);
+			    }    
+			    
+			    //add the widget to the view
+			    contentView.addView(hostView);
+		    } else {
+		    	//default view
+		    	findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
+		    	findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
+		    	findViewById(R.id.default_text_clock).setVisibility(View.VISIBLE);
+		    }
+	    }
+	}
+	
+	
+	/** Called when the user touches the snooze button */
+	public void sendSnooze(View view) {
+	    // Broadcast alarm snooze event
+		Intent alarmSnooze = new Intent(ALARM_SNOOZE_ACTION);
+		sendBroadcast(alarmSnooze);
+		//unset alarm firing flag
+		alarm_firing = false;
+		//refresh the display
+		refreshDisplay();
+	}
+	
+	/** Called when the user touches the dismiss button */
+	public void sendDismiss(View view) {
+		// Broadcast alarm dismiss event
+		Intent alarmDismiss = new Intent(ALARM_DISMISS_ACTION);
+		sendBroadcast(alarmDismiss);
+		//unset alarm firing flag
+		alarm_firing = false;
+		//refresh the display
+		refreshDisplay();
+	}
+	
 	@Override
 	protected void onStart() {
 	    super.onStart();
 	    on_screen = true;
-	    //start our widget listening - FIXME this might need sorting out once using multiple app widgets
-	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.startListening();
 	}
 	@Override
 	protected void onStop() {
 	    super.onStop();
 	    on_screen = false;
-	    //stop our widget listening - FIXME this might need sorting out once using multiple app widgets
-	    if (hmAppWidgetManager.doesWidgetExist("default")) hmAppWidgetManager.mAppWidgetHost.stopListening();
 	}
 	
 	@Override

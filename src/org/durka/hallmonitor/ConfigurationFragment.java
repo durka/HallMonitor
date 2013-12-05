@@ -43,12 +43,22 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    
 	    getPreferenceManager().getSharedPreferences()
 				.edit()
-				.putBoolean("pref_default_widget_enabled", Functions.Is.default_widget_enabled(getActivity()))
+				.putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(),"default"))
+				.commit();
+	    
+	    getPreferenceManager().getSharedPreferences()
+				.edit()
+				.putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(),"media"))
 				.commit();
 	    
 	    getPreferenceManager().getSharedPreferences()
 				.edit()
 				.putBoolean("pref_runasroot_enabled", Functions.Events.rootEnabled)
+				.commit();
+	    
+	    getPreferenceManager().getSharedPreferences()
+				.edit()
+				.putBoolean("pref_alarm_controls_enabled", Functions.Events.alarmControlsEnabled)
 				.commit();
 	    
 	    getPreferenceManager().getSharedPreferences()
@@ -88,7 +98,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				Functions.Actions.stop_service(getActivity());
 			}
 			
-		// if the default screen widget is being enabled/disabled the key will be pref_widget	
+		// if the default screen widget is being enabled/disabled the key will be pref_default_widget	
 		} else if (key.equals("pref_default_widget")) {
 				
 			if (prefs.getBoolean(key, false)) {
@@ -96,6 +106,15 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 			} else {
 				Functions.Actions.unregister_widget(getActivity(), "default");
 			}
+			
+		// if the media screen widget is being enabled/disabled the key will be pref_media_widget	
+			} else if (key.equals("pref_media_widget")) {
+					
+				if (prefs.getBoolean(key, false)) {
+					Functions.Actions.register_widget(getActivity(), "media");
+				} else {
+					Functions.Actions.unregister_widget(getActivity(), "media");
+				}	
 				
 			// if the default screen widget is being enabled/disabled the key will be pref_widget	
 		} else if (key.equals("pref_runasroot")) {
@@ -108,6 +127,16 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				Functions.Events.rootEnabled = false;
 			}
 				
+		// if the default screen widget is being enabled/disabled the key will be pref_alarm_controls	
+		} else if (key.equals("pref_alarm_controls")) {
+			
+			if (prefs.getBoolean(key, false)) {
+				Functions.Events.alarmControlsEnabled = true;
+			} else {
+				//Functions.Actions.unregister_widget(getActivity(), "default");
+				Functions.Events.alarmControlsEnabled = false;
+			}
+			
 		}
 	}
 

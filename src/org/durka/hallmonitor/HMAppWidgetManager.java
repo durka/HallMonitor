@@ -145,6 +145,9 @@ public class HMAppWidgetManager {
 	    //store hostView into our widgets map for access later
 	    widgetsMap.put(currentWidgetType, hostView);
 	    
+	    //start the widget listening
+	    mAppWidgetHost.startListening();
+	    
 	    Log.d("HMAWM.createWidget","Widget created and stored of type: " + currentWidgetType);
 	}	
 	
@@ -155,6 +158,9 @@ public class HMAppWidgetManager {
 	public void deleteAppWidgetId(int appWidgetId) {
 		
 		Log.d("HMAWM.deleteAppWidgetId","Deleting widget id: " + appWidgetId);
+		
+		//stop the widget listening
+		mAppWidgetHost.stopListening();
 		
 		mAppWidgetHost.deleteAppWidgetId(appWidgetId);
 	}
