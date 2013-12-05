@@ -14,12 +14,14 @@
  */
 package org.durka.hallmonitor;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
+import android.widget.Toast;
 
 public class ConfigurationFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
 	
@@ -39,27 +41,11 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    getPreferenceManager().getSharedPreferences()
 	    		.edit()
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
+	    		.putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(),"default"))
+	    		.putBoolean("pref_runasroot_enabled", Functions.Events.rootEnabled)
+	    		.putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(),"media"))
+	    		.putBoolean("pref_alarm_controls_enabled", Functions.Events.alarmControlsEnabled)
 	    		.commit();
-	    
-	    getPreferenceManager().getSharedPreferences()
-				.edit()
-				.putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(),"default"))
-				.commit();
-	    
-	    getPreferenceManager().getSharedPreferences()
-				.edit()
-				.putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(),"media"))
-				.commit();
-	    
-	    getPreferenceManager().getSharedPreferences()
-				.edit()
-				.putBoolean("pref_runasroot_enabled", Functions.Events.rootEnabled)
-				.commit();
-	    
-	    getPreferenceManager().getSharedPreferences()
-				.edit()
-				.putBoolean("pref_alarm_controls_enabled", Functions.Events.alarmControlsEnabled)
-				.commit();
 	    
 	    getPreferenceManager().getSharedPreferences()
         	.registerOnSharedPreferenceChangeListener(this);
@@ -136,7 +122,16 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				//Functions.Actions.unregister_widget(getActivity(), "default");
 				Functions.Events.alarmControlsEnabled = false;
 			}
-			
+
+		} else if (key.equals("pref_do_notifications")) {
+			startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+			if (prefs.getBoolean(key, false)) {
+				Toast.makeText(getActivity(), "check this box then", Toast.LENGTH_SHORT).show();
+				//getActivity().startService(new Intent(getActivity(), NotificationService.class));
+			} else {
+				Toast.makeText(getActivity(), "okay uncheck the box", Toast.LENGTH_SHORT).show();
+				//getActivity().startService(new Intent(getActivity(), NotificationService.class));
+			}
 		}
 	}
 

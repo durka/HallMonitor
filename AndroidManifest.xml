@@ -23,11 +23,14 @@
     android:versionName="0.0.2a" >
 
     <uses-sdk
-        android:minSdkVersion="17"
+        android:minSdkVersion="18"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    
 
     <application
         android:allowBackup="true"
@@ -51,6 +54,13 @@
         </activity>
 
         <service android:name="org.durka.hallmonitor.ViewCoverService" />
+        
+        <service android:name=".NotificationService"
+                 android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+     		<intent-filter>
+        		<action android:name="android.service.notification.NotificationListenerService" />
+     		</intent-filter>
+ 		</service>
 
         <receiver
             android:name="org.durka.hallmonitor.AdminReceiver"
