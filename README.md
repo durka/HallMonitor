@@ -23,6 +23,7 @@ Others have tested this under the following configuration(s):
 
 - Samsung Galaxy S4 Sprint (jfltespr / SPH-L720), CyanogenMod 10.2 (based on Android 4.3)
 - Samsung Galaxy S4 International (jfltexx / GT-i9505), CyanogenMod 10.2 (based on Android 4.3)
+- _[Partial functionality]_ S4 Exynos octacore international (GT-i9500), unofficial CyanogenMod 10.2
 - _[Partial functionality]_ S4 mini International (serranoltexx / GT-i9195), CyanogenMod 10.2
 
 If you test this on something other than the above (including another carrier's S4) and it works, please let me know! You can contact me at [android@alexburka.com](mailto:android@alexburka.com). If it doesn't work, please file an issue here. But no promises, because I can't really do tech support for devices I don't own.
