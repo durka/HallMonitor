@@ -23,8 +23,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.input.InputManager;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.InputDevice;
 
 
 public class ViewCoverService extends Service implements SensorEventListener {
@@ -46,6 +48,13 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		
 		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_NORMAL);
+		
+		Log.d("VCS-oSC", "scanning keyboards...");
+		InputManager im = (InputManager) getSystemService(INPUT_SERVICE);
+		for (int id : im.getInputDeviceIds()) {
+			InputDevice dev = im.getInputDevice(id);
+			Log.d("VCS-oSC", "\t" + dev.toString());
+		}
 
 		return START_STICKY;
 	}

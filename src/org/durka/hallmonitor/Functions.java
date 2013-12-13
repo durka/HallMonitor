@@ -33,8 +33,10 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -288,6 +290,21 @@ public class Functions {
 	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
 	        }
 		}
+
+
+		public static void hangup_call() {
+			Log.d("F.A.hc", "hanging up! goodbye");
+			run_commands_as_root(new String[]{"input keyevent 6"});
+			DefaultActivity.phone_ringing = false;
+			defaultActivity.refreshDisplay();
+		}
+		
+		public static void pickup_call() {
+			Log.d("F.A.pc", "picking up! hello");
+			run_commands_as_root(new String[]{"input keyevent 5"});
+			DefaultActivity.phone_ringing = false;
+			defaultActivity.refreshDisplay();
+		}
 	}
 
 	
@@ -444,6 +461,55 @@ public class Functions {
 				}
 			}
 			//Log.d(ctx.getString(R.string.app_name), String.format("cover_closed = %b", cover_closed));
+		}
+
+
+		public static void incoming_call(final Context ctx, String number) {
+			Log.d("F.E.ic", "call from " + number);
+			if (Functions.Is.cover_closed(ctx)) {
+				Log.d("F.E.ic", "but the screen is closed. screen my calls");
+				
+				//if the cover is closed then
+				//we want to pop this activity up over the top of the dialer activity
+				//to guarantee that we need to hold off until the dialer activity is running
+				//a 1 second delay seems to allow this
+				DefaultActivity.phone_ringing = true;
+
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						Intent intent = new Intent(ctx, DefaultActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+							          | Intent.FLAG_ACTIVITY_CLEAR_TOP
+							          | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+						intent.setAction(Intent.ACTION_MAIN);
+						ctx.startActivity(intent);
+
+					}
+				}, 1000);
+				
+				/*
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						Process process;
+						try {
+							process = Runtime.getRuntime().exec(new String[]{ "su","-c","input keyevent 6"});
+							process.waitFor();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					    
+					}
+				}, 500);
+				*/
+				
+			}
 		}
 	}
 	
