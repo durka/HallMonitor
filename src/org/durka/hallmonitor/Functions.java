@@ -245,7 +245,9 @@ public class Functions {
 		 * Execute shell commands
 		 * @param cmds Commands to execute
 		 */
-		public static void run_commands_as_root(String[] cmds) {
+		public static void run_commands_as_root(String[] cmds) { run_commands_as_root(cmds, true); }
+		
+		public static void run_commands_as_root(String[] cmds, boolean want_output) {
 	        try {
 	        	Process p = Runtime.getRuntime().exec("su");
 	        	
@@ -271,20 +273,22 @@ public class Functions {
 	            os.writeBytes("exit\n");  
 	            os.flush();
 	            
-	            //log out the output
-	            String output = "";
-	            while ((currentLine = isBr.readLine()) != null) {
-	              output += currentLine + "\n";
-	            } 
-	            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
-           
-	            //log out the error output
-	            String error = "";
-	            currentLine = "";
-	            while ((currentLine = esBr.readLine()) != null) {
-	              error += currentLine + "\n";
-	            }	           
-	            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
+	            if (want_output) {
+		            //log out the output
+		            String output = "";
+		            while ((currentLine = isBr.readLine()) != null) {
+		              output += currentLine + "\n";
+		            } 
+		            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
+	           
+		            //log out the error output
+		            String error = "";
+		            currentLine = "";
+		            while ((currentLine = esBr.readLine()) != null) {
+		              error += currentLine + "\n";
+		            }	           
+		            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
+	            }
 
 	        } catch (IOException ioe) {
 	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
@@ -293,17 +297,17 @@ public class Functions {
 
 
 		public static void hangup_call() {
-			Log.d("F.A.hc", "hanging up! goodbye");
-			run_commands_as_root(new String[]{"input keyevent 6"});
+			Log.d("phone", "hanging up! goodbye");
+			run_commands_as_root(new String[]{"input keyevent 6"}, false);
 			DefaultActivity.phone_ringing = false;
 			defaultActivity.refreshDisplay();
 		}
 		
 		public static void pickup_call() {
-			Log.d("F.A.pc", "picking up! hello");
-			run_commands_as_root(new String[]{"input keyevent 5"});
-			DefaultActivity.phone_ringing = false;
-			defaultActivity.refreshDisplay();
+			Log.d("phone", "picking up! hello");
+			run_commands_as_root(new String[]{"input keyevent 5"}, false);
+			//DefaultActivity.phone_ringing = false;
+			//defaultActivity.refreshDisplay();
 		}
 	}
 
@@ -465,9 +469,9 @@ public class Functions {
 
 
 		public static void incoming_call(final Context ctx, String number) {
-			Log.d("F.E.ic", "call from " + number);
+			Log.d("phone", "call from " + number);
 			if (Functions.Is.cover_closed(ctx)) {
-				Log.d("F.E.ic", "but the screen is closed. screen my calls");
+				Log.d("phone", "but the screen is closed. screen my calls");
 				
 				//if the cover is closed then
 				//we want to pop this activity up over the top of the dialer activity

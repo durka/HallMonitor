@@ -114,9 +114,10 @@ public class DefaultActivity extends Activity {
 				if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 					Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 				} else {
-					Log.d("DA.oR", "phone state changed to " + intent.getStringExtra(TelephonyManager.EXTRA_STATE));
-					if (phone_ringing) {
+					Log.d("phone", "phone state changed to " + intent.getStringExtra(TelephonyManager.EXTRA_STATE));
+					if (phone_ringing && intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.CALL_STATE_IDLE)) {
 						phone_ringing = false;
+						refreshDisplay();
 					}
 				}
 			}
