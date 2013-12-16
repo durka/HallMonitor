@@ -54,6 +54,16 @@ public class DefaultActivity extends Activity {
     public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
     //Action to trigger dismiss of the alarm
     public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
+    //This action should let us know if the alarm has been killed by another app
+    public static final String ALARM_DONE_ACTION = "com.android.deskclock.ALARM_DONE";
+    
+    //all the views we need
+    private GridView grid = null;
+    private View snoozeButton = null;
+    private View dismissButton = null;
+    private View defaultWidget = null;
+    private RelativeLayout defaultContent = null;
+    private TextClock defaultTextClock = null;
 	
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -109,7 +119,14 @@ public class DefaultActivity extends Activity {
 					Log.d("DA.onReceive", "Alarm controls are not enabled.");
 				}
 
-			
+			} else if (intent.getAction().equals(ALARM_DONE_ACTION) ) {
+					
+					Log.d("DA.onReceive", "Alarm done event received.");
+					
+					//if the alarm is turned off using the normal alarm screen this will
+					//ensure that we will hide the alarm controls
+					alarm_firing=false;
+				
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
 				if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 					Log.d("VCS", "call from " + intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
@@ -170,7 +187,16 @@ public class DefaultActivity extends Activity {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(ALARM_ALERT_ACTION);
+		filter.addAction(ALARM_DONE_ACTION);
 		registerReceiver(receiver, filter);
+		
+		//get the views we need
+		grid = (GridView)findViewById(R.id.default_icon_container);
+	    snoozeButton = findViewById(R.id.snoozebutton);
+	    dismissButton = findViewById(R.id.dismissbutton);
+	    defaultWidget = findViewById(R.id.default_widget);
+	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
+	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
 
 	}  
 
@@ -180,9 +206,7 @@ public class DefaultActivity extends Activity {
 		super.onResume();
 		
 		Log.d("DA.onResume", "On resume called.");
-
-		refreshDisplay();
-				
+			
 	}
 	
 	/**
@@ -191,7 +215,7 @@ public class DefaultActivity extends Activity {
 	private void refreshDisplay() {
 
 		//get the layout for the windowed view
-	    RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
+	    RelativeLayout contentView = defaultContent;
 	    
 	    //if the alarm is firing then show the alarm controls, otherwise
 	    //if we have a media app widget and media is playing or headphones are connected then display that, otherwise
@@ -205,10 +229,10 @@ public class DefaultActivity extends Activity {
 	    
 	    if (alarm_firing) {
 	    	//show the alarm controls
-	    	findViewById(R.id.dismissbutton).setVisibility(View.VISIBLE);
-	    	findViewById(R.id.snoozebutton).setVisibility(View.VISIBLE);
-	    	findViewById(R.id.default_widget).setVisibility(View.INVISIBLE);
-	    	findViewById(R.id.default_icon_container).setVisibility(View.INVISIBLE);
+	    	snoozeButton.setVisibility(View.VISIBLE);
+	    	dismissButton.setVisibility(View.VISIBLE);
+	    	defaultWidget.setVisibility(View.INVISIBLE);
+	    	grid.setVisibility(View.INVISIBLE);
 	
 	    } else {
 		    
@@ -232,16 +256,16 @@ public class DefaultActivity extends Activity {
 			    //add the widget to the view
 			    contentView.addView(hostView);
 		    } else {
-		    	//default view
-		    	findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
-		    	findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
-		    	findViewById(R.id.default_widget).setVisibility(View.VISIBLE);
-		    	findViewById(R.id.default_icon_container).setVisibility(View.VISIBLE);
+		    	//default view    	
+		    	snoozeButton.setVisibility(View.INVISIBLE);
+		    	dismissButton.setVisibility(View.INVISIBLE);
+		    	defaultWidget.setVisibility(View.VISIBLE);
+		    	grid.setVisibility(View.VISIBLE);
 		    	
 		    	Drawable rounded = getResources().getDrawable(R.drawable.rounded);
 		    	rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
-		    	((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
-		    	((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+		    	defaultContent.setBackground(rounded);
+		    	defaultTextClock.setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
 		    }
 	    }
 	}
@@ -275,6 +299,8 @@ public class DefaultActivity extends Activity {
 	    Log.d("DA-oS", "starting");
 	    on_screen = true;
 	    
+	    refreshDisplay();
+	    
 	    if (findViewById(R.id.default_battery) != null) {
 	    	Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 	    	if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
@@ -291,7 +317,7 @@ public class DefaultActivity extends Activity {
 	    	// TODO move this to Functions.java
 	    	final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
 	    	Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
-	    	final GridView grid = (GridView)findViewById(R.id.default_icon_container);
+	    	
 	    	final Context that = this;
 	    	grid.setNumColumns(notifs.length);
 	    	grid.setAdapter(new BaseAdapter() {
