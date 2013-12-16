@@ -33,6 +33,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -96,8 +97,13 @@ public class Functions {
 			//if we are running in root enabled mode then lets up the sensitivity on the view screen
 			//so we can use the screen through the window
 			 if (Functions.Events.rootEnabled) {
-				 Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
-				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,1 > cmd"});
+                 Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
+
+                 if (Build.DEVICE.equals("serranolte")) { // GT-I9195
+                     run_commands_as_root(new String[]{"echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd"});
+                 } else // others devices
+                     run_commands_as_root(new String[]{"echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd"});
+
 				 Log.d("F.Act.close_cover", "...Sensitivity boosted, hold onto your hats!");
 			 }
 			
@@ -134,8 +140,22 @@ public class Functions {
 			}, delay);
             
 		}
-		
-		
+
+        /**
+         * Invoked from the BootReceiver, allows for start on boot, as is registered in the manifest as listening for:
+         * android.intent.action.BOOT_COMPLETED and
+         * android:name="android.intent.action.QUICKBOOT_POWERON"
+         * Starts the ViewCoverService which handles detection of the cover state.
+         * @param ctx Application context
+         */
+        public static void init_cover(Context ctx)
+        {
+            if (Build.DEVICE.equals("serranolte"))  { // GT-I9195
+                Log.d("F.init_cover", "init tsp for serranolte");
+                run_commands_as_root(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd"});
+            }
+        }
+
 		/**
 		 * Called from within the Functions.Event.Proximity method.
          * If we are running root enabled reverts the screen sensitivity.
@@ -318,7 +338,9 @@ public class Functions {
 	    		Intent startServiceIntent = new Intent(ctx, ViewCoverService.class);
 	    		ctx.startService(startServiceIntent);
 	    	}
-		}
+
+            Functions.Actions.init_cover(ctx);
+        }
 		
 		
 		/**
