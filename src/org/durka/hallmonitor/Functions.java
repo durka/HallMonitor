@@ -52,6 +52,8 @@ public class Functions {
 	//widget configuration
 	public static final int REQUEST_PICK_APPWIDGET = 9;
 	public static final int REQUEST_CONFIGURE_APPWIDGET = 5;
+
+    private static final String DEV_SERRANO_LTE = "serranolte"; // GT-I9195
 	
 	//Class that handles interaction with 3rd party App Widgets
 	public static final HMAppWidgetManager hmAppWidgetManager = new HMAppWidgetManager();
@@ -99,8 +101,8 @@ public class Functions {
 			 if (Functions.Events.rootEnabled) {
                  Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
 
-                 if (Build.DEVICE.equals("serranolte")) { // GT-I9195
-                     run_commands_as_root(new String[]{"echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd"});
+                 if (Build.DEVICE.equals(DEV_SERRANO_LTE)) {
+                     run_commands_as_root(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
                  } else // others devices
                      run_commands_as_root(new String[]{"echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd"});
 
@@ -141,21 +143,6 @@ public class Functions {
             
 		}
 
-        /**
-         * Invoked from the BootReceiver, allows for start on boot, as is registered in the manifest as listening for:
-         * android.intent.action.BOOT_COMPLETED and
-         * android:name="android.intent.action.QUICKBOOT_POWERON"
-         * Starts the ViewCoverService which handles detection of the cover state.
-         * @param ctx Application context
-         */
-        public static void init_cover(Context ctx)
-        {
-            if (Build.DEVICE.equals("serranolte"))  { // GT-I9195
-                Log.d("F.init_cover", "init tsp for serranolte");
-                run_commands_as_root(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd"});
-            }
-        }
-
 		/**
 		 * Called from within the Functions.Event.Proximity method.
          * If we are running root enabled reverts the screen sensitivity.
@@ -191,7 +178,7 @@ public class Functions {
 			//so we can use the device as normal
 			 if (Functions.Events.rootEnabled) {
 				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
-				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd"});
+				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd && cat /sys/class/sec/tsp/cmd_result"});
 				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
 			 }
 		}
@@ -339,7 +326,6 @@ public class Functions {
 	    		ctx.startService(startServiceIntent);
 	    	}
 
-            Functions.Actions.init_cover(ctx);
         }
 		
 		
