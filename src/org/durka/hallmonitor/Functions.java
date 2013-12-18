@@ -34,8 +34,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -52,8 +54,6 @@ public class Functions {
 	//widget configuration
 	public static final int REQUEST_PICK_APPWIDGET = 9;
 	public static final int REQUEST_CONFIGURE_APPWIDGET = 5;
-
-    private static final String DEV_SERRANO_LTE = "serranolte"; // GT-I9195
 	
 	//Class that handles interaction with 3rd party App Widgets
 	public static final HMAppWidgetManager hmAppWidgetManager = new HMAppWidgetManager();
@@ -99,13 +99,8 @@ public class Functions {
 			//if we are running in root enabled mode then lets up the sensitivity on the view screen
 			//so we can use the screen through the window
 			 if (Functions.Events.rootEnabled) {
-                 Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
-
-                 if (Build.DEVICE.equals(DEV_SERRANO_LTE)) {
-                     run_commands_as_root(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
-                 } else // others devices
-                     run_commands_as_root(new String[]{"echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd"});
-
+				 Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
+				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,1 > cmd"});
 				 Log.d("F.Act.close_cover", "...Sensitivity boosted, hold onto your hats!");
 			 }
 			
@@ -142,7 +137,8 @@ public class Functions {
 			}, delay);
             
 		}
-
+		
+		
 		/**
 		 * Called from within the Functions.Event.Proximity method.
          * If we are running root enabled reverts the screen sensitivity.
@@ -178,7 +174,7 @@ public class Functions {
 			//so we can use the device as normal
 			 if (Functions.Events.rootEnabled) {
 				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
-				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd && cat /sys/class/sec/tsp/cmd_result"});
+				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd"});
 				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
 			 }
 		}
@@ -250,7 +246,9 @@ public class Functions {
 		 * Execute shell commands
 		 * @param cmds Commands to execute
 		 */
-		public static void run_commands_as_root(String[] cmds) {
+		public static void run_commands_as_root(String[] cmds) { run_commands_as_root(cmds, true); }
+		
+		public static void run_commands_as_root(String[] cmds, boolean want_output) {
 	        try {
 	        	Process p = Runtime.getRuntime().exec("su");
 	        	
@@ -276,24 +274,41 @@ public class Functions {
 	            os.writeBytes("exit\n");  
 	            os.flush();
 	            
-	            //log out the output
-	            String output = "";
-	            while ((currentLine = isBr.readLine()) != null) {
-	              output += currentLine + "\n";
-	            } 
-	            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
-           
-	            //log out the error output
-	            String error = "";
-	            currentLine = "";
-	            while ((currentLine = esBr.readLine()) != null) {
-	              error += currentLine + "\n";
-	            }	           
-	            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
+	            if (want_output) {
+		            //log out the output
+		            String output = "";
+		            while ((currentLine = isBr.readLine()) != null) {
+		              output += currentLine + "\n";
+		            } 
+		            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
+	           
+		            //log out the error output
+		            String error = "";
+		            currentLine = "";
+		            while ((currentLine = esBr.readLine()) != null) {
+		              error += currentLine + "\n";
+		            }	           
+		            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
+	            }
 
 	        } catch (IOException ioe) {
 	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
 	        }
+		}
+
+
+		public static void hangup_call() {
+			Log.d("phone", "hanging up! goodbye");
+			run_commands_as_root(new String[]{"input keyevent 6"}, false);
+			DefaultActivity.phone_ringing = false;
+			defaultActivity.refreshDisplay();
+		}
+		
+		public static void pickup_call() {
+			Log.d("phone", "picking up! hello");
+			run_commands_as_root(new String[]{"input keyevent 5"}, false);
+			//DefaultActivity.phone_ringing = false;
+			//defaultActivity.refreshDisplay();
 		}
 	}
 
@@ -325,8 +340,7 @@ public class Functions {
 	    		Intent startServiceIntent = new Intent(ctx, ViewCoverService.class);
 	    		ctx.startService(startServiceIntent);
 	    	}
-
-        }
+		}
 		
 		
 		/**
@@ -452,6 +466,55 @@ public class Functions {
 				}
 			}
 			//Log.d(ctx.getString(R.string.app_name), String.format("cover_closed = %b", cover_closed));
+		}
+
+
+		public static void incoming_call(final Context ctx, String number) {
+			Log.d("phone", "call from " + number);
+			if (Functions.Is.cover_closed(ctx)) {
+				Log.d("phone", "but the screen is closed. screen my calls");
+				
+				//if the cover is closed then
+				//we want to pop this activity up over the top of the dialer activity
+				//to guarantee that we need to hold off until the dialer activity is running
+				//a 1 second delay seems to allow this
+				DefaultActivity.phone_ringing = true;
+
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						Intent intent = new Intent(ctx, DefaultActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+							          | Intent.FLAG_ACTIVITY_CLEAR_TOP
+							          | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+						intent.setAction(Intent.ACTION_MAIN);
+						ctx.startActivity(intent);
+
+					}
+				}, 1000);
+				
+				/*
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						Process process;
+						try {
+							process = Runtime.getRuntime().exec(new String[]{ "su","-c","input keyevent 6"});
+							process.waitFor();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					    
+					}
+				}, 500);
+				*/
+				
+			}
 		}
 	}
 	

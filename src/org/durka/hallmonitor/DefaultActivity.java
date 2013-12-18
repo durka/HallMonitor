@@ -39,52 +39,54 @@ import android.widget.RelativeLayout;
  */
 public class DefaultActivity extends Activity {
 	private HMAppWidgetManager hmAppWidgetManager = Functions.hmAppWidgetManager;
-	
+
 	public static boolean on_screen;
-	
-	//state for whether alarm is firing
+
+	// states for alarm and phone
 	public static boolean alarm_firing = false;
-	
+	public static boolean phone_ringing = false;
+
 	//audio manager to detect media state
 	private AudioManager audioManager;
-	
+
 	//Action fired when alarm goes off
-    public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
-    //Action to trigger snooze of the alarm
-    public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
-    //Action to trigger dismiss of the alarm
-    public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
-	
+	public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
+	//Action to trigger snooze of the alarm
+	public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
+	//Action to trigger dismiss of the alarm
+	public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
+
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-				
+
 				Log.d("DA.onReceive", "Screen on event received.");
-				
+
 				if (Functions.Is.cover_closed(context)) {
 					Log.d("DA.onReceive", "Cover is closed, display Default Activity.");
 					//easiest way to do this is actually just to invoke the close_cover action as it does what we want
 					Functions.Actions.close_cover(getApplicationContext());
 				} else {
 					Log.d("DA.onReceive", "Cover is open, stopping Default Activity.");
-					
+
 					// when the cover opens, the fullscreen activity goes poof				
 					moveTaskToBack(true);
 				}
-			}if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
-				
+
+			} else if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
+
 				Log.d("DA.onReceive", "Alarm on event received.");
-				
+
 				//only take action if alarm controls are enabled
 				if (Functions.Events.alarmControlsEnabled) {
-					
+
 					Log.d("DA.onReceive", "Alarm controls are enabled, taking action.");
-					
+
 					//set the alarm firing state
 					alarm_firing=true;
-				
+
 					//if the cover is closed then
 					//we want to pop this activity up over the top of the alarm activity
 					//to guarantee that we need to hold off until the alarm activity is running
@@ -96,66 +98,46 @@ public class DefaultActivity extends Activity {
 							public void run() {	
 								Intent myIntent = new Intent(getApplicationContext(),DefaultActivity.class);
 								myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK 
-												| Intent.FLAG_ACTIVITY_CLEAR_TOP
-												| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+										| Intent.FLAG_ACTIVITY_CLEAR_TOP
+										| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 								myIntent.setAction(Intent.ACTION_MAIN);
-							    startActivity(myIntent);
-								
+								startActivity(myIntent);
+
 							}
 						}, 1000);	
 					}
-				}
-				else {
+				} else {
 					Log.d("DA.onReceive", "Alarm controls are not enabled.");
 				}
 
-			
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
 				if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-					Log.d("VCS", "call from " + intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
-					if (Functions.Is.cover_closed(context)) {
-						Log.d("VCS", "but the screen is closed. screen my calls");
-						
-						new Handler().postDelayed(new Runnable() {
-							@Override
-							public void run() {
-								Process process;
-								try {
-									process = Runtime.getRuntime().exec(new String[]{ "su","-c","input keyevent 5"});
-									process.waitFor();
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							    
-							}
-						}, 500);
-						
-					}
+					Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 				} else {
-					Log.d("VCS", "phone state changed to " + intent.getStringExtra(TelephonyManager.EXTRA_STATE));
+					Log.d("phone", "phone state changed to " + intent.getStringExtra(TelephonyManager.EXTRA_STATE));
+					if (phone_ringing && intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.CALL_STATE_IDLE)) {
+						phone_ringing = false;
+						refreshDisplay();
+					}
 				}
 			}
 		}
 	};
 
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		//get the audio manager
 		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-		
+
 		//pass a reference back to the Functions class so it can finish us when it wants to
 		//FIXME Presumably there is a better way to do this
 		Functions.defaultActivity = this;
-		
+
 		Log.d("DA.onCreate", "onCreate of DefaultView.");
-		
+
 		//Remove title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -164,12 +146,13 @@ public class DefaultActivity extends Activity {
 
 		//set default view
 		setContentView(R.layout.activity_default);
-		
+
 		//add screen on and alarm fired intent receiver
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(ALARM_ALERT_ACTION);
+		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 		registerReceiver(receiver, filter);
 
 	}  
@@ -178,78 +161,92 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 		Log.d("DA.onResume", "On resume called.");
 
 		refreshDisplay();
-				
+
 	}
-	
+
 	/**
 	 * Refresh the display taking account of device and application state
 	 */
-	private void refreshDisplay() {
+	public void refreshDisplay() {
 
 		//get the layout for the windowed view
-	    RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
-	    
-	    //if the alarm is firing then show the alarm controls, otherwise
-	    //if we have a media app widget and media is playing or headphones are connected then display that, otherwise
-	    //if we have a default app widget to use then display that, if not then display our default clock screen
-	    //(which is part of the default layout so will show anyway)
-	    //will do this simply by setting the widgetType
-	    String widgetType = "default";
-	    if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
-	    	widgetType = "media";
-	    }
-	    
-	    if (alarm_firing) {
-	    	//show the alarm controls
-	    	findViewById(R.id.dismissbutton).setVisibility(View.VISIBLE);
-	    	findViewById(R.id.snoozebutton).setVisibility(View.VISIBLE);
-	    	findViewById(R.id.default_widget).setVisibility(View.INVISIBLE);
-	    	findViewById(R.id.default_icon_container).setVisibility(View.INVISIBLE);
-	
-	    } else {
-		    
-		    
-		    //add the required widget based on the widgetType
-		    if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
-		    	
-		    	//remove the TextClock from the contentview
-			    contentView.removeAllViews();
-		    	
-		    	//get the widget
-			    AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
-			    
-			    //if the widget host view already has a parent then we need to detach it
-			    ViewGroup parent = (ViewGroup)hostView.getParent();
-			    if ( parent != null) {
-			    	Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
-			       	parent.removeView(hostView);
-			    }    
-			    
-			    //add the widget to the view
-			    contentView.addView(hostView);
-		    } else {
-		    	//default view
-		    	findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
-		    	findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
-		    	findViewById(R.id.default_widget).setVisibility(View.VISIBLE);
-		    	findViewById(R.id.default_icon_container).setVisibility(View.VISIBLE);
-		    	
-		    	Drawable rounded = getResources().getDrawable(R.drawable.rounded);
-		    	rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
-		    	((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
-		    	((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
-		    }
-	    }
+		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
+
+		//if the alarm is firing then show the alarm controls, otherwise
+		//if we have a media app widget and media is playing or headphones are connected then display that, otherwise
+		//if we have a default app widget to use then display that, if not then display our default clock screen
+		//(which is part of the default layout so will show anyway)
+		//will do this simply by setting the widgetType
+		String widgetType = "default";
+		if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
+			widgetType = "media";
+		}
+
+		if (alarm_firing) {
+			// show the alarm controls
+			findViewById(R.id.dismissbutton).setVisibility(View.VISIBLE);
+			findViewById(R.id.snoozebutton).setVisibility(View.VISIBLE);
+			findViewById(R.id.hangup_button).setVisibility(View.INVISIBLE);
+			findViewById(R.id.pickup_button).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_widget).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_icon_container).setVisibility(View.INVISIBLE);
+			
+		} else if (phone_ringing) {
+			
+			// show the phone controls
+			findViewById(R.id.hangup_button).setVisibility(View.VISIBLE);
+			findViewById(R.id.pickup_button).setVisibility(View.VISIBLE);
+			findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
+			findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_widget).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_icon_container).setVisibility(View.INVISIBLE);
+
+		} else {
+
+
+			//add the required widget based on the widgetType
+			if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
+
+				//remove the TextClock from the contentview
+				contentView.removeAllViews();
+
+				//get the widget
+				AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
+
+				//if the widget host view already has a parent then we need to detach it
+				ViewGroup parent = (ViewGroup)hostView.getParent();
+				if ( parent != null) {
+					Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
+					parent.removeView(hostView);
+				}    
+
+				//add the widget to the view
+				contentView.addView(hostView);
+			} else {
+				//default view
+				findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.hangup_button).setVisibility(View.INVISIBLE);
+				findViewById(R.id.pickup_button).setVisibility(View.INVISIBLE);
+				findViewById(R.id.default_widget).setVisibility(View.VISIBLE);
+				findViewById(R.id.default_icon_container).setVisibility(View.VISIBLE);
+
+				Drawable rounded = getResources().getDrawable(R.drawable.rounded);
+				rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
+				((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
+				((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+			}
+		}
 	}
-	
-	
+
+
 	/** Called when the user touches the snooze button */
 	public void sendSnooze(View view) {
-	    // Broadcast alarm snooze event
+		// Broadcast alarm snooze event
 		Intent alarmSnooze = new Intent(ALARM_SNOOZE_ACTION);
 		sendBroadcast(alarmSnooze);
 		//unset alarm firing flag
@@ -257,7 +254,7 @@ public class DefaultActivity extends Activity {
 		//refresh the display
 		refreshDisplay();
 	}
-	
+
 	/** Called when the user touches the dismiss button */
 	public void sendDismiss(View view) {
 		// Broadcast alarm dismiss event
@@ -269,32 +266,40 @@ public class DefaultActivity extends Activity {
 		refreshDisplay();
 	}
 	
+	public void sendHangUp(View view) {
+		Functions.Actions.hangup_call();
+	}
+	
+	public void sendPickUp(View view) {
+		Functions.Actions.pickup_call();
+	}
+
 	@Override
 	protected void onStart() {
-	    super.onStart();
-	    Log.d("DA-oS", "starting");
-	    on_screen = true;
-	    
-	    if (findViewById(R.id.default_battery) != null) {
-	    	Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-	    	if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
-	    		|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
-	    		((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
-	    	} else {
-	    		((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
-	    	}
-	    	((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
-	    }
-	    
-	    if (NotificationService.that != null) {
-	    	// notification listener service is running, show the current notifications
-	    	// TODO move this to Functions.java
-	    	final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
-	    	Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
-	    	final GridView grid = (GridView)findViewById(R.id.default_icon_container);
-	    	final Context that = this;
-	    	grid.setNumColumns(notifs.length);
-	    	grid.setAdapter(new BaseAdapter() {
+		super.onStart();
+		Log.d("DA-oS", "starting");
+		on_screen = true;
+
+		if (findViewById(R.id.default_battery) != null) {
+			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+			if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
+					|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
+				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
+			} else {
+				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
+			}
+			((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
+		}
+
+		if (NotificationService.that != null) {
+			// notification listener service is running, show the current notifications
+			// TODO move this to Functions.java
+			final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
+			Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
+			final GridView grid = (GridView)findViewById(R.id.default_icon_container);
+			final Context that = this;
+			grid.setNumColumns(notifs.length);
+			grid.setAdapter(new BaseAdapter() {
 
 				@Override
 				public int getCount() {
@@ -310,7 +315,7 @@ public class DefaultActivity extends Activity {
 				public long getItemId(int position) {
 					return 0;
 				}
-				
+
 				@Override
 				public View getView(int position, View convert, ViewGroup parent) {
 					ImageView view;
@@ -320,8 +325,8 @@ public class DefaultActivity extends Activity {
 						view = new ImageView(that);
 						view.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT));
 						view.setScaleType(ImageView.ScaleType.FIT_CENTER);
-			            view.setPadding(0, 0, 0, 0);
-			            try {
+						view.setPadding(0, 0, 0, 0);
+						try {
 							view.setImageDrawable(that.createPackageContext(notifs[position].getPackageName(), 0).getResources().getDrawable(notifs[position].getNotification().icon));
 						} catch (NotFoundException e) {
 							// TODO Auto-generated catch block
@@ -331,20 +336,20 @@ public class DefaultActivity extends Activity {
 							e.printStackTrace();
 						}
 					}
-					
+
 					return view;
 				}	    		
-	    	});
-	    }
+			});
+		}
 	}
-	
+
 	@Override
 	protected void onStop() {
-	    super.onStop();
-	    Log.d("DA-oS", "stopping");
-	    on_screen = false;
+		super.onStop();
+		Log.d("DA-oS", "stopping");
+		on_screen = false;
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
