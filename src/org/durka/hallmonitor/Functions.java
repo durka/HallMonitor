@@ -33,6 +33,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -51,6 +52,8 @@ public class Functions {
 	//widget configuration
 	public static final int REQUEST_PICK_APPWIDGET = 9;
 	public static final int REQUEST_CONFIGURE_APPWIDGET = 5;
+
+    private static final String DEV_SERRANO_LTE = "serranolte"; // GT-I9195
 	
 	//Class that handles interaction with 3rd party App Widgets
 	public static final HMAppWidgetManager hmAppWidgetManager = new HMAppWidgetManager();
@@ -96,8 +99,13 @@ public class Functions {
 			//if we are running in root enabled mode then lets up the sensitivity on the view screen
 			//so we can use the screen through the window
 			 if (Functions.Events.rootEnabled) {
-				 Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
-				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,1 > cmd"});
+                 Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
+
+                 if (Build.DEVICE.equals(DEV_SERRANO_LTE)) {
+                     run_commands_as_root(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
+                 } else // others devices
+                     run_commands_as_root(new String[]{"echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd"});
+
 				 Log.d("F.Act.close_cover", "...Sensitivity boosted, hold onto your hats!");
 			 }
 			
@@ -134,8 +142,7 @@ public class Functions {
 			}, delay);
             
 		}
-		
-		
+
 		/**
 		 * Called from within the Functions.Event.Proximity method.
          * If we are running root enabled reverts the screen sensitivity.
@@ -171,7 +178,7 @@ public class Functions {
 			//so we can use the device as normal
 			 if (Functions.Events.rootEnabled) {
 				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
-				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd"});
+				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd && cat /sys/class/sec/tsp/cmd_result"});
 				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
 			 }
 		}
@@ -318,7 +325,8 @@ public class Functions {
 	    		Intent startServiceIntent = new Intent(ctx, ViewCoverService.class);
 	    		ctx.startService(startServiceIntent);
 	    	}
-		}
+
+        }
 		
 		
 		/**
