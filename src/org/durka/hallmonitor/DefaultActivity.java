@@ -50,12 +50,22 @@ public class DefaultActivity extends Activity {
 	private AudioManager audioManager;
 
 	//Action fired when alarm goes off
-	public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
-	//Action to trigger snooze of the alarm
-	public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
-	//Action to trigger dismiss of the alarm
-	public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
-
+    public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
+    //Action to trigger snooze of the alarm
+    public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
+    //Action to trigger dismiss of the alarm
+    public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
+    //This action should let us know if the alarm has been killed by another app
+    public static final String ALARM_DONE_ACTION = "com.android.deskclock.ALARM_DONE";
+    
+    //all the views we need
+    private GridView grid = null;
+    private View snoozeButton = null;
+    private View dismissButton = null;
+    private View defaultWidget = null;
+    private RelativeLayout defaultContent = null;
+    private TextClock defaultTextClock = null;
+	
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
@@ -110,6 +120,14 @@ public class DefaultActivity extends Activity {
 					Log.d("DA.onReceive", "Alarm controls are not enabled.");
 				}
 
+			} else if (intent.getAction().equals(ALARM_DONE_ACTION) ) {
+					
+					Log.d("DA.onReceive", "Alarm done event received.");
+					
+					//if the alarm is turned off using the normal alarm screen this will
+					//ensure that we will hide the alarm controls
+					alarm_firing=false;
+				
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
 				if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 					Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
@@ -152,8 +170,17 @@ public class DefaultActivity extends Activity {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(ALARM_ALERT_ACTION);
+		filter.addAction(ALARM_DONE_ACTION);
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 		registerReceiver(receiver, filter);
+		
+		//get the views we need
+		grid = (GridView)findViewById(R.id.default_icon_container);
+	    snoozeButton = findViewById(R.id.snoozebutton);
+	    dismissButton = findViewById(R.id.dismissbutton);
+	    defaultWidget = findViewById(R.id.default_widget);
+	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
+	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
 
 	}  
 
@@ -163,9 +190,7 @@ public class DefaultActivity extends Activity {
 		super.onResume();
 
 		Log.d("DA.onResume", "On resume called.");
-
-		refreshDisplay();
-
+			
 	}
 
 	/**
@@ -174,73 +199,59 @@ public class DefaultActivity extends Activity {
 	public void refreshDisplay() {
 
 		//get the layout for the windowed view
-		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
-
-		//if the alarm is firing then show the alarm controls, otherwise
-		//if we have a media app widget and media is playing or headphones are connected then display that, otherwise
-		//if we have a default app widget to use then display that, if not then display our default clock screen
-		//(which is part of the default layout so will show anyway)
-		//will do this simply by setting the widgetType
-		String widgetType = "default";
-		if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
-			widgetType = "media";
-		}
-
-		if (alarm_firing) {
-			// show the alarm controls
-			findViewById(R.id.dismissbutton).setVisibility(View.VISIBLE);
-			findViewById(R.id.snoozebutton).setVisibility(View.VISIBLE);
-			findViewById(R.id.hangup_button).setVisibility(View.INVISIBLE);
-			findViewById(R.id.pickup_button).setVisibility(View.INVISIBLE);
-			findViewById(R.id.default_widget).setVisibility(View.INVISIBLE);
-			findViewById(R.id.default_icon_container).setVisibility(View.INVISIBLE);
-			
-		} else if (phone_ringing) {
-			
-			// show the phone controls
-			findViewById(R.id.hangup_button).setVisibility(View.VISIBLE);
-			findViewById(R.id.pickup_button).setVisibility(View.VISIBLE);
-			findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
-			findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
-			findViewById(R.id.default_widget).setVisibility(View.INVISIBLE);
-			findViewById(R.id.default_icon_container).setVisibility(View.INVISIBLE);
-
-		} else {
-
-
-			//add the required widget based on the widgetType
-			if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
-
-				//remove the TextClock from the contentview
-				contentView.removeAllViews();
-
-				//get the widget
-				AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
-
-				//if the widget host view already has a parent then we need to detach it
-				ViewGroup parent = (ViewGroup)hostView.getParent();
-				if ( parent != null) {
-					Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
-					parent.removeView(hostView);
-				}    
-
-				//add the widget to the view
-				contentView.addView(hostView);
-			} else {
-				//default view
-				findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
-				findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
-				findViewById(R.id.hangup_button).setVisibility(View.INVISIBLE);
-				findViewById(R.id.pickup_button).setVisibility(View.INVISIBLE);
-				findViewById(R.id.default_widget).setVisibility(View.VISIBLE);
-				findViewById(R.id.default_icon_container).setVisibility(View.VISIBLE);
-
-				Drawable rounded = getResources().getDrawable(R.drawable.rounded);
-				rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
-				((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
-				((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
-			}
-		}
+	    RelativeLayout contentView = defaultContent;
+	    
+	    //if the alarm is firing then show the alarm controls, otherwise
+	    //if we have a media app widget and media is playing or headphones are connected then display that, otherwise
+	    //if we have a default app widget to use then display that, if not then display our default clock screen
+	    //(which is part of the default layout so will show anyway)
+	    //will do this simply by setting the widgetType
+	    String widgetType = "default";
+	    if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
+	    	widgetType = "media";
+	    }
+	    
+	    if (alarm_firing) {
+	    	//show the alarm controls
+	    	snoozeButton.setVisibility(View.VISIBLE);
+	    	dismissButton.setVisibility(View.VISIBLE);
+	    	defaultWidget.setVisibility(View.INVISIBLE);
+	    	grid.setVisibility(View.INVISIBLE);
+	
+	    } else {
+		    
+		    
+		    //add the required widget based on the widgetType
+		    if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
+		    	
+		    	//remove the TextClock from the contentview
+			    contentView.removeAllViews();
+		    	
+		    	//get the widget
+			    AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
+			    
+			    //if the widget host view already has a parent then we need to detach it
+			    ViewGroup parent = (ViewGroup)hostView.getParent();
+			    if ( parent != null) {
+			    	Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
+			       	parent.removeView(hostView);
+			    }    
+			    
+			    //add the widget to the view
+			    contentView.addView(hostView);
+		    } else {
+		    	//default view    	
+		    	snoozeButton.setVisibility(View.INVISIBLE);
+		    	dismissButton.setVisibility(View.INVISIBLE);
+		    	defaultWidget.setVisibility(View.VISIBLE);
+		    	grid.setVisibility(View.VISIBLE);
+		    	
+		    	Drawable rounded = getResources().getDrawable(R.drawable.rounded);
+		    	rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
+		    	defaultContent.setBackground(rounded);
+		    	defaultTextClock.setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+		    }
+	    }
 	}
 
 
@@ -276,30 +287,32 @@ public class DefaultActivity extends Activity {
 
 	@Override
 	protected void onStart() {
-		super.onStart();
-		Log.d("DA-oS", "starting");
-		on_screen = true;
-
-		if (findViewById(R.id.default_battery) != null) {
-			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
-					|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
-			} else {
-				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
-			}
-			((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
-		}
-
-		if (NotificationService.that != null) {
-			// notification listener service is running, show the current notifications
-			// TODO move this to Functions.java
-			final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
-			Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
-			final GridView grid = (GridView)findViewById(R.id.default_icon_container);
-			final Context that = this;
-			grid.setNumColumns(notifs.length);
-			grid.setAdapter(new BaseAdapter() {
+	    super.onStart();
+	    Log.d("DA-oS", "starting");
+	    on_screen = true;
+	    
+	    refreshDisplay();
+	    
+	    if (findViewById(R.id.default_battery) != null) {
+	    	Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+	    	if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
+	    		|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
+	    		((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
+	    	} else {
+	    		((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
+	    	}
+	    	((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
+	    }
+	    
+	    if (NotificationService.that != null) {
+	    	// notification listener service is running, show the current notifications
+	    	// TODO move this to Functions.java
+	    	final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
+	    	Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
+	    	
+	    	final Context that = this;
+	    	grid.setNumColumns(notifs.length);
+	    	grid.setAdapter(new BaseAdapter() {
 
 				@Override
 				public int getCount() {
