@@ -72,8 +72,8 @@ public class Functions {
 	public static class Actions {
 		
 		//used for the timer to turn off the screen on a delay
-        private static Timer timer = new Timer();
-        private static TimerTask timerTask;
+        public static Timer timer = new Timer();
+        public static TimerTask timerTask;
 		
         
         /**

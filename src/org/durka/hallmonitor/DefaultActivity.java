@@ -351,6 +351,9 @@ public class DefaultActivity extends Activity {
 	protected void onStop() {
 		super.onStop();
 		Log.d("DA-oS", "stopping");
+		if (Functions.Actions.timerTask != null) {
+			Functions.Actions.timerTask.cancel();
+		}
 		on_screen = false;
 	}
 
