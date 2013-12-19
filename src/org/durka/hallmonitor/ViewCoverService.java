@@ -38,9 +38,6 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d("VCS.onStartCommand", "View cover service started");
 
-        // restore rootEnabled
-        Functions.Events.rootEnabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_runasroot", false);
-
         //We don't want to do this - almost by defninition the cover can't be closed, and we don't actually want to do any open cover functionality
 		//until the cover is closed and then opened again
 		/*if (Functions.Is.cover_closed(this)) {

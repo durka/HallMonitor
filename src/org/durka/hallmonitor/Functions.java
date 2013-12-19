@@ -106,7 +106,7 @@ public class Functions {
 			
 			//if we are running in root enabled mode then lets up the sensitivity on the view screen
 			//so we can use the screen through the window
-			 if (Functions.Events.rootEnabled) {
+			 if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
                  Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
 
                  if (Build.DEVICE.equals(DEV_SERRANO_LTE)) {
@@ -184,7 +184,7 @@ public class Functions {
 			
 			//if we are running in root enabled mode then lets revert the sensitivity on the view screen
 			//so we can use the device as normal
-			 if (Functions.Events.rootEnabled) {
+			 if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
 				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
 				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd && cat /sys/class/sec/tsp/cmd_result"});
 				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
@@ -258,9 +258,9 @@ public class Functions {
 		 * Execute shell commands
 		 * @param cmds Commands to execute
 		 */
-		public static void run_commands_as_root(String[] cmds) { run_commands_as_root(cmds, true); }
+		public static String run_commands_as_root(String[] cmds) { return run_commands_as_root(cmds, true); }
 		
-		public static void run_commands_as_root(String[] cmds, boolean want_output) {
+		public static String run_commands_as_root(String[] cmds, boolean want_output) {
 	        try {
 	        	Process p = Runtime.getRuntime().exec("su");
 	        	
@@ -301,10 +301,14 @@ public class Functions {
 		              error += currentLine + "\n";
 		            }	           
 		            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
+		            
+		            return output.trim();
 	            }
+	            return "";
 
 	        } catch (IOException ioe) {
 	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
+	        	return "";
 	        }
 		}
 
@@ -332,12 +336,6 @@ public class Functions {
 		
 		//is the cover closed
 		private static boolean cover_closed;
-		//has root been enabled
-		public static boolean rootEnabled = false;
-		//have alarm controls been enabled
-		public static boolean alarmControlsEnabled = false;
-		// have phone controls been enabled
-		public static boolean phoneControlsEnabled = false;
 		
 		/**
 		 * Invoked from the BootReceiver, allows for start on boot, as is registered in the manifest as listening for:

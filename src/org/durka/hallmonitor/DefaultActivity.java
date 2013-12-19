@@ -89,7 +89,7 @@ public class DefaultActivity extends Activity {
 				Log.d("DA.onReceive", "Alarm on event received.");
 
 				//only take action if alarm controls are enabled
-				if (Functions.Events.alarmControlsEnabled) {
+				if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_alarm_controls", false)) {
 
 					Log.d("DA.onReceive", "Alarm controls are enabled, taking action.");
 
@@ -121,7 +121,7 @@ public class DefaultActivity extends Activity {
 
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
 				
-				if (Functions.Events.phoneControlsEnabled) {
+				if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_phone_controls", false)) {
 					String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
 					Log.d("phone", "phone state changed to " + state);
 					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
@@ -132,6 +132,8 @@ public class DefaultActivity extends Activity {
 							refreshDisplay();
 						}
 					}
+				} else {
+					Log.d("phone", "phone controls are not enabled");
 				}
 			}
 		}

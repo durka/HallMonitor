@@ -42,9 +42,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    		.edit()
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
 	    		.putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(),"default"))
-	    		.putBoolean("pref_runasroot_enabled", Functions.Events.rootEnabled)
 	    		.putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(),"media"))
-	    		.putBoolean("pref_alarm_controls_enabled", Functions.Events.alarmControlsEnabled)
 	    		.commit();
 	    
 	    getPreferenceManager().getSharedPreferences()
@@ -106,29 +104,10 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 		} else if (key.equals("pref_runasroot")) {
 				
 			if (prefs.getBoolean(key, false)) {
-				Functions.Actions.run_commands_as_root(new String[]{"whoami"});
-				Functions.Events.rootEnabled = true;
-			} else {
-				//Functions.Actions.unregister_widget(getActivity(), "default");
-				Functions.Events.rootEnabled = false;
-			}
-				
-		// if the default screen widget is being enabled/disabled the key will be pref_alarm_controls	
-		} else if (key.equals("pref_alarm_controls")) {
-			
-			if (prefs.getBoolean(key, false)) {
-				Functions.Events.alarmControlsEnabled = true;
-			} else {
-				//Functions.Actions.unregister_widget(getActivity(), "default");
-				Functions.Events.alarmControlsEnabled = false;
-			}
-			
-		} else if (key.equals("phone_controls_enabled")) {
-			
-			if (prefs.getBoolean(key, false)) {
-				Functions.Events.phoneControlsEnabled = true;
-			} else {
-				Functions.Events.phoneControlsEnabled = false;
+				if (!Functions.Actions.run_commands_as_root(new String[]{"whoami"}).equals("root")) {
+					// if "whoami" doesn't work, refuse to set preference
+					prefs.edit().putBoolean(key, false).commit();
+				}
 			}
 
 		} else if (key.equals("pref_do_notifications")) {
