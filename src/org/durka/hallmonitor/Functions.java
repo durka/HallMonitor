@@ -336,6 +336,8 @@ public class Functions {
 		public static boolean rootEnabled = false;
 		//have alarm controls been enabled
 		public static boolean alarmControlsEnabled = false;
+		// have phone controls been enabled
+		public static boolean phoneControlsEnabled = false;
 		
 		/**
 		 * Invoked from the BootReceiver, allows for start on boot, as is registered in the manifest as listening for:

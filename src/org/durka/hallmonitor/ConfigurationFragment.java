@@ -122,6 +122,14 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				//Functions.Actions.unregister_widget(getActivity(), "default");
 				Functions.Events.alarmControlsEnabled = false;
 			}
+			
+		} else if (key.equals("phone_controls_enabled")) {
+			
+			if (prefs.getBoolean(key, false)) {
+				Functions.Events.phoneControlsEnabled = true;
+			} else {
+				Functions.Events.phoneControlsEnabled = false;
+			}
 
 		} else if (key.equals("pref_do_notifications")) {
 			startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));

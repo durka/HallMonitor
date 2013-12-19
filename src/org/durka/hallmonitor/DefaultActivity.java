@@ -120,14 +120,17 @@ public class DefaultActivity extends Activity {
 				}
 
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
-				String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-				Log.d("phone", "phone state changed to " + state);
-				if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-					Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
-				} else {
-					if (state.equals(TelephonyManager.CALL_STATE_IDLE)) {
-						Functions.Events.call_finished(context);
-						refreshDisplay();
+				
+				if (Functions.Events.phoneControlsEnabled) {
+					String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+					Log.d("phone", "phone state changed to " + state);
+					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+						Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
+					} else {
+						if (state.equals(TelephonyManager.CALL_STATE_IDLE)) {
+							Functions.Events.call_finished(context);
+							refreshDisplay();
+						}
 					}
 				}
 			}
