@@ -31,14 +31,20 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.app.admin.DevicePolicyManager;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
+import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -478,6 +484,7 @@ public class Functions {
 				//to guarantee that we need to hold off until the dialer activity is running
 				//a 1 second delay seems to allow this
 				DefaultActivity.phone_ringing = true;
+				DefaultActivity.call_from = number;
 
 				Timer timer = new Timer();
 				timer.schedule(new TimerTask() {
@@ -514,6 +521,12 @@ public class Functions {
 				*/
 				
 			}
+		}
+		
+		public static void call_finished(Context ctx) {
+			Log.d("phone", "call is over, cleaning up");
+			DefaultActivity.phone_ringing = false;
+			((TextView)defaultActivity.findViewById(R.id.call_from)).setText(ctx.getString(R.string.unknown_caller));
 		}
 	}
 	
@@ -592,6 +605,35 @@ public class Functions {
 		
 		
 		
+	}
+	
+	public static class Util {
+		// from http://stackoverflow.com/questions/3712112/search-contact-by-phone-number
+		public static String getContactName(Context ctx, String number) {
+			Log.d("phone", "looking up " + number + "...");
+			
+		    Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+		    String name = number;
+
+		    ContentResolver contentResolver = ctx.getContentResolver();
+		    Cursor contactLookup = contentResolver.query(uri, new String[] {BaseColumns._ID,
+		            ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
+
+		    try {
+		        if (contactLookup != null && contactLookup.getCount() > 0) {
+		            contactLookup.moveToNext();
+		            name = contactLookup.getString(contactLookup.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
+		            //String contactId = contactLookup.getString(contactLookup.getColumnIndex(BaseColumns._ID));
+		        }
+		    } finally {
+		        if (contactLookup != null) {
+		            contactLookup.close();
+		        }
+		    }
+
+		    Log.d("phone", "...result is " + name);
+		    return name;
+		}
 	}
 
 }

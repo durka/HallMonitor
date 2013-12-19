@@ -4,15 +4,20 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.io.IOException;
 
+import org.durka.hallmonitor.Functions.Util;
+
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
+import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -20,6 +25,8 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
+import android.provider.ContactsContract;
 import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -32,6 +39,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 /**
  * This is the activity that is displayed by default - it is displayed for the configurable delay number of milliseconds when the case is closed,
@@ -45,6 +53,7 @@ public class DefaultActivity extends Activity {
 	// states for alarm and phone
 	public static boolean alarm_firing = false;
 	public static boolean phone_ringing = false;
+	public static String call_from = "";
 
 	//audio manager to detect media state
 	private AudioManager audioManager;
@@ -111,12 +120,13 @@ public class DefaultActivity extends Activity {
 				}
 
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
-				if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+				String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+				Log.d("phone", "phone state changed to " + state);
+				if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 					Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 				} else {
-					Log.d("phone", "phone state changed to " + intent.getStringExtra(TelephonyManager.EXTRA_STATE));
-					if (phone_ringing && intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.CALL_STATE_IDLE)) {
-						phone_ringing = false;
+					if (state.equals(TelephonyManager.CALL_STATE_IDLE)) {
+						Functions.Events.call_finished(context);
 						refreshDisplay();
 					}
 				}
@@ -174,7 +184,7 @@ public class DefaultActivity extends Activity {
 	public void refreshDisplay() {
 
 		//get the layout for the windowed view
-		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_content);
+		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
 
 		//if the alarm is firing then show the alarm controls, otherwise
 		//if we have a media app widget and media is playing or headphones are connected then display that, otherwise
@@ -188,25 +198,24 @@ public class DefaultActivity extends Activity {
 
 		if (alarm_firing) {
 			// show the alarm controls
-			findViewById(R.id.dismissbutton).setVisibility(View.VISIBLE);
-			findViewById(R.id.snoozebutton).setVisibility(View.VISIBLE);
-			findViewById(R.id.hangup_button).setVisibility(View.INVISIBLE);
-			findViewById(R.id.pickup_button).setVisibility(View.INVISIBLE);
-			findViewById(R.id.default_widget).setVisibility(View.INVISIBLE);
-			findViewById(R.id.default_icon_container).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_alarm).setVisibility(View.VISIBLE);
+			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
 			
 		} else if (phone_ringing) {
 			
 			// show the phone controls
-			findViewById(R.id.hangup_button).setVisibility(View.VISIBLE);
-			findViewById(R.id.pickup_button).setVisibility(View.VISIBLE);
-			findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
-			findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
-			findViewById(R.id.default_widget).setVisibility(View.INVISIBLE);
-			findViewById(R.id.default_icon_container).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_phone).setVisibility(View.VISIBLE);
+			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
+			
+			((TextView)findViewById(R.id.call_from)).setText(Functions.Util.getContactName(this, call_from));
 
 		} else {
-
+			//normal view
+			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_normal).setVisibility(View.VISIBLE);
 
 			//add the required widget based on the widgetType
 			if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
@@ -227,13 +236,6 @@ public class DefaultActivity extends Activity {
 				//add the widget to the view
 				contentView.addView(hostView);
 			} else {
-				//default view
-				findViewById(R.id.dismissbutton).setVisibility(View.INVISIBLE);
-				findViewById(R.id.snoozebutton).setVisibility(View.INVISIBLE);
-				findViewById(R.id.hangup_button).setVisibility(View.INVISIBLE);
-				findViewById(R.id.pickup_button).setVisibility(View.INVISIBLE);
-				findViewById(R.id.default_widget).setVisibility(View.VISIBLE);
-				findViewById(R.id.default_icon_container).setVisibility(View.VISIBLE);
 
 				Drawable rounded = getResources().getDrawable(R.drawable.rounded);
 				rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
@@ -280,15 +282,17 @@ public class DefaultActivity extends Activity {
 		Log.d("DA-oS", "starting");
 		on_screen = true;
 
-		if (findViewById(R.id.default_battery) != null) {
+		if (findViewById(R.id.default_battery_picture) != null) {
 			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
-					|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
+			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
+				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
+				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
 			} else {
-				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
+				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
 			}
-			((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
+			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
+			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
 		}
 
 		if (NotificationService.that != null) {

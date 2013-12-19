@@ -85,6 +85,12 @@
         android:summary="@string/pref_alarm_controls_summary"
         android:defaultValue="false" />
     
+    <CheckBoxPreference
+        android:key="pref_phone_controls"
+        android:title="@string/pref_phone_controls"
+        android:summary="@string/pref_phone_controls_summary"
+        android:defaultValue="false" />
+    
     <Preference
         android:title=""
         android:summary=""
