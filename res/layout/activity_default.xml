@@ -17,67 +17,128 @@
         android:gravity="center"
         android:keepScreenOn="true" >
         
-         <Button
-           android:id="@+id/snoozebutton"
-           style="?android:attr/buttonStyleSmall"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_alignBaseline="@+id/dismissbutton"
-           android:layout_alignBottom="@+id/dismissbutton"
-           android:layout_alignParentLeft="true"
-           android:background="@drawable/snooze_button"
-           android:onClick="sendSnooze"
-           android:visibility="visible" />
-
-       	<Button
-       	    android:id="@+id/dismissbutton"
-       	    style="?android:attr/buttonStyleSmall"
-       	    android:layout_width="wrap_content"
-       	    android:layout_height="wrap_content"
-       	    android:layout_alignParentRight="true"
-       	    android:layout_centerVertical="true"
-       	    android:background="@drawable/dismiss_button"
-       	    android:onClick="sendDismiss"
-       	    android:visibility="visible" />
-
+        <RelativeLayout
+            android:id="@+id/default_content_alarm"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" >
+	            
+	         <ImageButton
+	           android:id="@+id/snoozebutton"
+	           style="?android:attr/buttonStyleSmall"
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:layout_alignBaseline="@+id/dismissbutton"
+	           android:layout_alignBottom="@+id/dismissbutton"
+	           android:layout_alignParentLeft="true"
+	           android:src="@drawable/snooze_button"
+	           android:onClick="sendSnooze" />
+	
+	       	<ImageButton
+	       	    android:id="@+id/dismissbutton"
+	       	    style="?android:attr/buttonStyleSmall"
+	       	    android:layout_width="wrap_content"
+	       	    android:layout_height="wrap_content"
+	       	    android:layout_alignParentRight="true"
+	       	    android:layout_centerVertical="true"
+	       	    android:src="@drawable/dismiss_button"
+	       	    android:onClick="sendDismiss" />
+	       	
+       	</RelativeLayout>
+       	
+        <RelativeLayout
+            android:id="@+id/default_content_phone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" >
+       	
+	       <ImageButton
+	           android:id="@+id/hangup_button"
+	           style="?android:attr/buttonStyleSmall"
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:layout_alignBaseline="@+id/pickup_button"
+	           android:layout_alignBottom="@+id/pickup_button"
+	           android:layout_alignParentLeft="true"
+	           android:src="@drawable/ic_jog_dial_decline"
+	           android:onClick="sendHangUp" />
+	       
+	
+	        <TextView
+	            android:id="@+id/call_from"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerHorizontal="true"
+	            android:text="@string/unknown_caller"
+	            android:textAppearance="?android:attr/textAppearanceLarge" />
+	
+	       	<ImageButton
+	       	    android:id="@+id/pickup_button"
+	       	    style="?android:attr/buttonStyleSmall"
+	       	    android:layout_width="wrap_content"
+	       	    android:layout_height="wrap_content"
+	       	    android:layout_alignParentRight="true"
+	       	    android:layout_centerVertical="true"
+	       	    android:src="@drawable/ic_jog_dial_answer"
+	       	    android:onClick="sendPickUp" />
+	       	
+	   </RelativeLayout>
+	   
        <RelativeLayout
-           android:id="@+id/default_widget"
-           android:layout_width="310dp"
-           android:layout_height="75dp"
-           android:layout_centerHorizontal="true"
-           android:gravity="center" >
-       
-               <TextClock
-                   android:id="@+id/default_text_clock"
-                   android:layout_width="wrap_content"
-                   android:layout_height="match_parent"
-                   android:keepScreenOn="true"
-                   android:textColor="#33b5e5"
-                   android:textSize="50sp"
-                   android:textStyle="bold" />
+           android:id="@+id/default_content_normal"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:visible="true" >
 
-               <ImageView
-                   android:id="@+id/default_battery"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_toRightOf="@id/default_text_clock"
-                   android:layout_alignParentRight="true"
-                   android:layout_centerVertical="true"
-                   android:layout_marginRight="23dp"
-                   android:src="@drawable/stat_sys_battery" />
-       
+	       <RelativeLayout
+	           android:id="@+id/default_widget"
+	           android:layout_width="match_parent"
+	           android:layout_height="75dp"
+	           android:layout_centerHorizontal="true"
+	           android:gravity="center" >
+	       
+	               <TextClock
+	                   android:id="@+id/default_text_clock"
+	                   android:layout_width="wrap_content"
+	                   android:layout_height="match_parent"
+	                   android:keepScreenOn="true"
+	                   android:textColor="#33b5e5"
+	                   android:textSize="50sp"
+	                   android:textStyle="bold" />
+
+	               <TextView
+	                   android:id="@+id/default_battery_percent"
+	                   android:layout_width="wrap_content"
+	                   android:layout_height="wrap_content"
+	                   android:layout_alignParentRight="true"
+	                   android:layout_centerVertical="true"
+	                   android:text="100%"
+	                   android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	               <ImageView
+	                   android:id="@+id/default_battery_picture"
+	                   android:layout_width="wrap_content"
+	                   android:layout_height="wrap_content"
+	                   android:layout_alignParentRight="true"
+	                   android:layout_centerVertical="true"
+	                   android:layout_marginRight="60dp"
+	                   android:src="@drawable/stat_sys_battery" />
+	       
+	       </RelativeLayout>
+	              
+	       <GridView
+	        android:id="@+id/default_icon_container"
+	        android:layout_width="match_parent"
+	        android:layout_height="50dp"
+	        android:layout_below="@id/default_widget"
+	        android:padding="0dp"
+	        android:layout_margin="0dp"
+	                android:horizontalSpacing="4dp"
+	                android:columnWidth="24dp"
+	                android:numColumns="0" />
+
        </RelativeLayout>
-              
-       <GridView
-        android:id="@+id/default_icon_container"
-        android:layout_width="310dp"
-        android:layout_height="50dp"
-        android:layout_below="@id/default_widget"
-        android:padding="0dp"
-        android:layout_margin="0dp"
-                android:horizontalSpacing="4dp"
-                android:columnWidth="24dp"
-                android:numColumns="0" />
+        
+       </RelativeLayout>
 
-        </RelativeLayout>
 </RelativeLayout>

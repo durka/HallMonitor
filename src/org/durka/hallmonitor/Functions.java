@@ -31,13 +31,21 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.app.admin.DevicePolicyManager;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
+import android.provider.ContactsContract;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -67,8 +75,8 @@ public class Functions {
 	public static class Actions {
 		
 		//used for the timer to turn off the screen on a delay
-        private static Timer timer = new Timer();
-        private static TimerTask timerTask;
+        public static Timer timer = new Timer();
+        public static TimerTask timerTask;
 		
         
         /**
@@ -250,7 +258,9 @@ public class Functions {
 		 * Execute shell commands
 		 * @param cmds Commands to execute
 		 */
-		public static void run_commands_as_root(String[] cmds) {
+		public static void run_commands_as_root(String[] cmds) { run_commands_as_root(cmds, true); }
+		
+		public static void run_commands_as_root(String[] cmds, boolean want_output) {
 	        try {
 	        	Process p = Runtime.getRuntime().exec("su");
 	        	
@@ -276,24 +286,41 @@ public class Functions {
 	            os.writeBytes("exit\n");  
 	            os.flush();
 	            
-	            //log out the output
-	            String output = "";
-	            while ((currentLine = isBr.readLine()) != null) {
-	              output += currentLine + "\n";
-	            } 
-	            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
-           
-	            //log out the error output
-	            String error = "";
-	            currentLine = "";
-	            while ((currentLine = esBr.readLine()) != null) {
-	              error += currentLine + "\n";
-	            }	           
-	            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
+	            if (want_output) {
+		            //log out the output
+		            String output = "";
+		            while ((currentLine = isBr.readLine()) != null) {
+		              output += currentLine + "\n";
+		            } 
+		            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
+	           
+		            //log out the error output
+		            String error = "";
+		            currentLine = "";
+		            while ((currentLine = esBr.readLine()) != null) {
+		              error += currentLine + "\n";
+		            }	           
+		            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
+	            }
 
 	        } catch (IOException ioe) {
 	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
 	        }
+		}
+
+
+		public static void hangup_call() {
+			Log.d("phone", "hanging up! goodbye");
+			run_commands_as_root(new String[]{"input keyevent 6"}, false);
+			DefaultActivity.phone_ringing = false;
+			defaultActivity.refreshDisplay();
+		}
+		
+		public static void pickup_call() {
+			Log.d("phone", "picking up! hello");
+			run_commands_as_root(new String[]{"input keyevent 5"}, false);
+			//DefaultActivity.phone_ringing = false;
+			//defaultActivity.refreshDisplay();
 		}
 	}
 
@@ -453,6 +480,62 @@ public class Functions {
 			}
 			//Log.d(ctx.getString(R.string.app_name), String.format("cover_closed = %b", cover_closed));
 		}
+
+
+		public static void incoming_call(final Context ctx, String number) {
+			Log.d("phone", "call from " + number);
+			if (Functions.Is.cover_closed(ctx)) {
+				Log.d("phone", "but the screen is closed. screen my calls");
+				
+				//if the cover is closed then
+				//we want to pop this activity up over the top of the dialer activity
+				//to guarantee that we need to hold off until the dialer activity is running
+				//a 1 second delay seems to allow this
+				DefaultActivity.phone_ringing = true;
+				DefaultActivity.call_from = number;
+
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						Intent intent = new Intent(ctx, DefaultActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+							          | Intent.FLAG_ACTIVITY_CLEAR_TOP
+							          | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+						intent.setAction(Intent.ACTION_MAIN);
+						ctx.startActivity(intent);
+
+					}
+				}, 1000);
+				
+				/*
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						Process process;
+						try {
+							process = Runtime.getRuntime().exec(new String[]{ "su","-c","input keyevent 6"});
+							process.waitFor();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					    
+					}
+				}, 500);
+				*/
+				
+			}
+		}
+		
+		public static void call_finished(Context ctx) {
+			Log.d("phone", "call is over, cleaning up");
+			DefaultActivity.phone_ringing = false;
+			((TextView)defaultActivity.findViewById(R.id.call_from)).setText(ctx.getString(R.string.unknown_caller));
+		}
 	}
 	
 	/**
@@ -530,6 +613,35 @@ public class Functions {
 		
 		
 		
+	}
+	
+	public static class Util {
+		// from http://stackoverflow.com/questions/3712112/search-contact-by-phone-number
+		public static String getContactName(Context ctx, String number) {
+			Log.d("phone", "looking up " + number + "...");
+			
+		    Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+		    String name = number;
+
+		    ContentResolver contentResolver = ctx.getContentResolver();
+		    Cursor contactLookup = contentResolver.query(uri, new String[] {BaseColumns._ID,
+		            ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
+
+		    try {
+		        if (contactLookup != null && contactLookup.getCount() > 0) {
+		            contactLookup.moveToNext();
+		            name = contactLookup.getString(contactLookup.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
+		            //String contactId = contactLookup.getString(contactLookup.getColumnIndex(BaseColumns._ID));
+		        }
+		    } finally {
+		        if (contactLookup != null) {
+		            contactLookup.close();
+		        }
+		    }
+
+		    Log.d("phone", "...result is " + name);
+		    return name;
+		}
 	}
 
 }
