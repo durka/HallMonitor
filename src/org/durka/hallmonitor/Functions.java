@@ -85,8 +85,8 @@ public class Functions {
 	public static class Actions {
 		
 		//used for the timer to turn off the screen on a delay
-        private static Timer timer = new Timer();
-        private static TimerTask timerTask;
+        public static Timer timer = new Timer();
+        public static TimerTask timerTask;
 		
         
         /**
@@ -279,9 +279,11 @@ public class Functions {
 		 * Execute shell commands
 		 * @param cmds Commands to execute
 		 */
-		public static void run_commands_as_root(String[] cmds) { run_commands_as_root(cmds, true); }
+		public static String run_commands_as_root(String[] cmds) { return run_commands_as_root(cmds, true); }
 		
-		public static void run_commands_as_root(String[] cmds, boolean want_output) {
+		public static String run_commands_as_root(String[] cmds, boolean want_output) {
+            String result = "";
+
 	        try {
 	        	Process p = Runtime.getRuntime().exec("su");
 	        	
@@ -314,7 +316,7 @@ public class Functions {
 		              output += currentLine + "\n";
 		            } 
 		            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
-	           
+
 		            //log out the error output
 		            String error = "";
 		            currentLine = "";
@@ -322,15 +324,14 @@ public class Functions {
 		              error += currentLine + "\n";
 		            }	           
 		            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
-		            
-		            return output.trim();
-	            }
-	            return "";
 
+                    result = output.trim();
+                }
 	        } catch (IOException ioe) {
 	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
-	        	return "";
 	        }
+
+            return result;
 		}
 
 

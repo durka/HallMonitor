@@ -60,9 +60,8 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="snooze">SNOOZE</string>
     <string name="dismiss">DISMISS</string>
-    <string name="unknown_caller">Unknown caller</string>
     <string name="title_activity_call">CallActivity</string>
     <string name="caller_name">Caller Name</string>
-    <string name="caller_number">+49 30 1234 5678</string>
+    <string name="caller_number">+49 30 1234 5678</string><string name="unknown_caller">unknown caller</string>
 
 </resources>

@@ -6,7 +6,6 @@
 
     <RelativeLayout
         android:id="@+id/default_content"
-        android:background="@drawable/rounded"
         android:layout_width="310dp"
         android:layout_height="125dp"
         android:layout_marginTop="12dp"
@@ -18,7 +17,7 @@
             android:id="@+id/default_content_alarm"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" >
+            android:visibility="invisible" >
 	            
 	         <ImageButton
 	           android:id="@+id/snoozebutton"
@@ -47,7 +46,7 @@
             android:id="@+id/default_content_phone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" >
+            android:visibility="invisible" >
        	
 	       <ImageButton
 	           android:id="@+id/hangup_button"
@@ -66,8 +65,7 @@
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_centerHorizontal="true"
-	            android:text="@string/unknown_caller"
-	            android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 	
 	       	<ImageButton
 	       	    android:id="@+id/pickup_button"
@@ -85,7 +83,7 @@
            android:id="@+id/default_content_normal"
            android:layout_width="match_parent"
            android:layout_height="match_parent"
-           android:visible="true" >
+           android:visibility="visible" >
 
 	       <RelativeLayout
 	           android:id="@+id/default_widget"
@@ -94,23 +92,23 @@
 	           android:layout_centerHorizontal="true"
 	           android:gravity="center" >
 	       
-	               <TextClock
-	                   android:id="@+id/default_text_clock"
-	                   android:layout_width="wrap_content"
-	                   android:layout_height="match_parent"
-	                   android:keepScreenOn="true"
-	                   android:textColor="#33b5e5"
-	                   android:textSize="50sp"
-	                   android:textStyle="bold" />
+               <TextClock
+                   android:id="@+id/default_text_clock"
+                   android:layout_width="wrap_content"
+                   android:layout_height="match_parent"
+                   android:keepScreenOn="true"
+                   android:textColor="#33b5e5"
+                   android:textSize="50sp"
+                   android:textStyle="bold" />
 
-	               <TextView
-	                   android:id="@+id/default_battery_percent"
-	                   android:layout_width="wrap_content"
-	                   android:layout_height="wrap_content"
-	                   android:layout_alignParentRight="true"
-	                   android:layout_centerVertical="true"
-	                   android:text="100%"
-	                   android:textAppearance="?android:attr/textAppearanceLarge" />
+               <TextView
+                   android:id="@+id/default_battery_percent"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentRight="true"
+                   android:layout_centerVertical="true"
+                   android:text="100%"
+                   android:textAppearance="?android:attr/textAppearanceLarge" />
 
               <ImageView
                   android:id="@+id/default_battery"
@@ -137,6 +135,9 @@
 
        </RelativeLayout>
 
+
+    </RelativeLayout>
+
     <GridLayout
         android:layout_width="310dp"
         android:layout_height="125dp"
@@ -148,7 +149,8 @@
         android:id="@+id/phone_widget"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
-        android:layoutMode="opticalBounds">
+        android:layoutMode="opticalBounds"
+        android:visibility="invisible" >
 
         <TextView
             android:id="@+id/caller_name"
