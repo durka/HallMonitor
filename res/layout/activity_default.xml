@@ -56,15 +56,26 @@
                    android:textSize="50sp"
                    android:textStyle="bold" />
 
-               <ImageView
-                   android:id="@+id/default_battery"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_toRightOf="@id/default_text_clock"
-                   android:layout_alignParentRight="true"
-                   android:layout_centerVertical="true"
-                   android:layout_marginRight="23dp"
-                   android:src="@drawable/stat_sys_battery" />
+               <ImageButton
+                  android:id="@+id/torchbutton"
+                  style="?android:attr/buttonBarButtonStyle"
+                  android:layout_width="40dp"
+                  android:layout_height="wrap_content"
+                  android:layout_centerVertical="true"
+                  android:layout_marginLeft="10dp"
+                  android:layout_toRightOf="@+id/default_text_clock"
+                  android:onClick="sendToggleTorch"
+                  android:src="@drawable/ic_appwidget_torch_off" />
+              
+              <ImageView
+                  android:id="@+id/default_battery"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toRightOf="@id/torchbutton"
+                  android:layout_alignParentRight="true"
+                  android:layout_centerVertical="true"
+                  android:layout_marginRight="50dp"
+                  android:src="@drawable/stat_sys_battery_0" />
        
        </RelativeLayout>
               
