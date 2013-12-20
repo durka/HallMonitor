@@ -2,7 +2,6 @@ package org.durka.hallmonitor;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.io.IOException;
 
 import org.durka.hallmonitor.Functions.Util;
 
@@ -140,7 +139,7 @@ public class DefaultActivity extends Activity {
 						timer.schedule(new TimerTask() {
 							@Override
 							public void run() {	
-								Intent myIntent = new Intent(getApplicationContext(),DefaultActivity.class);
+								Intent myIntent = new Intent(getApplicationContext(), DefaultActivity.class);
 								myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK 
 										| Intent.FLAG_ACTIVITY_CLEAR_TOP
 										| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -186,7 +185,6 @@ public class DefaultActivity extends Activity {
 			}
 		}
 	};
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -266,6 +264,7 @@ public class DefaultActivity extends Activity {
 	    }
 	    
 	    if (alarm_firing) {
+	    	Log.d("DA", "refreshDisplay: alarm_firing");
 	    	//show the alarm controls
 	    	defaultContent.setVisibility(View.VISIBLE);
 	    	phoneView.setVisibility(View.INVISIBLE);
@@ -297,6 +296,7 @@ public class DefaultActivity extends Activity {
 
 	    	//add the required widget based on the widgetType
 		    if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
+		    	Log.d("DA", "refreshDisplay: default_widget");
 		    	
 		    	//remove the TextClock from the contentview
 			    contentView.removeAllViews();
@@ -314,7 +314,8 @@ public class DefaultActivity extends Activity {
 			    //add the widget to the view
 			    contentView.addView(hostView);
 		    } else {
-		    	//default view    	
+		    	Log.d("DA", "refreshDisplay: default_widget");
+			    
 		    	snoozeButton.setVisibility(View.INVISIBLE);
 		    	dismissButton.setVisibility(View.INVISIBLE);
 		    	defaultWidget.setVisibility(View.VISIBLE);
@@ -578,27 +579,20 @@ public class DefaultActivity extends Activity {
 
 
 	@Override
-
-	/**
-	 * phone widget stuff (end)
-	 */
-
 	protected void onStart() {
 		super.onStart();
 		Log.d("DA-oS", "starting");
 		on_screen = true;
 
-		if (findViewById(R.id.default_battery_picture) != null) {
+		if (findViewById(R.id.default_battery) != null) {
 			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
-				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
+			if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
+					|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
+				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
 			} else {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
+				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
 			}
-			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
-			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
+			((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
 		}
 
 		if (NotificationService.that != null) {

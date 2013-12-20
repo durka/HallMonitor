@@ -85,8 +85,8 @@ public class Functions {
 	public static class Actions {
 		
 		//used for the timer to turn off the screen on a delay
-        public static Timer timer = new Timer();
-        public static TimerTask timerTask;
+        private static Timer timer = new Timer();
+        private static TimerTask timerTask;
 		
         
         /**
@@ -171,7 +171,7 @@ public class Functions {
 				}
 			}, delay);
 		}
-
+		
 		/**
 		 * Called from within the Functions.Event.Proximity method.
          * If we are running root enabled reverts the screen sensitivity.
@@ -279,9 +279,9 @@ public class Functions {
 		 * Execute shell commands
 		 * @param cmds Commands to execute
 		 */
-		public static String run_commands_as_root(String[] cmds) { return run_commands_as_root(cmds, true); }
+		public static void run_commands_as_root(String[] cmds) { run_commands_as_root(cmds, true); }
 		
-		public static String run_commands_as_root(String[] cmds, boolean want_output) {
+		public static void run_commands_as_root(String[] cmds, boolean want_output) {
 	        try {
 	        	Process p = Runtime.getRuntime().exec("su");
 	        	
@@ -417,7 +417,6 @@ public class Functions {
 	    		Intent startServiceIntent = new Intent(ctx, ViewCoverService.class);
 	    		ctx.startService(startServiceIntent);
 	    	}
-
         }
 		
 		
@@ -547,7 +546,7 @@ public class Functions {
 		}
 
 
-		public static void incoming_call(final Context ctx, String number) {
+		public static void incoming_call(final Context ctx, final String number) {
 			Log.d("phone", "call from " + number);
 			if (Functions.Is.cover_closed(ctx)) {
 				Log.d("phone", "but the screen is closed. screen my calls");

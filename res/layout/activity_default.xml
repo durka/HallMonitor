@@ -1,11 +1,8 @@
-
-
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
-    tools:context=".DefaultActivity" >
+    android:background="#000000" >
 
     <RelativeLayout
         android:id="@+id/default_content"
@@ -115,19 +112,28 @@
 	                   android:text="100%"
 	                   android:textAppearance="?android:attr/textAppearanceLarge" />
 
-               <ImageView
-                   android:id="@+id/default_battery"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_toRightOf="@id/default_text_clock"
-                   android:layout_alignParentRight="true"
-                   android:layout_centerVertical="true"
-                   android:layout_marginRight="23dp"
-                   android:src="@drawable/stat_sys_battery" />
+              <ImageView
+                  android:id="@+id/default_battery"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toRightOf="@id/default_text_clock"
+                  android:layout_alignParentRight="true"
+                  android:layout_centerVertical="true"
+                  android:layout_marginRight="23dp"
+                  android:src="@drawable/stat_sys_battery" />
        
        </RelativeLayout>
-        
-       </RelativeLayout>
+              
+       <GridView
+        android:id="@+id/default_icon_container"
+        android:layout_width="310dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/default_widget"
+        android:padding="0dp"
+        android:layout_margin="0dp"
+                android:horizontalSpacing="4dp"
+                android:columnWidth="24dp"
+                android:numColumns="0" />
 
        </RelativeLayout>
 
