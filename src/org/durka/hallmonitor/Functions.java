@@ -126,15 +126,27 @@ public class Functions {
 
 				 Log.d("F.Act.close_cover", "...Sensitivity boosted, hold onto your hats!");
 			 }
+
+			 rearmScreenOffTimer(ctx);
+		}
+
+		public static void rearmScreenOffTimer(Context ctx)
+		{
+			boolean coverClosed = Is.cover_closed(ctx);
 			
-			//need this to let us lock the phone
+			Log.d("F.Act.rearmScreenOffTimer", "rearmScreenOffTimer: cover_closed = " + coverClosed);
+			
+			if (!coverClosed)
+				return;
+
+            //need this to let us lock the phone
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
 			//final PowerManager pm = (PowerManager)ctx.getSystemService(Context.POWER_SERVICE);
 			
 			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 			if (!dpm.isAdminActive(me)) {
 				// if we're not an admin, we can't do anything
-				Log.d("F.Act.close_cover", "We are not an admin so cannot do anything.");
+				Log.d("F.Act.rearmScreenOffTimer", "We are not an admin so cannot do anything.");
 				return;
 			}
 			
@@ -143,7 +155,7 @@ public class Functions {
             //step 2: wait for the delay period and turn the screen off
             int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000);
             
-            Log.d("F.Act.close_cover", "Delay set to: " + delay);
+            Log.d("F.Act.rearmScreenOffTimer", "Delay set to: " + delay);
             
             
             //using the handler is causing a problem, seems to lock up the app, hence replaced with a Timer
@@ -151,14 +163,13 @@ public class Functions {
 			//handler.postDelayed(new Runnable() {
 				@Override
 				public void run() {	
-					Log.d("F.Act.close_cover", "Locking screen now.");
+					Log.d("F.Act.rearmScreenOffTimer", "Locking screen now.");
 					dpm.lockNow();
 					//FIXME Would it be better to turn the screen off rather than actually locking
 					//presumably then it will auto lock as per phone configuration
 					//I can't work out how to do it though!
 				}
 			}, delay);
-            
 		}
 
 		/**
@@ -546,7 +557,6 @@ public class Functions {
 				//to guarantee that we need to hold off until the dialer activity is running
 				//a 1 second delay seems to allow this
 				DefaultActivity.phone_ringing = true;
-				DefaultActivity.call_from = number;
 
 				Timer timer = new Timer();
 				timer.schedule(new TimerTask() {
@@ -557,6 +567,11 @@ public class Functions {
 							          | Intent.FLAG_ACTIVITY_CLEAR_TOP
 							          | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 						intent.setAction(Intent.ACTION_MAIN);
+						
+						// parameter
+						intent.putExtra("incomingNumber", number);
+						
+						// start
 						ctx.startActivity(intent);
 
 					}

@@ -18,23 +18,27 @@ import android.net.Uri;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
 import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
+import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextClock;
@@ -53,7 +57,6 @@ public class DefaultActivity extends Activity {
 	// states for alarm and phone
 	public static boolean alarm_firing = false;
 	public static boolean phone_ringing = false;
-	public static String call_from = "";
 
 	//audio manager to detect media state
 	private AudioManager audioManager;
@@ -74,7 +77,29 @@ public class DefaultActivity extends Activity {
     private View defaultWidget = null;
     private RelativeLayout defaultContent = null;
     private TextClock defaultTextClock = null;
-	
+    
+    /**
+     *  phone widget
+     */
+    protected GridLayout phoneView;
+    protected TextView mCallerName;
+    protected TextView mCallerNumber;
+    protected View mAcceptButton;
+    protected View mAcceptSlide;
+    protected View mRejectButton;
+    protected View mRejectSlide;
+
+    private boolean mViewNeedsReset = false;
+
+    // drawing stuff
+    private final static int mButtonMargin = 15; // designer use just 10dp; ode rendering issue
+    private final static int mRedrawOffset = 10; // move min 10dp before redraw
+
+    private int mActivePointerId = -1;
+    /**
+     *  phone widget (end)
+     */
+    	
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
@@ -121,7 +146,6 @@ public class DefaultActivity extends Activity {
 										| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 								myIntent.setAction(Intent.ACTION_MAIN);
 								startActivity(myIntent);
-
 							}
 						}, 1000);	
 					}
@@ -131,20 +155,22 @@ public class DefaultActivity extends Activity {
 
 			
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
+				String phoneExtraState = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+				boolean isRinging = phoneExtraState.equals(TelephonyManager.EXTRA_STATE_RINGING);
 				
-				if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_phone_controls", false)) {
-					String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-					Log.d("phone", "phone state changed to " + state);
-					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-						Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
-					} else {
-						if (state.equals(TelephonyManager.CALL_STATE_IDLE)) {
-							Functions.Events.call_finished(context);
-							refreshDisplay();
-						}
-					}
+				Log.d("DA", "onReceive: ACTION_PHONE_STATE_CHANGED = " + phoneExtraState + ", riniging = " + isRinging);
+				
+				if (isRinging) {
+					Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 				} else {
-					Log.d("phone", "phone controls are not enabled");
+					Log.d("phone", "phone state changed to " + phoneExtraState);
+					if (phone_ringing && phoneExtraState.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+						phone_ringing = false;
+						refreshDisplay();
+						
+						// rearm screen off timer
+						Functions.Actions.rearmScreenOffTimer(context);
+					}
 				}
 			} else if (intent.getAction().equals("org.durka.hallmonitor.debug")) {
 				Log.d("DA.onReceive", "received debug intent");
@@ -201,22 +227,29 @@ public class DefaultActivity extends Activity {
 	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
 	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
 
+	    // phone_widget
+	    phoneView = (GridLayout)findViewById(R.id.phone_widget);
+        mCallerName = (TextView)findViewById(R.id.caller_name);
+        mCallerNumber = (TextView)findViewById(R.id.caller_number);
+        mAcceptButton = findViewById(R.id.call_accept_button);
+        mAcceptSlide = findViewById(R.id.call_accept_slide);
+        mRejectButton = findViewById(R.id.call_reject_button);
+        mRejectSlide = findViewById(R.id.call_reject_slide);
 	}  
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onResume() {
 		super.onResume();
 
 		Log.d("DA.onResume", "On resume called.");
-
+			
 		refreshDisplay();
-
 	}
 
 	/**
 	 * Refresh the display taking account of device and application state
 	 */
+	@SuppressWarnings("deprecation")
 	public void refreshDisplay() {
 
 		//get the layout for the windowed view
@@ -234,15 +267,35 @@ public class DefaultActivity extends Activity {
 	    
 	    if (alarm_firing) {
 	    	//show the alarm controls
+	    	defaultContent.setVisibility(View.VISIBLE);
+	    	phoneView.setVisibility(View.INVISIBLE);
+	    	
 	    	snoozeButton.setVisibility(View.VISIBLE);
 	    	dismissButton.setVisibility(View.VISIBLE);
 	    	defaultWidget.setVisibility(View.INVISIBLE);
 	    	grid.setVisibility(View.INVISIBLE);
-	
+	    } else if (phone_ringing) {
+	    	Log.d("DA", "refreshDisplay: phone_ringing");
+	    	//show the phone controls
+    		defaultContent.setVisibility(View.INVISIBLE);
+	    	phoneView.setVisibility(View.VISIBLE);
+	    	
+	    	snoozeButton.setVisibility(View.INVISIBLE);
+	    	dismissButton.setVisibility(View.INVISIBLE);
+	    	defaultWidget.setVisibility(View.INVISIBLE);
+	    	grid.setVisibility(View.INVISIBLE);
+	    	
+			// reset to defaults
+			resetPhoneWidgetMakeVisible();
+
+			// parse parameter
+	    	setIncomingNumber(getIntent().getStringExtra("incomingNumber"));
 	    } else {
-		    
-		    
-		    //add the required widget based on the widgetType
+	    	//default view    	
+	    	defaultContent.setVisibility(View.VISIBLE);
+	    	phoneView.setVisibility(View.INVISIBLE);
+
+	    	//add the required widget based on the widgetType
 		    if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
 		    	
 		    	//remove the TextClock from the contentview
@@ -269,7 +322,7 @@ public class DefaultActivity extends Activity {
 		    	
 		    	Drawable rounded = getResources().getDrawable(R.drawable.rounded);
 		    	rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
-		    	defaultContent.setBackground(rounded);
+		    	//defaultContent.setBackground(rounded);
 		    	defaultTextClock.setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
 		    }
 	    }
@@ -306,7 +359,230 @@ public class DefaultActivity extends Activity {
 		Functions.Actions.pickup_call();
 	}
 
+	/**
+	 * phone widget stuff
+	 */
+
+	private boolean setIncomingNumber(String incomingNumber) {
+		Log.d("CallActivity", "incomingNumber: " + incomingNumber);
+
+		boolean result = false;
+				
+		if (incomingNumber == null) 
+			return result;
+		
+		mCallerName.setText(incomingNumber);
+		result = setDisplayNameByIncomingNumber(incomingNumber);
+		
+		return result;
+	}
+	
+	private boolean setDisplayNameByIncomingNumber(String incomingNumber) {
+	    String name = null, type = null;
+	    Cursor contactLookup = null;
+	    
+	    try {
+	    	contactLookup = getContentResolver().query(
+	    			Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(incomingNumber))
+		    	,	new String[]{ PhoneLookup.DISPLAY_NAME, PhoneLookup.TYPE }
+		    	,	null
+		    	,	null
+		    	, 	null);
+	    	
+	        if (contactLookup != null && contactLookup.getCount() > 0) {
+
+		    	contactLookup.moveToFirst();
+	            name = contactLookup.getString(contactLookup.getColumnIndex(PhoneLookup.DISPLAY_NAME));
+	            type = contactLookup.getString(contactLookup.getColumnIndex(PhoneLookup.TYPE));
+	        }
+
+	        if (name != null) {
+				mCallerName.setText(name);
+				mCallerNumber.setText(incomingNumber);
+
+				Log.d("CallActivity", "displayName: " + name + " (" + type + ")");
+	        }
+	    } finally {
+	        if (contactLookup != null) {
+	            contactLookup.close();
+	        }
+	    }
+	    
+	    return (name != null);
+	}
+
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent)
+    {
+        float maxSwipe = 150;
+        float swipeTolerance = 0.95f;
+        int defaultOffset = 10;
+
+        // point handling
+        MotionEvent.PointerCoords pointerCoords = new MotionEvent.PointerCoords();
+        final int actionIndex = motionEvent.getActionIndex();
+        final int actionMasked = motionEvent.getActionMasked();
+        final int pointerId = actionIndex;
+        int pointerIndex = -1;
+        motionEvent.getPointerCoords(actionIndex, pointerCoords);
+
+        switch (actionMasked) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (!TouchEventProcessor.isTracking()) {
+                    // check accept button
+                    if (mAcceptButton.getVisibility() == View.VISIBLE && TouchEventProcessor.pointerInRect(pointerCoords, mAcceptButton) && !TouchEventProcessor.isTracking())
+                        TouchEventProcessor.startTracking(mAcceptButton);
+
+                    // check reject button
+                    if (mRejectButton.getVisibility() == View.VISIBLE && TouchEventProcessor.pointerInRect(pointerCoords, mRejectButton) && !TouchEventProcessor.isTracking())
+                        TouchEventProcessor.startTracking(mRejectButton);
+
+                    if (TouchEventProcessor.isTracking()) {
+                        mActivePointerId = pointerId;
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                for (int idx=0; idx < motionEvent.getPointerCount(); idx++)
+                    if (motionEvent.getPointerId(idx) == mActivePointerId) {
+                        pointerIndex = idx;
+                        break;
+                    }
+
+                // process tracking
+                if (TouchEventProcessor.isTracking() && pointerIndex != -1) {
+                    motionEvent.getPointerCoords(pointerIndex, pointerCoords);
+
+                    float dist = TouchEventProcessor.getHorizontalDistance(pointerCoords.x);
+
+                    // check accept
+                    if (TouchEventProcessor.isTrackedObj(mAcceptButton) && dist >= maxSwipe * swipeTolerance) {
+                        callAcceptedPhoneWidget();
+                        TouchEventProcessor.stopTracking();
+                        mActivePointerId = -1;
+                    } else
+                    // animate accept
+                    if (TouchEventProcessor.isTrackedObj(mAcceptButton) && dist > 0 && dist < maxSwipe)
+                        moveCallButton(mAcceptButton, defaultOffset + Math.round(dist));
+
+                    // modify negative dist
+                    dist = Math.abs(dist);
+                    // check rejected
+                    if (TouchEventProcessor.isTrackedObj(mRejectButton) && dist >= maxSwipe * swipeTolerance) {
+                        callRejectedPhoneWidget();
+                        TouchEventProcessor.stopTracking();
+                        mActivePointerId = -1;
+                    } else
+                    // animate rejected
+                    if (TouchEventProcessor.isTrackedObj(mRejectButton) && dist > 0 && dist < maxSwipe)
+                        moveCallButton(mRejectButton, defaultOffset + Math.round(dist));
+                }
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                if (mActivePointerId == -1 || (mActivePointerId != -1 && motionEvent.findPointerIndex(mActivePointerId) != actionIndex))
+                    break;
+            case MotionEvent.ACTION_UP:
+                if (TouchEventProcessor.isTracking()) {
+                        resetPhoneWidget();
+                        TouchEventProcessor.stopTracking();
+                        mActivePointerId = -1;
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                Log.d("DA-oTE", "CANCEL: never seen");
+                callRejectedPhoneWidget();
+                TouchEventProcessor.stopTracking();
+                mActivePointerId = -1;
+                break;
+            default:
+                break;
+        }
+
+        return true;
+    }
+
+    public void moveCallButton(View button, int offset)
+    {
+        if (!mAcceptButton.equals(button) && !mRejectButton.equals(button))
+            return;
+
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(button.getLayoutParams());
+
+        if (button.equals(mAcceptButton)) {
+            // don't draw yet
+            if (offset > mButtonMargin && offset <= lp.leftMargin + mRedrawOffset)
+                return;
+
+            lp.setMargins(offset, 0, 0, 0);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_START);
+        }
+
+        if (button.equals(mRejectButton)) {
+            // don't draw yet
+            if (offset > mButtonMargin && offset <= lp.rightMargin + mRedrawOffset)
+                return;
+
+            lp.setMargins(0, 0, offset, 0);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_END);
+        }
+
+        lp.addRule(RelativeLayout.CENTER_VERTICAL);
+        button.setLayoutParams(lp);
+
+        mViewNeedsReset = true;
+    }
+
+    public void callAcceptedPhoneWidget() {
+        Log.d("DA", "callAcceptedPhoneWidget");
+        mAcceptButton.setVisibility(View.INVISIBLE);
+        mAcceptSlide.setVisibility(View.INVISIBLE);
+        resetPhoneWidget();
+        sendPickUp(phoneView);
+    }
+
+    public void callRejectedPhoneWidget() {
+        Log.d("DA", "callRejectedPhoneWidget");
+        resetPhoneWidgetMakeVisible();
+        // rearm screen off timer
+		Functions.Actions.rearmScreenOffTimer(this);
+        sendHangUp(phoneView);
+    }
+
+    public void resetPhoneWidget() {
+        if (!mViewNeedsReset)
+            return;
+
+        Log.d("DA", "resetPhoneWidget");
+        moveCallButton(mAcceptButton, mButtonMargin);
+        moveCallButton(mRejectButton, mButtonMargin);
+
+        mViewNeedsReset = false;
+    }
+
+    public void resetPhoneWidgetMakeVisible() {
+        Log.d("DA", "resetPhoneWidgetMakeVisible");
+        resetPhoneWidget();
+        mAcceptButton.setVisibility(View.VISIBLE);
+        mAcceptSlide.setVisibility(View.VISIBLE);
+        mRejectButton.setVisibility(View.VISIBLE);
+        mRejectSlide.setVisibility(View.VISIBLE);
+
+        // TODO: clear text fields
+    }
+
+	/**
+	 * phone widget stuff (end)
+	 */
+
+
+
 	@Override
+
+	/**
+	 * phone widget stuff (end)
+	 */
+
 	protected void onStart() {
 		super.onStart();
 		Log.d("DA-oS", "starting");
@@ -347,5 +623,59 @@ public class DefaultActivity extends Activity {
 		super.onDestroy();
 		//tidy up our receiver when we are destroyed
 		unregisterReceiver(receiver);
-	}
+}
+
+	/**
+	 * phone widget
+	 */
+    public static class TouchEventProcessor
+    {
+        private static View mTrackObj = null;
+        private static Point mTrackStartPoint;
+
+        private final static int mHitRectBoost = 50;
+
+        public static boolean pointerInRect(MotionEvent.PointerCoords pointer, View view) {
+            return pointerInRect(pointer, view, mHitRectBoost);
+        }
+
+        public static boolean pointerInRect(MotionEvent.PointerCoords pointer, View view, int hitRectBoost) {
+            Rect rect = new Rect();
+            view.getGlobalVisibleRect(rect);
+
+            int extraSnap = (isTrackedObj(view) || !isTracking() ? hitRectBoost : 0);
+            return (pointer.x >= rect.left - extraSnap && pointer.x <= rect.right + extraSnap && pointer.y >= rect.top - extraSnap && pointer.y <= rect.bottom + extraSnap);
+        }
+
+        public static boolean isTracking() {
+            //Log.d("DA.TouchEventProcessor", "TouchEventProcessor.isTracking: " + (mTrackObj != null));
+            return (mTrackObj != null);
+        }
+
+        public static boolean isTrackedObj(View view) {
+            //Log.d("DA.TouchEventProcessor", "TouchEventProcessor.isTrackedObj: " + (isTracking() && mTrackObj.equals(view)));
+            return (isTracking() && mTrackObj.equals(view));
+        }
+
+        public static void startTracking(View view) {
+            //Log.d("DA.TouchEventProcessor", "TouchEventProcessor.startTracking: " + view.getId());
+            mTrackObj = view;
+
+            Rect mRect = new Rect();
+            view.getGlobalVisibleRect(mRect);
+
+            mTrackStartPoint = new Point(mRect.centerX(), mRect.centerY());
+        }
+
+        public static void stopTracking() {
+            //Log.d("DA.TouchEventProcessor", "TouchEventProcessor.stopTracking");
+            mTrackObj = null;
+            mTrackStartPoint = null;
+        }
+
+        public static float getHorizontalDistance(float currentX) {
+            return currentX - mTrackStartPoint.x;
+        }
+    }
+
 }
