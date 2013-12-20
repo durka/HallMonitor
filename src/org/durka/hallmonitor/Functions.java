@@ -560,7 +560,7 @@ public class Functions {
 						ctx.startActivity(intent);
 
 					}
-				}, 1000);
+				}, 500);
 				
 				/*
 				new Handler().postDelayed(new Runnable() {
@@ -672,6 +672,9 @@ public class Functions {
 	public static class Util {
 		// from http://stackoverflow.com/questions/3712112/search-contact-by-phone-number
 		public static String getContactName(Context ctx, String number) {
+			
+			if (number.equals("")) return "";
+			
 			Log.d("phone", "looking up " + number + "...");
 			
 		    Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
