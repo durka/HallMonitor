@@ -28,6 +28,8 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -360,6 +362,23 @@ public class Functions {
 			});
 		}
 		
+		
+		public static void debug_notification(Context ctx, boolean showhide) {
+			if (showhide) {
+				Notification.Builder mBuilder =
+				        new Notification.Builder(ctx)
+				        .setSmallIcon(R.drawable.ic_launcher)
+				        .setContentTitle("Hall Monitor")
+				        .setContentText("Debugging is fun!");
+
+				NotificationManager mNotificationManager =
+				    (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+				mNotificationManager.notify(42, mBuilder.build());
+			} else {
+				NotificationManager mNotificationManager =
+					    (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+					mNotificationManager.cancel(42);
+			}
 		}
 	}
 

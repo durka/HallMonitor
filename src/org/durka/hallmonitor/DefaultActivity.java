@@ -135,6 +135,17 @@ public class DefaultActivity extends Activity {
 				} else {
 					Log.d("phone", "phone controls are not enabled");
 				}
+			} else if (intent.getAction().equals("org.durka.hallmonitor.debug")) {
+				Log.d("DA.onReceive", "received debug intent");
+				// test intent to show/hide a notification
+				switch (intent.getIntExtra("notif", 0)) {
+				case 1:
+					Functions.Actions.debug_notification(context, true);
+					break;
+				case 2:
+					Functions.Actions.debug_notification(context, false);
+					break;
+				}
 			}
 		}
 	};
@@ -168,6 +179,7 @@ public class DefaultActivity extends Activity {
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(ALARM_ALERT_ACTION);
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		filter.addAction("org.durka.hallmonitor.debug");
 		registerReceiver(receiver, filter);
 
 	}  
