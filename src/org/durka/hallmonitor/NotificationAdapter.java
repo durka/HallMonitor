@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -22,7 +23,7 @@ public class NotificationAdapter extends BaseAdapter {
 	
 	public void update(StatusBarNotification[] n) {
 		notifs = n;
-		notifyDataSetChanged();
+		Log.d("NA.upd", "update: " + Integer.toString(n.length) + " notifications");
 	}
 
 	@Override

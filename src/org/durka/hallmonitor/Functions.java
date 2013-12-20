@@ -344,9 +344,22 @@ public class Functions {
 		}
 		
 		public static void refresh_notifications() {
-			GridView grid = (GridView)defaultActivity.findViewById(R.id.default_icon_container);
-			((NotificationAdapter)grid.getAdapter()).update(NotificationService.that.getActiveNotifications());
-			grid.invalidateViews();
+			final GridView grid = (GridView)defaultActivity.findViewById(R.id.default_icon_container);
+			final NotificationAdapter adapter = (NotificationAdapter)grid.getAdapter();
+			final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
+			adapter.update(notifs);
+			defaultActivity.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					
+					grid.setNumColumns(notifs.length);
+					adapter.notifyDataSetChanged();
+				}
+				
+			});
+		}
+		
 		}
 	}
 
