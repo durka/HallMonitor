@@ -14,16 +14,6 @@
  */
 package org.durka.hallmonitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import android.app.Service;
-import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.os.IBinder;
 import android.util.Log;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;

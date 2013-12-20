@@ -50,7 +50,7 @@
     <string name="pref_default_fgcolor">Foreground color</string>
     <string name="pref_default_fgcolor_summary">Text color for the clock you will see through the closed cover</string>
     <string name="pref_about">About Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+    <string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="title_activity_window">WindowActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_fullscreen">FullscreenActivity</string>
@@ -58,6 +58,8 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="snooze">SNOOZE</string>
     <string name="dismiss">DISMISS</string>
+    <string name="title_activity_call">CallActivity</string>
+    <string name="caller_name">Caller Name</string>
+    <string name="caller_number">+49 30 1234 5678</string>
 
 </resources>
-

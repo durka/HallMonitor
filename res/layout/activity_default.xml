@@ -1,15 +1,11 @@
-
-
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
-    tools:context=".DefaultActivity" >
+    android:background="#000000" >
 
     <RelativeLayout
         android:id="@+id/default_content"
-        android:background="@drawable/rounded"
         android:layout_width="310dp"
         android:layout_height="125dp"
         android:layout_marginTop="12dp"
@@ -17,17 +13,17 @@
         android:gravity="center"
         android:keepScreenOn="true" >
         
-         <Button
-           android:id="@+id/snoozebutton"
-           style="?android:attr/buttonStyleSmall"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_alignBaseline="@+id/dismissbutton"
-           android:layout_alignBottom="@+id/dismissbutton"
-           android:layout_alignParentLeft="true"
-           android:background="@drawable/snooze_button"
-           android:onClick="sendSnooze"
-           android:visibility="visible" />
+		<Button
+			android:id="@+id/snoozebutton"
+			style="?android:attr/buttonStyleSmall"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignBaseline="@+id/dismissbutton"
+			android:layout_alignBottom="@+id/dismissbutton"
+			android:layout_alignParentLeft="true"
+			android:background="@drawable/snooze_button"
+			android:onClick="sendSnooze"
+			android:visibility="visible" />
 
        	<Button
        	    android:id="@+id/dismissbutton"
@@ -40,29 +36,6 @@
        	    android:onClick="sendDismiss"
        	    android:visibility="visible" />
        	
-       <Button
-           android:id="@+id/hangup_button"
-           style="?android:attr/buttonStyleSmall"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_alignBaseline="@+id/pickup_button"
-           android:layout_alignBottom="@+id/pickup_button"
-           android:layout_alignParentLeft="true"
-           android:background="@drawable/ic_jog_dial_decline"
-           android:onClick="sendHangUp"
-           android:visibility="visible" />
-
-       	<Button
-       	    android:id="@+id/pickup_button"
-       	    style="?android:attr/buttonStyleSmall"
-       	    android:layout_width="wrap_content"
-       	    android:layout_height="wrap_content"
-       	    android:layout_alignParentRight="true"
-       	    android:layout_centerVertical="true"
-       	    android:background="@drawable/ic_jog_dial_answer"
-       	    android:onClick="sendPickUp"
-       	    android:visibility="visible" />
-
        <RelativeLayout
            android:id="@+id/default_widget"
            android:layout_width="310dp"
@@ -70,24 +43,24 @@
            android:layout_centerHorizontal="true"
            android:gravity="center" >
        
-               <TextClock
-                   android:id="@+id/default_text_clock"
-                   android:layout_width="wrap_content"
-                   android:layout_height="match_parent"
-                   android:keepScreenOn="true"
-                   android:textColor="#33b5e5"
-                   android:textSize="50sp"
-                   android:textStyle="bold" />
+              <TextClock
+                  android:id="@+id/default_text_clock"
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:keepScreenOn="true"
+                  android:textColor="#33b5e5"
+                  android:textSize="50sp"
+                  android:textStyle="bold" />
 
-               <ImageView
-                   android:id="@+id/default_battery"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_toRightOf="@id/default_text_clock"
-                   android:layout_alignParentRight="true"
-                   android:layout_centerVertical="true"
-                   android:layout_marginRight="23dp"
-                   android:src="@drawable/stat_sys_battery" />
+              <ImageView
+                  android:id="@+id/default_battery"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toRightOf="@id/default_text_clock"
+                  android:layout_alignParentRight="true"
+                  android:layout_centerVertical="true"
+                  android:layout_marginRight="23dp"
+                  android:src="@drawable/stat_sys_battery" />
        
        </RelativeLayout>
               
@@ -102,5 +75,122 @@
                 android:columnWidth="24dp"
                 android:numColumns="0" />
 
+       </RelativeLayout>
+
+    <GridLayout
+        android:layout_width="310dp"
+        android:layout_height="125dp"
+        android:layout_gravity="center_horizontal"
+        android:columnCount="6"
+        android:rowCount="6"
+        android:background="#000000"
+        android:columnOrderPreserved="true"
+        android:id="@+id/phone_widget"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:layoutMode="opticalBounds">
+
+        <TextView
+            android:id="@+id/caller_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnSpan="6"
+            android:layout_gravity="center_horizontal"
+            android:layout_row="0"
+            android:gravity="center_horizontal"
+            android:text="@string/caller_name"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caller_number"
+            android:id="@+id/caller_number"
+            android:layout_row="1"
+            android:layout_column="0"
+            android:layout_columnSpan="6"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center_horizontal"
+            android:textSize="14sp" />
+
+        <RelativeLayout
+            android:id="@+id/call_accept_panel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnSpan="6"
+            android:layout_row="2"
+            android:layout_rowSpan="4" >
+
+            <ImageView
+                android:id="@+id/call_accept_button"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="left"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/ic_call_accept" />
+
         </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/call_reject_panel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnSpan="6"
+            android:layout_row="2"
+            android:layout_rowSpan="4" >
+
+            <ImageView
+                android:id="@+id/call_reject_button"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="right"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/ic_call_reject" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnSpan="6"
+            android:layout_row="4"
+            android:layout_rowSpan="2"
+            android:layout_gravity="center"
+            android:gravity="center|center_vertical|center_horizontal">
+
+            <ImageView
+                android:id="@+id/call_accept_slide"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentStart="false"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_call_accept_slide" />
+
+            <ImageView
+                android:id="@+id/call_reject_slide"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentStart="false"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/call_accept_slide"
+                android:layout_toRightOf="@+id/call_accept_slide"
+                android:background="@drawable/ic_call_reject_slide" />
+
+        </RelativeLayout>
+
+    </GridLayout>
+
 </RelativeLayout>
