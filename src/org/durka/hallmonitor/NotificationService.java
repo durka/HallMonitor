@@ -48,11 +48,17 @@ public class NotificationService extends NotificationListenerService {
 	@Override
 	public void onNotificationPosted(StatusBarNotification sbn) {
 		Log.d("NS-oNP", "notification posted: " + sbn.toString());
+		if (DefaultActivity.on_screen) {
+			Functions.Actions.refresh_notifications();
+		}
 	}
 
 	@Override
 	public void onNotificationRemoved(StatusBarNotification sbn) {
 		Log.d("NS-oNR", "notification removed: " + sbn.toString());
+		if (DefaultActivity.on_screen) {
+			Functions.Actions.refresh_notifications();
+		}
 	}
 	
 	

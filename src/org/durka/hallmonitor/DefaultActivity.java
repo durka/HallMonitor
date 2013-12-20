@@ -303,52 +303,7 @@ public class DefaultActivity extends Activity {
 		if (NotificationService.that != null) {
 			// notification listener service is running, show the current notifications
 			// TODO move this to Functions.java
-			final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
-			Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
-			final GridView grid = (GridView)findViewById(R.id.default_icon_container);
-			final Context that = this;
-			grid.setNumColumns(notifs.length);
-			grid.setAdapter(new BaseAdapter() {
-
-				@Override
-				public int getCount() {
-					return notifs.length;
-				}
-
-				@Override
-				public Object getItem(int position) {
-					return null;
-				}
-
-				@Override
-				public long getItemId(int position) {
-					return 0;
-				}
-
-				@Override
-				public View getView(int position, View convert, ViewGroup parent) {
-					ImageView view;
-					if (convert != null) {
-						view = (ImageView)convert;
-					} else {
-						view = new ImageView(that);
-						view.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT));
-						view.setScaleType(ImageView.ScaleType.FIT_CENTER);
-						view.setPadding(0, 0, 0, 0);
-						try {
-							view.setImageDrawable(that.createPackageContext(notifs[position].getPackageName(), 0).getResources().getDrawable(notifs[position].getNotification().icon));
-						} catch (NotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (NameNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-
-					return view;
-				}	    		
-			});
+			Functions.Actions.setup_notifications();
 		}
 	}
 

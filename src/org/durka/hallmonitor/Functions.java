@@ -34,6 +34,8 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources.NotFoundException;
 import android.os.Build;
 import android.database.Cursor;
 import android.net.Uri;
@@ -42,9 +44,15 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
+import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -325,6 +333,20 @@ public class Functions {
 			run_commands_as_root(new String[]{"input keyevent 5"}, false);
 			//DefaultActivity.phone_ringing = false;
 			//defaultActivity.refreshDisplay();
+		}
+		
+		public static void setup_notifications() {
+			StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
+			Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
+			GridView grid = (GridView)defaultActivity.findViewById(R.id.default_icon_container);
+			grid.setNumColumns(notifs.length);
+			grid.setAdapter(new NotificationAdapter(defaultActivity, notifs));
+		}
+		
+		public static void refresh_notifications() {
+			GridView grid = (GridView)defaultActivity.findViewById(R.id.default_icon_container);
+			((NotificationAdapter)grid.getAdapter()).update(NotificationService.that.getActiveNotifications());
+			grid.invalidateViews();
 		}
 	}
 
