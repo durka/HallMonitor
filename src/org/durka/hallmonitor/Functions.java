@@ -130,11 +130,17 @@ public class Functions {
 			 rearmScreenOffTimer(ctx);
 		}
 
+		/**
+		 * ScreenOnTimer
+		 */
 		public static void rearmScreenOffTimer(Context ctx)
 		{
 			boolean coverClosed = Is.cover_closed(ctx);
 			
-			Log.d("F.Act.rearmScreenOffTimer", "rearmScreenOffTimer: cover_closed = " + coverClosed);
+			// don't let run more than 1 timer
+			stopScreenOffTimer("called from rearmScreenOffTimer");
+			
+			Log.d("F.Act.rearmScreenOffTimer", "cover_closed = " + coverClosed);
 			
 			if (!coverClosed)
 				return;
@@ -170,6 +176,19 @@ public class Functions {
 					//I can't work out how to do it though!
 				}
 			}, delay);
+		}
+		
+		public static void stopScreenOffTimer() {
+			stopScreenOffTimer(null);
+		}
+		
+		public static void stopScreenOffTimer(String info)
+		{
+			Log.d("F.Act.stopScreenOffTimer", "active: " + (timerTask != null) + (info != null ? " (" + info + ")" : ""));
+			if (timerTask != null) {
+				timerTask.cancel();
+				timerTask = null;
+			}
 		}
 		
 		/**
@@ -573,30 +592,8 @@ public class Functions {
 						
 						// start
 						ctx.startActivity(intent);
-
 					}
 				}, 1000);
-				
-				/*
-				new Handler().postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						Process process;
-						try {
-							process = Runtime.getRuntime().exec(new String[]{ "su","-c","input keyevent 6"});
-							process.waitFor();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					    
-					}
-				}, 500);
-				*/
-				
 			}
 		}
 		

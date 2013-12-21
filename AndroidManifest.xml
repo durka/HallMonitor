@@ -47,7 +47,12 @@
             </intent-filter>
         </activity>
 
-        <service android:name="org.durka.hallmonitor.ViewCoverService" />
+        <service
+            android:name="org.durka.hallmonitor.ViewCoverService" >
+            <intent-filter>
+                <action android:name="org.durka.hallmonitor.sendTextToSpeech" />
+            </intent-filter>
+        </service>
         <service
             android:name="org.durka.hallmonitor.NotificationService"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
@@ -80,8 +85,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:noHistory="true"
             android:screenOrientation="portrait"
-            android:theme="@style/FullscreenTheme"
-            android:permission="android.permission.READ_CONTACTS">
+            android:theme="@style/FullscreenTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.HEADSET_PLUG" />
+            </intent-filter>
         </activity>
     </application>
 

@@ -14,29 +14,62 @@
  */
 package org.durka.hallmonitor;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.input.InputManager;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.InputDevice;
+import android.view.WindowManager;
 
 
-public class ViewCoverService extends Service implements SensorEventListener {
-	
+public class ViewCoverService extends Service implements SensorEventListener, TextToSpeech.OnInitListener {
+
+    private final static String LOGD = "VCS";
+
 	private SensorManager       mSensorManager;
-	
-	@Override
+
+    /**
+     *  Text-To-Speech
+     */
+    private TextToSpeech mTts;
+    private boolean mTtsInitComplete = false;
+
+    private boolean mWiredHeadSetPlugged = false;
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action.equals(Intent.ACTION_HEADSET_PLUG)) {	// headset (un-)plugged
+                mWiredHeadSetPlugged = ((intent.getIntExtra("state", -1) == 1));
+            } else if (action.equals(getString(R.string.ACTION_SEND_TO_SPEECH_RECEIVE))) {
+                String text = intent.getStringExtra("sendTextToSpeech");
+                sendTextToSpeech(text);
+            }
+        }
+    };
+
+
+    @Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d("VCS.onStartCommand", "View cover service started");
+		Log.d(LOGD + ".onStartCommand", "View cover service started");
 
         //We don't want to do this - almost by defninition the cover can't be closed, and we don't actually want to do any open cover functionality
 		//until the cover is closed and then opened again
@@ -50,14 +83,22 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		
 		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_NORMAL);
 		
-//		Log.d("VCS-oSC", "scanning keyboards...");
+//		Log.d(LOGD + "-oSC", "scanning keyboards...");
 //		InputManager im = (InputManager) getSystemService(INPUT_SERVICE);
 //		for (int id : im.getInputDeviceIds()) {
 //			InputDevice dev = im.getInputDevice(id);
-//			Log.d("VCS-oSC", "\t" + dev.toString());
+//			Log.d(LOGD + "-oSC", "\t" + dev.toString());
 //		}
 
-		return START_STICKY;
+        // Text-To-Speech
+        initTextToSpeech();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_HEADSET_PLUG);
+        filter.addAction(getString(R.string.ACTION_SEND_TO_SPEECH_RECEIVE));
+        registerReceiver(receiver, filter);
+
+        return START_STICKY;
 	}
 	
 	@Override
@@ -67,23 +108,26 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	
 	@Override
 	public void onDestroy() {
-		Log.d("VCS.onStartCommand", "View cover service stopped");
+		Log.d(LOGD + ".onStartCommand", "View cover service stopped");
 		
-		//unregisterReceiver(receiver);
 		mSensorManager.unregisterListener(this);
+
+        // Text-To-Speech
+        unregisterReceiver(receiver);
+        destroyTextToSpeech();
 	}
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// I don't care
-		Log.d("VCS.onAccuracyChanged", "OnAccuracyChanged: Sensor=" + sensor.getName() + ", accuracy=" + accuracy);
+		Log.d(LOGD + "onAccuracyChanged", "OnAccuracyChanged: Sensor=" + sensor.getName() + ", accuracy=" + accuracy);
 	}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		
 		if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {	
-			Log.d("VCS.onSensorChanged", "Proximity sensor changed, value=" + event.values[0]);
+			Log.d(LOGD + ".onSensorChanged", "Proximity sensor changed, value=" + event.values[0]);
 			Functions.Events.proximity(this, event.values[0]);
 			
 			//improve reliability by refiring the event 200ms afterwards
@@ -106,4 +150,71 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		}
 	}
 
+    /**
+     * Text-To-Speech
+     *
+     * Executed when a new TTS is instantiated. We don't do anything here since
+     * our speech is now determine by the button click
+     * @param initStatus
+     */
+
+    public void onInit(int initStatus)
+    {
+        switch (initStatus) {
+            case TextToSpeech.SUCCESS:
+                Log.d(LOGD, "init Text To Speech successed");
+                //mTts.setLanguage(Locale.GERMANY);
+                mTtsInitComplete = true;
+                break;
+            case TextToSpeech.ERROR:
+                Log.d(LOGD, "init Text To Speech failed");
+                mTts = null;
+                break;
+            default:
+                Log.d(LOGD, "onInit: " + initStatus);
+                break;
+        }
+    }
+
+
+    private void initTextToSpeech() {
+        // init Text To Speech
+        if (!mTtsInitComplete && mTts ==  null) {
+            mTts = new TextToSpeech(this, this);
+        }
+    }
+
+    private boolean sendTextToSpeech(String text) {
+        boolean result = false;
+
+        Log.d(LOGD, "sendTextToSpeech: text = '" + text + "', " + mTtsInitComplete + ", " + (mTts != null));
+        if (mTtsInitComplete && mTts != null) {
+            AudioManager audioManager = (AudioManager)this.getSystemService(AUDIO_SERVICE);
+
+            Log.d(LOGD, "sendTextToSpeech: text = '" + text + "', " + mWiredHeadSetPlugged + ", " + audioManager.isBluetoothA2dpOn());
+
+            if (audioManager.isBluetoothA2dpOn() || mWiredHeadSetPlugged) {
+                HashMap <String, String> params = new HashMap<String, String>(1);
+                params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(audioManager.STREAM_VOICE_CALL));
+
+                mTts.speak(text, TextToSpeech.QUEUE_FLUSH, params);
+                result = mTts.isSpeaking();
+            }
+        }
+
+        Log.d(LOGD, "sendTextToSpeech: text = '" + text + "' -> " + (result ? "ok" : "failed"));
+        return result;
+    }
+
+    private void destroyTextToSpeech() {
+        if (mTts != null)
+        {
+            mTts.stop();
+            mTts.shutdown();
+        }
+    }
+
+    /**
+     * Text-To-Speech (end)
+     */
 }

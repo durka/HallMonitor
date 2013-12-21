@@ -3,19 +3,14 @@ package org.durka.hallmonitor;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.durka.hallmonitor.Functions.Util;
-
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
@@ -25,10 +20,8 @@ import android.graphics.drawable.Drawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
-import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -36,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -49,6 +41,9 @@ import android.widget.TextView;
  * it is also displayed when the power button is pressed when the case is already closed
  */
 public class DefaultActivity extends Activity {
+	
+	private final static String LOGD = "DA";
+	
 	private HMAppWidgetManager hmAppWidgetManager = Functions.hmAppWidgetManager;
 
 	public static boolean on_screen;
@@ -77,6 +72,8 @@ public class DefaultActivity extends Activity {
     private RelativeLayout defaultContent = null;
     private TextClock defaultTextClock = null;
     
+    protected boolean mWiredHeadSetPlugged = false;
+
     /**
      *  phone widget
      */
@@ -95,37 +92,39 @@ public class DefaultActivity extends Activity {
     private final static int mRedrawOffset = 10; // move min 10dp before redraw
 
     private int mActivePointerId = -1;
-    /**
-     *  phone widget (end)
-     */
     	
-	//we need to kill this activity when the screen opens
+	// we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+            String action = intent.getAction();
+            
+			if (action.equals(Intent.ACTION_SCREEN_ON)) {
 
-				Log.d("DA.onReceive", "Screen on event received.");
+				Log.d(LOGD + ".onReceive", "Screen on event received.");
 
 				if (Functions.Is.cover_closed(context)) {
-					Log.d("DA.onReceive", "Cover is closed, display Default Activity.");
+					Log.d(LOGD + ".onReceive", "Cover is closed, display Default Activity.");
 					//easiest way to do this is actually just to invoke the close_cover action as it does what we want
 					Functions.Actions.close_cover(getApplicationContext());
 				} else {
-					Log.d("DA.onReceive", "Cover is open, stopping Default Activity.");
+					Log.d(LOGD + ".onReceive", "Cover is open, stopping Default Activity.");
 
 					// when the cover opens, the fullscreen activity goes poof				
 					moveTaskToBack(true);
+					
+					// stop screen off timer
+					Functions.Actions.stopScreenOffTimer();
 				}
 
-			} else if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
+			} else if (action.equals(ALARM_ALERT_ACTION)) {
 
-				Log.d("DA.onReceive", "Alarm on event received.");
+				Log.d(LOGD + ".onReceive", "Alarm on event received.");
 
 				//only take action if alarm controls are enabled
 				if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_alarm_controls", false)) {
 
-					Log.d("DA.onReceive", "Alarm controls are enabled, taking action.");
+					Log.d(LOGD + ".onReceive", "Alarm controls are enabled, taking action.");
 
 					//set the alarm firing state
 					alarm_firing=true;
@@ -149,15 +148,15 @@ public class DefaultActivity extends Activity {
 						}, 1000);	
 					}
 				} else {
-					Log.d("DA.onReceive", "Alarm controls are not enabled.");
+					Log.d(LOGD + ".onReceive", "Alarm controls are not enabled.");
 				}
 
 			
-			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
+			} else if (action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
 				String phoneExtraState = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
 				boolean isRinging = phoneExtraState.equals(TelephonyManager.EXTRA_STATE_RINGING);
 				
-				Log.d("DA", "onReceive: ACTION_PHONE_STATE_CHANGED = " + phoneExtraState + ", riniging = " + isRinging);
+				Log.d(LOGD + ".onReceive", "ACTION_PHONE_STATE_CHANGED = " + phoneExtraState + ", riniging = " + isRinging);
 				
 				if (isRinging) {
 					Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
@@ -171,8 +170,8 @@ public class DefaultActivity extends Activity {
 						Functions.Actions.rearmScreenOffTimer(context);
 					}
 				}
-			} else if (intent.getAction().equals("org.durka.hallmonitor.debug")) {
-				Log.d("DA.onReceive", "received debug intent");
+			} else if (action.equals("org.durka.hallmonitor.debug")) {
+				Log.d(LOGD + ".onReceive", "received debug intent");
 				// test intent to show/hide a notification
 				switch (intent.getIntExtra("notif", 0)) {
 				case 1:
@@ -182,7 +181,10 @@ public class DefaultActivity extends Activity {
 					Functions.Actions.debug_notification(context, false);
 					break;
 				}
-			}
+			} else if (action.equals(Intent.ACTION_HEADSET_PLUG)) {	// headset (un-)plugged
+                mWiredHeadSetPlugged = ((intent.getIntExtra("state", -1) == 1));
+                Log.d(LOGD + ".onReceive", "ACTION_HEADSET_PLUG: plugged " + mWiredHeadSetPlugged + " (" + intent.getIntExtra("state", -1) + ")");
+            }
 		}
 	};
 
@@ -197,7 +199,7 @@ public class DefaultActivity extends Activity {
 		//FIXME Presumably there is a better way to do this
 		Functions.defaultActivity = this;
 
-		Log.d("DA.onCreate", "onCreate of DefaultView.");
+		Log.d(LOGD + ".onCreate", "onCreate of DefaultView.");
 
 		//Remove title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -215,6 +217,7 @@ public class DefaultActivity extends Activity {
 		filter.addAction(ALARM_ALERT_ACTION);
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 		filter.addAction("org.durka.hallmonitor.debug");
+        filter.addAction(Intent.ACTION_HEADSET_PLUG);
 		registerReceiver(receiver, filter);
 		
 		//get the views we need
@@ -233,21 +236,72 @@ public class DefaultActivity extends Activity {
         mAcceptSlide = findViewById(R.id.call_accept_slide);
         mRejectButton = findViewById(R.id.call_reject_button);
         mRejectSlide = findViewById(R.id.call_reject_slide);
-	}  
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		Log.d(LOGD + "-oS", "starting");
+		on_screen = true;
+
+		if (findViewById(R.id.default_battery) != null) {
+			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+			if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
+					|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
+				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
+			} else {
+				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
+			}
+			((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
+		}
+
+		if (NotificationService.that != null) {
+			// notification listener service is running, show the current notifications
+			Functions.Actions.setup_notifications();
+		}
+	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 
-		Log.d("DA.onResume", "On resume called.");
+		Log.d(LOGD + ".onResume", "On resume called.");
 			
 		refreshDisplay();
 	}
 
-	/**
+	@Override
+	protected void onStop() {
+		super.onStop();
+		Log.d(LOGD + "-oS", "stopping");
+		Functions.Actions.stopScreenOffTimer();
+		on_screen = false;
+	}
+
+	@Override
+	protected void onDestroy() {
+        //tidy up our receiver when we are destroyed
+        unregisterReceiver(receiver);
+
+        super.onDestroy();
+	}
+
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent)
+    {
+        boolean result = true;
+
+        // event handling phoneWidget
+        if (phoneView.getVisibility() == View.VISIBLE)
+            result = onTouchEvent_PhoneWidgetHandler(motionEvent);
+
+        return result;
+    }
+
+
+    /**
 	 * Refresh the display taking account of device and application state
 	 */
-	@SuppressWarnings("deprecation")
 	public void refreshDisplay() {
 
 		//get the layout for the windowed view
@@ -259,12 +313,12 @@ public class DefaultActivity extends Activity {
 	    //(which is part of the default layout so will show anyway)
 	    //will do this simply by setting the widgetType
 	    String widgetType = "default";
-	    if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
+	    if (hmAppWidgetManager.doesWidgetExist("media") && (mWiredHeadSetPlugged || audioManager.isMusicActive())) {
 	    	widgetType = "media";
 	    }
 	    
 	    if (alarm_firing) {
-	    	Log.d("DA", "refreshDisplay: alarm_firing");
+	    	Log.d(LOGD, "refreshDisplay: alarm_firing");
 	    	//show the alarm controls
 	    	defaultContent.setVisibility(View.VISIBLE);
 	    	phoneView.setVisibility(View.INVISIBLE);
@@ -274,7 +328,7 @@ public class DefaultActivity extends Activity {
 	    	defaultWidget.setVisibility(View.INVISIBLE);
 	    	grid.setVisibility(View.INVISIBLE);
 	    } else if (phone_ringing) {
-	    	Log.d("DA", "refreshDisplay: phone_ringing");
+	    	Log.d(LOGD, "refreshDisplay: phone_ringing");
 	    	//show the phone controls
     		defaultContent.setVisibility(View.INVISIBLE);
 	    	phoneView.setVisibility(View.VISIBLE);
@@ -296,7 +350,7 @@ public class DefaultActivity extends Activity {
 
 	    	//add the required widget based on the widgetType
 		    if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
-		    	Log.d("DA", "refreshDisplay: default_widget");
+		    	Log.d(LOGD, "refreshDisplay: default_widget");
 		    	
 		    	//remove the TextClock from the contentview
 			    contentView.removeAllViews();
@@ -307,14 +361,14 @@ public class DefaultActivity extends Activity {
 			    //if the widget host view already has a parent then we need to detach it
 			    ViewGroup parent = (ViewGroup)hostView.getParent();
 			    if ( parent != null) {
-			    	Log.d("DA.onCreate", "hostView had already been added to a group, detaching it.");
+			    	Log.d(LOGD + ".onCreate", "hostView had already been added to a group, detaching it.");
 			       	parent.removeView(hostView);
 			    }    
 			    
 			    //add the widget to the view
 			    contentView.addView(hostView);
 		    } else {
-		    	Log.d("DA", "refreshDisplay: default_widget");
+		    	Log.d(LOGD, "refreshDisplay: default_widget");
 			    
 		    	snoozeButton.setVisibility(View.INVISIBLE);
 		    	dismissButton.setVisibility(View.INVISIBLE);
@@ -360,12 +414,27 @@ public class DefaultActivity extends Activity {
 		Functions.Actions.pickup_call();
 	}
 
+    /**
+     * Text-To-Speech
+     */
+	
+    private void sendTextToSpeech(String text) {
+        Intent intent = new Intent();
+        intent.setAction(getString(R.string.ACTION_SEND_TO_SPEECH_RECEIVE));
+        intent.putExtra("sendTextToSpeech", text);
+        sendBroadcast(intent);
+    }
+
+    /**
+     * Text-To-Speech (end)
+     */
+	
 	/**
 	 * phone widget stuff
 	 */
 
 	private boolean setIncomingNumber(String incomingNumber) {
-		Log.d("CallActivity", "incomingNumber: " + incomingNumber);
+		Log.d(LOGD, "incomingNumber: " + incomingNumber);
 
 		boolean result = false;
 				
@@ -379,13 +448,13 @@ public class DefaultActivity extends Activity {
 	}
 	
 	private boolean setDisplayNameByIncomingNumber(String incomingNumber) {
-	    String name = null, type = null;
+        String name = null, type = null, label = null;
 	    Cursor contactLookup = null;
 	    
 	    try {
 	    	contactLookup = getContentResolver().query(
 	    			Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(incomingNumber))
-		    	,	new String[]{ PhoneLookup.DISPLAY_NAME, PhoneLookup.TYPE }
+		    	,	new String[]{ PhoneLookup.DISPLAY_NAME, PhoneLookup.TYPE, ContactsContract.PhoneLookup.TYPE, ContactsContract.PhoneLookup.LABEL }
 		    	,	null
 		    	,	null
 		    	, 	null);
@@ -393,16 +462,20 @@ public class DefaultActivity extends Activity {
 	        if (contactLookup != null && contactLookup.getCount() > 0) {
 
 		    	contactLookup.moveToFirst();
-	            name = contactLookup.getString(contactLookup.getColumnIndex(PhoneLookup.DISPLAY_NAME));
-	            type = contactLookup.getString(contactLookup.getColumnIndex(PhoneLookup.TYPE));
+                name = contactLookup.getString(contactLookup.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                type = contactLookup.getString(contactLookup.getColumnIndex(ContactsContract.PhoneLookup.TYPE));
+                label = contactLookup.getString(contactLookup.getColumnIndex(ContactsContract.PhoneLookup.LABEL));
 	        }
 
-	        if (name != null) {
-				mCallerName.setText(name);
-				mCallerNumber.setText(incomingNumber);
+            if (name != null) {
+                String typeString = (String)ContactsContract.CommonDataKinds.Phone.getTypeLabel(this.getResources(), Integer.parseInt(type), "");
 
-				Log.d("CallActivity", "displayName: " + name + " (" + type + ")");
-	        }
+                mCallerName.setText(name);
+                mCallerNumber.setText((typeString == null ? incomingNumber : typeString));
+
+                Log.d(LOGD, "displayName: " + name + " aka " + label + " (" + type + " -> " + typeString + ")");
+                sendTextToSpeech(name + (typeString != null ? " " + typeString : ""));
+            }
 	    } finally {
 	        if (contactLookup != null) {
 	            contactLookup.close();
@@ -412,8 +485,7 @@ public class DefaultActivity extends Activity {
 	    return (name != null);
 	}
 
-    @Override
-    public boolean onTouchEvent(MotionEvent motionEvent)
+    protected boolean onTouchEvent_PhoneWidgetHandler(MotionEvent motionEvent)
     {
         float maxSwipe = 150;
         float swipeTolerance = 0.95f;
@@ -491,7 +563,7 @@ public class DefaultActivity extends Activity {
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
-                Log.d("DA-oTE", "CANCEL: never seen");
+                Log.d(LOGD + "-oTE", "CANCEL: never seen");
                 callRejectedPhoneWidget();
                 TouchEventProcessor.stopTracking();
                 mActivePointerId = -1;
@@ -535,7 +607,7 @@ public class DefaultActivity extends Activity {
     }
 
     public void callAcceptedPhoneWidget() {
-        Log.d("DA", "callAcceptedPhoneWidget");
+        Log.d(LOGD, "callAcceptedPhoneWidget");
         mAcceptButton.setVisibility(View.INVISIBLE);
         mAcceptSlide.setVisibility(View.INVISIBLE);
         resetPhoneWidget();
@@ -543,7 +615,7 @@ public class DefaultActivity extends Activity {
     }
 
     public void callRejectedPhoneWidget() {
-        Log.d("DA", "callRejectedPhoneWidget");
+        Log.d(LOGD, "callRejectedPhoneWidget");
         resetPhoneWidgetMakeVisible();
         // rearm screen off timer
 		Functions.Actions.rearmScreenOffTimer(this);
@@ -554,7 +626,7 @@ public class DefaultActivity extends Activity {
         if (!mViewNeedsReset)
             return;
 
-        Log.d("DA", "resetPhoneWidget");
+        Log.d(LOGD, "resetPhoneWidget");
         moveCallButton(mAcceptButton, mButtonMargin);
         moveCallButton(mRejectButton, mButtonMargin);
 
@@ -562,66 +634,17 @@ public class DefaultActivity extends Activity {
     }
 
     public void resetPhoneWidgetMakeVisible() {
-        Log.d("DA", "resetPhoneWidgetMakeVisible");
+        Log.d(LOGD, "resetPhoneWidgetMakeVisible");
         resetPhoneWidget();
         mAcceptButton.setVisibility(View.VISIBLE);
         mAcceptSlide.setVisibility(View.VISIBLE);
         mRejectButton.setVisibility(View.VISIBLE);
         mRejectSlide.setVisibility(View.VISIBLE);
 
-        // TODO: clear text fields
+        mCallerName.setText("");
+        mCallerNumber.setText("");
     }
 
-	/**
-	 * phone widget stuff (end)
-	 */
-
-
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		Log.d("DA-oS", "starting");
-		on_screen = true;
-
-		if (findViewById(R.id.default_battery) != null) {
-			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
-					|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
-			} else {
-				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
-			}
-			((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
-		}
-
-		if (NotificationService.that != null) {
-			// notification listener service is running, show the current notifications
-			// TODO move this to Functions.java
-			Functions.Actions.setup_notifications();
-		}
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		Log.d("DA-oS", "stopping");
-		if (Functions.Actions.timerTask != null) {
-			Functions.Actions.timerTask.cancel();
-		}
-		on_screen = false;
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		//tidy up our receiver when we are destroyed
-		unregisterReceiver(receiver);
-}
-
-	/**
-	 * phone widget
-	 */
     public static class TouchEventProcessor
     {
         private static View mTrackObj = null;
@@ -642,17 +665,17 @@ public class DefaultActivity extends Activity {
         }
 
         public static boolean isTracking() {
-            //Log.d("DA.TouchEventProcessor", "TouchEventProcessor.isTracking: " + (mTrackObj != null));
+            //Log.d(LOGD + ".TouchEventProcessor", "isTracking: " + (mTrackObj != null));
             return (mTrackObj != null);
         }
 
         public static boolean isTrackedObj(View view) {
-            //Log.d("DA.TouchEventProcessor", "TouchEventProcessor.isTrackedObj: " + (isTracking() && mTrackObj.equals(view)));
+            //Log.d(LOGD + ".TouchEventProcessor", "isTrackedObj: " + (isTracking() && mTrackObj.equals(view)));
             return (isTracking() && mTrackObj.equals(view));
         }
 
         public static void startTracking(View view) {
-            //Log.d("DA.TouchEventProcessor", "TouchEventProcessor.startTracking: " + view.getId());
+            //Log.d(LOGD + ".TouchEventProcessor", "startTracking: " + view.getId());
             mTrackObj = view;
 
             Rect mRect = new Rect();
@@ -662,7 +685,7 @@ public class DefaultActivity extends Activity {
         }
 
         public static void stopTracking() {
-            //Log.d("DA.TouchEventProcessor", "TouchEventProcessor.stopTracking");
+            //Log.d(LOGD + ".TouchEventProcessor", "stopTracking");
             mTrackObj = null;
             mTrackStartPoint = null;
         }
@@ -672,4 +695,8 @@ public class DefaultActivity extends Activity {
         }
     }
 
+    /**
+	 * phone widget stuff (end)
+	 */
+    
 }
