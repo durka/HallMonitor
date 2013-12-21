@@ -84,12 +84,24 @@
         android:title="@string/pref_alarm_controls"
         android:summary="@string/pref_alarm_controls_summary"
         android:defaultValue="false" />
-    
-    <CheckBoxPreference
-        android:key="pref_phone_controls"
-        android:title="@string/pref_phone_controls"
-        android:summary="@string/pref_phone_controls_summary"
-        android:defaultValue="false" />
+
+    <PreferenceCategory android:title="@string/pref_phone_controls">
+        <CheckBoxPreference
+            android:key="pref_phone_controls"
+            android:title="@string/pref_phone_controls"
+            android:summary="@string/pref_phone_controls_summary"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="pref_phone_controls_tts"
+            android:title="@string/pref_phone_controls_tts"
+            android:summary="@string/pref_phone_controls_tts_summary"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="pref_phone_controls_speaker"
+            android:title="@string/pref_phone_controls_speaker"
+            android:summary="@string/pref_phone_controls_speaker_summary"
+            android:defaultValue="false" />
+    </PreferenceCategory>
     
     <Preference
         android:title=""

@@ -97,7 +97,7 @@ public class DefaultActivity extends Activity {
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+            final String action = intent.getAction();
             
 			if (action.equals(Intent.ACTION_SCREEN_ON)) {
 

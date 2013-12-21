@@ -51,6 +51,7 @@
             android:name="org.durka.hallmonitor.ViewCoverService" >
             <intent-filter>
                 <action android:name="org.durka.hallmonitor.sendTextToSpeech" />
+                <action android:name="org.durka.hallmonitor.stopTextToSpeech" />
             </intent-filter>
         </service>
         <service

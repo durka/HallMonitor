@@ -62,6 +62,8 @@ public class ViewCoverService extends Service implements SensorEventListener, Te
             } else if (action.equals(getString(R.string.ACTION_SEND_TO_SPEECH_RECEIVE))) {
                 String text = intent.getStringExtra("sendTextToSpeech");
                 sendTextToSpeech(text);
+            } else if (action.equals(getString(R.string.ACTION_STOP_TO_SPEECH_RECEIVE))) {
+                stopTextToSpeech();
             }
         }
     };
@@ -96,6 +98,7 @@ public class ViewCoverService extends Service implements SensorEventListener, Te
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_HEADSET_PLUG);
         filter.addAction(getString(R.string.ACTION_SEND_TO_SPEECH_RECEIVE));
+        filter.addAction(getString(R.string.ACTION_STOP_TO_SPEECH_RECEIVE));
         registerReceiver(receiver, filter);
 
         return START_STICKY;
@@ -185,15 +188,17 @@ public class ViewCoverService extends Service implements SensorEventListener, Te
     }
 
     private boolean sendTextToSpeech(String text) {
+        boolean ttsEnabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_phone_controls_tts", false);
+        boolean speakerEnabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_phone_controls_speaker", false);
         boolean result = false;
 
-        Log.d(LOGD, "sendTextToSpeech: text = '" + text + "', " + mTtsInitComplete + ", " + (mTts != null));
-        if (mTtsInitComplete && mTts != null) {
+        Log.d(LOGD, "sendTextToSpeech: text = '" + text + "', " + mTtsInitComplete + ", " + (mTts != null) + ", " + ttsEnabled);
+        if (mTtsInitComplete && mTts != null && ttsEnabled) {
             AudioManager audioManager = (AudioManager)this.getSystemService(AUDIO_SERVICE);
 
             Log.d(LOGD, "sendTextToSpeech: text = '" + text + "', " + mWiredHeadSetPlugged + ", " + audioManager.isBluetoothA2dpOn());
 
-            if (audioManager.isBluetoothA2dpOn() || mWiredHeadSetPlugged) {
+            if (audioManager.isBluetoothA2dpOn() || mWiredHeadSetPlugged || speakerEnabled) {
                 HashMap <String, String> params = new HashMap<String, String>(1);
                 params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(audioManager.STREAM_VOICE_CALL));
 
@@ -206,9 +211,13 @@ public class ViewCoverService extends Service implements SensorEventListener, Te
         return result;
     }
 
+    private void stopTextToSpeech() {
+        if (mTtsInitComplete && mTts != null)
+            mTts.stop();
+    }
+
     private void destroyTextToSpeech() {
-        if (mTts != null)
-        {
+        if (mTts != null) {
             mTts.stop();
             mTts.shutdown();
         }
