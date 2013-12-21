@@ -59,12 +59,22 @@ public class DefaultActivity extends Activity {
 	private AudioManager audioManager;
 
 	//Action fired when alarm goes off
-	public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
-	//Action to trigger snooze of the alarm
-	public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
-	//Action to trigger dismiss of the alarm
-	public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
-
+    public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
+    //Action to trigger snooze of the alarm
+    public static final String ALARM_SNOOZE_ACTION = "com.android.deskclock.ALARM_SNOOZE";
+    //Action to trigger dismiss of the alarm
+    public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
+    //This action should let us know if the alarm has been killed by another app
+    public static final String ALARM_DONE_ACTION = "com.android.deskclock.ALARM_DONE";
+    
+    //all the views we need
+    private GridView grid = null;
+    private View snoozeButton = null;
+    private View dismissButton = null;
+    private View defaultWidget = null;
+    private RelativeLayout defaultContent = null;
+    private TextClock defaultTextClock = null;
+	
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
@@ -119,6 +129,14 @@ public class DefaultActivity extends Activity {
 					Log.d("DA.onReceive", "Alarm controls are not enabled.");
 				}
 
+			} else if (intent.getAction().equals(ALARM_DONE_ACTION) ) {
+					
+					Log.d("DA.onReceive", "Alarm done event received.");
+					
+					//if the alarm is turned off using the normal alarm screen this will
+					//ensure that we will hide the alarm controls
+					alarm_firing=false;
+				
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
 				
 				if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_phone_controls", false)) {
@@ -180,7 +198,16 @@ public class DefaultActivity extends Activity {
 		filter.addAction(ALARM_ALERT_ACTION);
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 		filter.addAction("org.durka.hallmonitor.debug");
+		filter.addAction(ALARM_DONE_ACTION);
 		registerReceiver(receiver, filter);
+		
+		//get the views we need
+		grid = (GridView)findViewById(R.id.default_icon_container);
+	    snoozeButton = findViewById(R.id.snoozebutton);
+	    dismissButton = findViewById(R.id.dismissbutton);
+	    defaultWidget = findViewById(R.id.default_widget);
+	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
+	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
 
 	}  
 
@@ -191,8 +218,7 @@ public class DefaultActivity extends Activity {
 
 		Log.d("DA.onResume", "On resume called.");
 
-		refreshDisplay();
-
+		refreshDisplay(); // TODO is this necessary to do here?
 	}
 
 	/**
@@ -295,9 +321,9 @@ public class DefaultActivity extends Activity {
 
 	@Override
 	protected void onStart() {
-		super.onStart();
-		Log.d("DA-oS", "starting");
-		on_screen = true;
+	    super.onStart();
+	    Log.d("DA-oS", "starting");
+	    on_screen = true;
 
 		if (findViewById(R.id.default_battery_picture) != null) {
 			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
