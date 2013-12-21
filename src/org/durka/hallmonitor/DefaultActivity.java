@@ -36,6 +36,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
@@ -67,6 +68,10 @@ public class DefaultActivity extends Activity {
     //This action should let us know if the alarm has been killed by another app
     public static final String ALARM_DONE_ACTION = "com.android.deskclock.ALARM_DONE";
     
+    //this action will let us toggle the flashlight
+    public static final String TOGGLE_FLASHLIGHT = "net.cactii.flash2.TOGGLE_FLASHLIGHT";
+    boolean torchIsOn = false;
+    
     //all the views we need
     private GridView grid = null;
     private View snoozeButton = null;
@@ -74,7 +79,8 @@ public class DefaultActivity extends Activity {
     private View defaultWidget = null;
     private RelativeLayout defaultContent = null;
     private TextClock defaultTextClock = null;
-	
+    private ImageButton torchButton = null;
+    
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
@@ -208,6 +214,7 @@ public class DefaultActivity extends Activity {
 	    defaultWidget = findViewById(R.id.default_widget);
 	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
 	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
+	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
 
 	}  
 
@@ -319,6 +326,18 @@ public class DefaultActivity extends Activity {
 		Functions.Actions.pickup_call();
 	}
 
+	//toggle the torch
+	public void sendToggleTorch(View view) {
+		Intent intent = new Intent(TOGGLE_FLASHLIGHT);
+        intent.putExtra("strobe", false);
+        intent.putExtra("period", 100);
+        intent.putExtra("bright", false);
+        sendBroadcast(intent);
+        torchIsOn = !torchIsOn;
+        if (torchIsOn) torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
+        else torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
+	}
+	
 	@Override
 	protected void onStart() {
 	    super.onStart();

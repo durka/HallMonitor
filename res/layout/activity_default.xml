@@ -96,47 +96,59 @@
 	           android:layout_height="75dp"
 	           android:layout_centerHorizontal="true"
 	           android:gravity="center" >
-	       
-	               <TextClock
-	                   android:id="@+id/default_text_clock"
-	                   android:layout_width="wrap_content"
-	                   android:layout_height="match_parent"
-	                   android:keepScreenOn="true"
-	                   android:textColor="#33b5e5"
-	                   android:textSize="50sp"
-	                   android:textStyle="bold" />
 
-	               <TextView
-	                   android:id="@+id/default_battery_percent"
-	                   android:layout_width="wrap_content"
-	                   android:layout_height="wrap_content"
-	                   android:layout_alignParentRight="true"
-	                   android:layout_centerVertical="true"
-	                   android:text="100%"
-	                   android:textAppearance="?android:attr/textAppearanceLarge" />
+	           <TextClock
+	               android:id="@+id/default_text_clock"
+	               android:layout_width="wrap_content"
+	               android:layout_height="match_parent"
+	               android:keepScreenOn="true"
+	               android:textColor="#33b5e5"
+	               android:textSize="50sp"
+	               android:textStyle="bold" />
 
-	               <ImageView
-	                   android:id="@+id/default_battery_picture"
-	                   android:layout_width="wrap_content"
-	                   android:layout_height="wrap_content"
-	                   android:layout_alignParentRight="true"
-	                   android:layout_centerVertical="true"
-	                   android:layout_marginRight="60dp"
-	                   android:src="@drawable/stat_sys_battery" />
-	       
+	           <TextView
+	               android:id="@+id/default_battery_percent"
+	               android:layout_width="wrap_content"
+	               android:layout_height="wrap_content"
+	               android:layout_alignParentRight="true"
+	               android:layout_alignParentTop="true"
+	               android:text="100%"
+	               android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	           <ImageView
+	               android:id="@+id/default_battery_picture"
+	               android:layout_width="wrap_content"
+	               android:layout_height="wrap_content"
+	               android:layout_alignParentTop="true"
+	               android:layout_marginTop="3dp"
+	               android:layout_marginRight="8dp"
+	               android:layout_toLeftOf="@+id/default_battery_percent"
+	               android:src="@drawable/stat_sys_battery" />
+
 	       </RelativeLayout>
 	              
 	       <GridView
-	        android:id="@+id/default_icon_container"
-	        android:layout_width="match_parent"
-	        android:layout_height="50dp"
-	        android:layout_below="@id/default_widget"
-	        android:padding="0dp"
-	        android:layout_margin="0dp"
-	                android:horizontalSpacing="4dp"
-	                android:columnWidth="24dp"
-	                android:numColumns="0" />
+	           android:id="@+id/default_icon_container"
+	           android:layout_width="match_parent"
+	           android:layout_height="50dp"
+	           android:layout_below="@id/default_widget"
+	           android:layout_margin="0dp"
+	           android:columnWidth="24dp"
+	           android:horizontalSpacing="4dp"
+	           android:numColumns="0"
+	           android:padding="0dp" />
 
+               <ImageButton
+                   android:id="@+id/torchbutton"
+                   style="?android:attr/buttonBarButtonStyle"
+                   android:layout_width="40dp"
+                   android:layout_height="wrap_content"
+                   android:layout_alignBottom="@+id/default_widget"
+                   android:layout_alignParentRight="true"
+                   android:layout_marginRight="18dp"
+                   android:onClick="sendToggleTorch"
+                   android:src="@drawable/ic_appwidget_torch_off" />
+       
        </RelativeLayout>
         
        </RelativeLayout>
