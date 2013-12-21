@@ -74,6 +74,12 @@
         android:defaultValue="false" />
     
     <CheckBoxPreference
+        android:key="pref_flash_controls"
+        android:title="@string/pref_flash_controls"
+        android:summary="@string/pref_flash_controls_summary"
+        android:defaultValue="false" />
+    
+    <CheckBoxPreference
         android:key="pref_media_widget"
         android:title="@string/pref_media_widget"
         android:summary="@string/pref_media_widget_summary"

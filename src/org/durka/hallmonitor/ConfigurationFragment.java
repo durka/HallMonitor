@@ -14,9 +14,12 @@
  */
 package org.durka.hallmonitor;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceFragment;
@@ -24,6 +27,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class ConfigurationFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
+	
+
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
 	    		.putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(),"default"))
 	    		.putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(),"media"))
+	    		.putBoolean("showFlashControl", Functions.Is.showFlashControl)
 	    		.commit();
 	    
 	    getPreferenceManager().getSharedPreferences()
@@ -120,6 +126,25 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				//getActivity().startService(new Intent(getActivity(), NotificationService.class));
 			}
 		}
+		
+		
+		// if the flash controls are being enabled/disabled the key will be pref_widget	
+		else if (key.equals("pref_flash_controls")) {
+			
+			if (prefs.getBoolean(key, false) ) {
+				  try {
+					  PackageManager packageManager = getActivity().getPackageManager();
+					  packageManager.getApplicationLogo("net.cactii.flash2");
+					  Functions.Is.showFlashControl = true;
+				  } catch (PackageManager.NameNotFoundException nfne) {
+					  Toast.makeText(getActivity(), "Default torch application is not installed - cannot enable torch button!", Toast.LENGTH_SHORT).show();			  
+				  }
+			}
+			else {
+				Functions.Is.showFlashControl = false;
+			}
+		}
+		
 	}
 
 }
