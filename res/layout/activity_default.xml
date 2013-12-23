@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="#000000" >
 
+    <!-- default_content -->
     <RelativeLayout
         android:id="@+id/default_content"
         android:layout_width="310dp"
@@ -12,7 +13,8 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:keepScreenOn="true" >
-        
+
+        <!-- default_content_alarm -->
         <RelativeLayout
             android:id="@+id/default_content_alarm"
             android:layout_width="match_parent"
@@ -41,7 +43,8 @@
 	       	    android:onClick="sendDismiss" />
 	       	
        	</RelativeLayout>
-       	
+
+        <!-- default_content_phone -->
         <RelativeLayout
             android:id="@+id/default_content_phone"
             android:layout_width="match_parent"
@@ -77,21 +80,22 @@
 	       	    android:src="@drawable/ic_jog_dial_answer"
 	       	    android:onClick="sendPickUp" />
 	       	
-	   </RelativeLayout>
-	   
-       <RelativeLayout
+        </RelativeLayout>
+
+        <!-- default_content_normal -->
+        <RelativeLayout
            android:id="@+id/default_content_normal"
            android:layout_width="match_parent"
            android:layout_height="match_parent"
            android:visibility="visible" >
 
-	       <RelativeLayout
-	           android:id="@+id/default_widget"
-	           android:layout_width="match_parent"
-	           android:layout_height="75dp"
-	           android:layout_centerHorizontal="true"
-	           android:gravity="center" >
-	       
+           <RelativeLayout
+               android:id="@+id/default_widget"
+               android:layout_width="match_parent"
+               android:layout_height="75dp"
+               android:layout_centerHorizontal="true"
+               android:gravity="center" >
+
                <TextClock
                    android:id="@+id/default_text_clock"
                    android:layout_width="wrap_content"
@@ -108,7 +112,8 @@
                    android:layout_alignParentRight="true"
                    android:layout_centerVertical="true"
                    android:text="100%"
-                   android:textAppearance="?android:attr/textAppearanceLarge" />
+                   android:textAppearance="?android:attr/textAppearanceLarge"
+                   android:visibility="invisible" />
 
               <ImageView
                   android:id="@+id/default_battery"
@@ -119,9 +124,9 @@
                   android:layout_centerVertical="true"
                   android:layout_marginRight="23dp"
                   android:src="@drawable/stat_sys_battery" />
-       
-       </RelativeLayout>
-              
+
+        </RelativeLayout>
+
        <GridView
         android:id="@+id/default_icon_container"
         android:layout_width="310dp"
@@ -135,16 +140,15 @@
 
        </RelativeLayout>
 
-
     </RelativeLayout>
 
+    <!-- phone widget -->
     <GridLayout
         android:layout_width="310dp"
         android:layout_height="125dp"
         android:layout_gravity="center_horizontal"
         android:columnCount="6"
         android:rowCount="6"
-        android:background="#000000"
         android:columnOrderPreserved="true"
         android:id="@+id/phone_widget"
         android:layout_centerHorizontal="true"

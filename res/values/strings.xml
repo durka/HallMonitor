@@ -45,12 +45,17 @@
     <string name="pref_media_widget_summary">Whether to use a 3rd party widget inside the cover window to show when media is playing / headphones are connected</string>
     <string name="pref_alarm_controls">Alarm Controls Enable</string>
     <string name="pref_alarm_controls_summary">Whether to show alarm dismiss and snooze buttons in the cover window if the alarm goes off whilst the cover is closed</string>
-    <string name="pref_phone_controls">Phone Controls Enable</string>
-    <string name="pref_phone_controls_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed</string>
+    <string name="pref_phone_screen">Phone Controls</string>
+    <string name="pref_phone_screen_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed</string>
+    <string name="pref_phone_controls">Enabled</string>
     <string name="pref_phone_controls_tts">Text-To-Speech Enable</string>
-    <string name="pref_phone_controls_tts_summary">speaks the caller id of incoming calls based on your phone´s stored contacts. connected headset is required.</string>
+    <string name="pref_phone_controls_tts_summary">Speaks the caller id of incoming calls based on your phone´s stored contacts. connected headset is required.</string>
+    <string name="pref_phone_controls_tts_delay">Text-To-Speech Delay</string>
+    <string name="pref_phone_controls_tts_delay_summary">Before speak the caller id of incoming calls.</string>
     <string name="pref_phone_controls_speaker">Speaker Enable</string>
     <string name="pref_phone_controls_speaker_summary">suppress headset check</string>
+    <string name="pref_phone_preview">Test</string>
+    <string name="pref_phone_preview_summary">coming soon</string>
     <string name="pref_default_bgcolor">Background color</string>
     <string name="pref_default_bgcolor_summary">Background of the view you will see through the closed cover</string>
     <string name="pref_default_fgcolor">Foreground color</string>
@@ -70,5 +75,6 @@
     <string name="unknown_caller">unknown caller</string>
     <string name="ACTION_SEND_TO_SPEECH_RECEIVE">org.durka.hallmonitor.sendTextToSpeech</string>
     <string name="ACTION_STOP_TO_SPEECH_RECEIVE">org.durka.hallmonitor.stopTextToSpeech</string>
+    <string name="ACTION_RESTART_DEFAULT_ACTIVITY">org.durka.hallmonitor.restartDefaultActivity</string>
 
 </resources>

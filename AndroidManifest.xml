@@ -31,7 +31,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -52,6 +52,7 @@
             <intent-filter>
                 <action android:name="org.durka.hallmonitor.sendTextToSpeech" />
                 <action android:name="org.durka.hallmonitor.stopTextToSpeech" />
+                <action android:name="org.durka.hallmonitor.restartDefaultActivity" />
             </intent-filter>
         </service>
         <service

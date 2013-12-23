@@ -593,7 +593,7 @@ public class Functions {
 						// start
 						ctx.startActivity(intent);
 					}
-				}, 1000);
+				}, 500);
 			}
 		}
 		
@@ -674,11 +674,6 @@ public class Functions {
 			
 			return widgetEnabled;
 		}
-		
-		
-		
-		
-		
 	}
 	
 	public static class Util {
