@@ -14,9 +14,12 @@
  */
 package org.durka.hallmonitor;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -56,6 +59,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
 	    		.putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(),"default"))
 	    		.putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(),"media"))
+	    		.putBoolean("showFlashControl", Functions.Is.showFlashControl)
 	    		.commit();
 
         prefs
@@ -88,8 +92,8 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 		if (findPreference(key) instanceof CheckBoxPreference) {
 			((CheckBoxPreference)findPreference(key)).setChecked(prefs.getBoolean(key, false));
 		}
-
-		// if the service is being enabled/disabled the key will be pref_enabled
+		
+		// if the service is being enabled/disabled the key will be pref_enabled 
 		if (key.equals("pref_enabled")) {
 			
 			if (prefs.getBoolean(key, false)) {
@@ -97,7 +101,8 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 			} else {
 				Functions.Actions.stop_service(getActivity());
 			}
-		// if the default screen widget is being enabled/disabled the key will be pref_default_widget
+			
+		// if the default screen widget is being enabled/disabled the key will be pref_default_widget	
 		} else if (key.equals("pref_default_widget")) {
 				
 			if (prefs.getBoolean(key, false)) {
@@ -138,8 +143,24 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
             findPreference("pref_phone_controls_tts").setEnabled(prefs.getBoolean(key, false));
             findPreference("pref_phone_controls_tts_delay").setEnabled(prefs.getBoolean(key, false));
             findPreference("pref_phone_controls_speaker").setEnabled(prefs.getBoolean(key, false));
-        }
-
+		} else
+		// if the flash controls are being enabled/disabled the key will be pref_widget	
+		if (key.equals("pref_flash_controls")) {
+			
+			if (prefs.getBoolean(key, false) ) {
+				  try {
+					  PackageManager packageManager = getActivity().getPackageManager();
+					  packageManager.getApplicationLogo("net.cactii.flash2");
+					  Functions.Is.showFlashControl = true;
+				  } catch (PackageManager.NameNotFoundException nfne) {
+					  Toast.makeText(getActivity(), "Default torch application is not installed - cannot enable torch button!", Toast.LENGTH_SHORT).show();			  
+				  }
+			}
+			else {
+				Functions.Is.showFlashControl = false;
+			}
+		}
+		
         // phone control
         enablePhoneScreen(prefs);
     }

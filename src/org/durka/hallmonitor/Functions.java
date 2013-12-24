@@ -335,7 +335,7 @@ public class Functions {
 		              output += currentLine + "\n";
 		            } 
 		            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
-
+	           
 		            //log out the error output
 		            String error = "";
 		            currentLine = "";
@@ -566,7 +566,7 @@ public class Functions {
 		}
 
 
-		public static void incoming_call(final Context ctx, final String number) {
+		public static void incoming_call(final Context ctx, String number) {
 			Log.d("phone", "call from " + number);
 			if (Functions.Is.cover_closed(ctx)) {
 				Log.d("phone", "but the screen is closed. screen my calls");
@@ -608,6 +608,8 @@ public class Functions {
 	 * Contains methods to check the state
 	 */
 	public static class Is {
+		
+		public static boolean showFlashControl = false;
 		
 		/**
 		 * Is the cover closed.
@@ -679,6 +681,9 @@ public class Functions {
 	public static class Util {
 		// from http://stackoverflow.com/questions/3712112/search-contact-by-phone-number
 		public static String getContactName(Context ctx, String number) {
+			
+			if (number.equals("")) return "";
+			
 			Log.d("phone", "looking up " + number + "...");
 			
 		    Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));

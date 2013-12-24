@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
@@ -19,7 +21,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.TelephonyManager;
@@ -31,6 +35,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
@@ -64,6 +69,10 @@ public class DefaultActivity extends Activity {
     //This action should let us know if the alarm has been killed by another app
     public static final String ALARM_DONE_ACTION = "com.android.deskclock.ALARM_DONE";
     
+    //this action will let us toggle the flashlight
+    public static final String TOGGLE_FLASHLIGHT = "net.cactii.flash2.TOGGLE_FLASHLIGHT";
+    boolean torchIsOn = false;
+    
     //all the views we need
     private GridView grid = null;
     private View snoozeButton = null;
@@ -71,6 +80,7 @@ public class DefaultActivity extends Activity {
     private View defaultWidget = null;
     private RelativeLayout defaultContent = null;
     private TextClock defaultTextClock = null;
+    private ImageButton torchButton = null;
     
     protected boolean mWiredHeadSetPlugged = false;
 
@@ -138,7 +148,7 @@ public class DefaultActivity extends Activity {
 						timer.schedule(new TimerTask() {
 							@Override
 							public void run() {	
-								Intent myIntent = new Intent(getApplicationContext(), DefaultActivity.class);
+								Intent myIntent = new Intent(getApplicationContext(),DefaultActivity.class);
 								myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK 
 										| Intent.FLAG_ACTIVITY_CLEAR_TOP
 										| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -151,6 +161,13 @@ public class DefaultActivity extends Activity {
 					Log.d(LOG_TAG + ".onReceive", "Alarm controls are not enabled.");
 				}
 
+            } else if (intent.getAction().equals(ALARM_DONE_ACTION) ) {
+
+                Log.d(LOG_TAG + ".onReceive", "Alarm done event received.");
+
+                //if the alarm is turned off using the normal alarm screen this will
+                //ensure that we will hide the alarm controls
+                alarm_firing=false;
 			
 			} else if (action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
 				String phoneExtraState = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
@@ -215,6 +232,7 @@ public class DefaultActivity extends Activity {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(ALARM_ALERT_ACTION);
+        filter.addAction(ALARM_DONE_ACTION);
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 		filter.addAction("org.durka.hallmonitor.debug");
         filter.addAction(Intent.ACTION_HEADSET_PLUG);
@@ -227,6 +245,7 @@ public class DefaultActivity extends Activity {
 	    defaultWidget = findViewById(R.id.default_widget);
 	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
 	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
+	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
 
 	    // phone_widget
 	    phoneView = (GridLayout)findViewById(R.id.phone_widget);
@@ -391,7 +410,7 @@ public class DefaultActivity extends Activity {
 
 
 	/** Called when the user touches the snooze button */
-    private void sendSnooze(View view) {
+	public void sendSnooze(View view) {
 		// Broadcast alarm snooze event
 		Intent alarmSnooze = new Intent(ALARM_SNOOZE_ACTION);
 		sendBroadcast(alarmSnooze);
@@ -402,7 +421,7 @@ public class DefaultActivity extends Activity {
 	}
 
 	/** Called when the user touches the dismiss button */
-    private void sendDismiss(View view) {
+	public void sendDismiss(View view) {
 		// Broadcast alarm dismiss event
 		Intent alarmDismiss = new Intent(ALARM_DISMISS_ACTION);
 		sendBroadcast(alarmDismiss);
@@ -411,14 +430,26 @@ public class DefaultActivity extends Activity {
 		//refresh the display
 		refreshDisplay();
 	}
-
-    private void sendHangUp(View view) {
+	
+	public void sendHangUp(View view) {
 		Functions.Actions.hangup_call();
 	}
-
-    private void sendPickUp(View view) {
+	
+	public void sendPickUp(View view) {
 		Functions.Actions.pickup_call();
 	}
+
+    //toggle the torch
+    public void sendToggleTorch(View view) {
+        Intent intent = new Intent(TOGGLE_FLASHLIGHT);
+        intent.putExtra("strobe", false);
+        intent.putExtra("period", 100);
+        intent.putExtra("bright", false);
+        sendBroadcast(intent);
+        torchIsOn = !torchIsOn;
+        if (torchIsOn) torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
+        else torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
+    }
 
     /**
      * Text-To-Speech

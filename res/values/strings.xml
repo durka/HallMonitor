@@ -56,12 +56,14 @@
     <string name="pref_phone_controls_speaker_summary">suppress headset check</string>
     <string name="pref_phone_preview">Test</string>
     <string name="pref_phone_preview_summary">coming soon</string>
+    <string name="pref_flash_controls">Torch Control Enable</string>
+    <string name="pref_flash_controls_summary">Whether to include a button to turn the torch on and off on the default screen</string>
     <string name="pref_default_bgcolor">Background color</string>
     <string name="pref_default_bgcolor_summary">Background of the view you will see through the closed cover</string>
     <string name="pref_default_fgcolor">Foreground color</string>
     <string name="pref_default_fgcolor_summary">Text color for the clock you will see through the closed cover</string>
     <string name="pref_about">About Hall Monitor</string>
-    <string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="title_activity_window">WindowActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_fullscreen">FullscreenActivity</string>
