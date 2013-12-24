@@ -237,8 +237,12 @@ public class DefaultActivity extends Activity {
 		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
 		
 		//hide or show the torch button as required
-		if (Functions.Is.showFlashControl) torchButton.setVisibility(View.VISIBLE);
-		else torchButton.setVisibility(View.INVISIBLE);
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false))
+		{
+			torchButton.setVisibility(View.VISIBLE);
+		} else {
+			torchButton.setVisibility(View.INVISIBLE);
+		}
 		
 		//if the alarm is firing then show the alarm controls, otherwise
 		//if we have a media app widget and media is playing or headphones are connected then display that, otherwise

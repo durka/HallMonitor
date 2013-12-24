@@ -48,7 +48,6 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
 	    		.putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(),"default"))
 	    		.putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(),"media"))
-	    		.putBoolean("showFlashControl", Functions.Is.showFlashControl)
 	    		.commit();
 	    
 	    getPreferenceManager().getSharedPreferences()
@@ -112,6 +111,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 			if (prefs.getBoolean(key, false)) {
 				if (!Functions.Actions.run_commands_as_root(new String[]{"whoami"}).equals("root")) {
 					// if "whoami" doesn't work, refuse to set preference
+					Toast.makeText(getActivity(), "Root access not granted - cannot enable root features!", Toast.LENGTH_SHORT).show();			  
 					prefs.edit().putBoolean(key, false).commit();
 				}
 			}
@@ -128,20 +128,18 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 		}
 		
 		
-		// if the flash controls are being enabled/disabled the key will be pref_widget	
+		// if the flash controls are being enabled/disabled the key will be pref_flash_controls	
 		else if (key.equals("pref_flash_controls")) {
 			
 			if (prefs.getBoolean(key, false) ) {
-				  try {
-					  PackageManager packageManager = getActivity().getPackageManager();
-					  packageManager.getApplicationLogo("net.cactii.flash2");
-					  Functions.Is.showFlashControl = true;
-				  } catch (PackageManager.NameNotFoundException nfne) {
-					  Toast.makeText(getActivity(), "Default torch application is not installed - cannot enable torch button!", Toast.LENGTH_SHORT).show();			  
-				  }
-			}
-			else {
-				Functions.Is.showFlashControl = false;
+				try {
+					PackageManager packageManager = getActivity().getPackageManager();
+					packageManager.getApplicationLogo("net.cactii.flash2");
+				} catch (PackageManager.NameNotFoundException nfne) {
+					// if the app isn't installed, just refuse to set the preference
+					Toast.makeText(getActivity(), "Default torch application is not installed - cannot enable torch button!", Toast.LENGTH_SHORT).show();			  
+					prefs.edit().putBoolean(key, false).commit();
+				}
 			}
 		}
 		

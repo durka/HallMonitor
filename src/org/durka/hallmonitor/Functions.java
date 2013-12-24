@@ -597,8 +597,6 @@ public class Functions {
 	 */
 	public static class Is {
 		
-		public static boolean showFlashControl = false;
-		
 		/**
 		 * Is the cover closed.
 		 * @param ctx Application context.
