@@ -15,16 +15,17 @@ Screenshots:
 
 ![Configuration screen (okay, it's the only screen)](https://raw.github.com/durka/HallMonitor/master/screenshot.png "Configuration screen (okay, it's the only screen)") ![GIF of opening and closing the cover](https://raw.github.com/durka/HallMonitor/master/animation_trimmed.gif "GIF of opening and closing the cover")
 
-**Important**: I have **ONLY** personally tested this under the following configuration(s):
+**Important**: The preponderance of the evidence so far indicates that there should be no problem running this app on any Galaxy S4, and even on the S4 mini. However, I have only _personally_ tested it under the following configuration(s):
 
 - Samsung Galaxy S4 T-Mobile (jfltetmo / SGH-M919), CyanogenMod 10.1.3 (based on Android 4.2.2)
+- Samsung Galaxy S4 T-Mobile (jfltetmo / SGH-M919), CyanogenMod 10.2 (based on Android 4.3)
 
 Others have tested this under the following configuration(s):
 
-- Samsung Galaxy S4 Sprint (jfltespr / SPH-L720), CyanogenMod 10.2 (based on Android 4.3)
-- Samsung Galaxy S4 International (jfltexx / GT-i9505), CyanogenMod 10.2 (based on Android 4.3)
-- _[Partial functionality]_ S4 Exynos octacore international (GT-i9500), unofficial CyanogenMod 10.2
-- _[Partial functionality]_ S4 mini International (serranoltexx / GT-i9195), CyanogenMod 10.2
+- Samsung Galaxy S4 Sprint (jfltespr / SPH-L720), CyanogenMod 10.2
+- Samsung Galaxy S4 international (jfltexx / GT-I9505), CyanogenMod 10.2
+- _[Mostly working]_ S4 Exynos octacore international (GT-I9500), unofficial CyanogenMod 10.2
+- _[Mostly working]_ S4 mini international (serranoltexx / GT-I9195), CyanogenMod 10.2
 
 If you test this on something other than the above (including another carrier's S4) and it works, please let me know! You can contact me at [android@alexburka.com](mailto:android@alexburka.com). If it doesn't work, please file an issue here. But no promises, because I can't really do tech support for devices I don't own.
 
@@ -32,7 +33,7 @@ Installation / Usage
 --------------------
 The current release is: [0.0.2a](https://github.com/durka/HallMonitor/tree/0.0.2a) (see [changelog](https://github.com/durka/HallMonitor/blob/master/CHANGELOG.md))
 
-- I will be submitting the app to F-Droid. This should be by far the easiest way to install. I'll update here once there is a link.
+- The easiest way to install the latest stable version is through [F-Droid](https://f-droid.org/), an "app store" for open source. Here is [Hall Monitor's entry](https://f-droid.org/repository/browse/?fdid=org.durka.hallmonitor).
 - You can download [`bin/HallMonitor.apk`](https://github.com/durka/HallMonitor/blob/0.0.2a/bin/HallMonitor.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
 - You can clone the repository at a tagged version and build from source. It's configured as an Eclipse project, but I haven't even used any external libraries yet, so it "should" be "simple" to build with another system such as Android Studio or ant.
 
@@ -49,8 +50,9 @@ Future Plans
 1. Comment the code more
 2. Remove the above limitations
 3. Enhance the view cover lockscreen:
-    - Either modify cLock, or make a new lockscreen widget, that crams more information into the space you can see through the view cover
-    - Make the lockscreen, or just a fullscreen activity, come up immediately when you close the cover instead of turning the screen off and back on (this could supersede the previous point)
+    - (done) Either modify cLock, or make a new lockscreen widget, that crams more information into the space you can see through the view cover
+    - (done) Make the lockscreen, or just a fullscreen activity, come up immediately when you close the cover instead of turning the screen off and back on (this could supersede the previous point)
+    - (in progress) More enhancements to the fullscreen activity; see the issues/wiki for a roadmap
 4. Add options to support other S4-specific things:
     - Keep the screen on while the camera can see your eyes
     - Air gestures? I never used them myself and don't know exactly how they work, but maybe people want them?
