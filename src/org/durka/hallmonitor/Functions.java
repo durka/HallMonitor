@@ -70,6 +70,9 @@ public class Functions {
 	//widget configuration
 	public static final int REQUEST_PICK_APPWIDGET = 9;
 	public static final int REQUEST_CONFIGURE_APPWIDGET = 5;
+	
+    //this action will let us toggle the flashlight
+    public static final String TOGGLE_FLASHLIGHT = "net.cactii.flash2.TOGGLE_FLASHLIGHT";
 
     private static final String DEV_SERRANO_LTE = "serranolte"; // GT-I9195
 	
@@ -337,6 +340,22 @@ public class Functions {
 			//defaultActivity.refreshDisplay();
 		}
 		
+		public static void toggle_torch(DefaultActivity da) {
+			Intent intent = new Intent(TOGGLE_FLASHLIGHT);
+	        intent.putExtra("strobe", false);
+	        intent.putExtra("period", 100);
+	        intent.putExtra("bright", false);
+	        da.sendBroadcast(intent);
+	        Is.torchIsOn = !Is.torchIsOn;
+	        if (Is.torchIsOn) {
+	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
+	        	if (timerTask != null) timerTask.cancel();
+	        } else {
+	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
+	        	close_cover(da);
+	        }
+		}
+		
 		public static void setup_notifications() {
 			StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
 			Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
@@ -596,6 +615,8 @@ public class Functions {
 	 * Contains methods to check the state
 	 */
 	public static class Is {
+		
+		public static boolean torchIsOn = false;
 		
 		/**
 		 * Is the cover closed.
