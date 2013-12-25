@@ -47,6 +47,8 @@
     <string name="pref_alarm_controls_summary">Whether to show alarm dismiss and snooze buttons in the cover window if the alarm goes off whilst the cover is closed</string>
     <string name="pref_phone_controls">Phone Controls Enable</string>
     <string name="pref_phone_controls_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed</string>
+    <string name="pref_flash_controls">Torch Control Enable</string>
+    <string name="pref_flash_controls_summary">Whether to include a button to turn the torch on and off on the default screen</string>
     <string name="pref_default_bgcolor">Background color</string>
     <string name="pref_default_bgcolor_summary">Background of the view you will see through the closed cover</string>
     <string name="pref_default_fgcolor">Foreground color</string>
