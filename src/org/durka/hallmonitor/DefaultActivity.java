@@ -2,10 +2,14 @@ package org.durka.hallmonitor;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.IOException;
+
+import org.durka.hallmonitor.Functions.Util;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -80,7 +84,7 @@ public class DefaultActivity extends Activity {
     private View defaultWidget = null;
     private RelativeLayout defaultContent = null;
     private TextClock defaultTextClock = null;
-    private ImageButton torchButton = null;
+    public ImageButton torchButton = null;
     
     protected boolean mWiredHeadSetPlugged = false;
 
@@ -320,18 +324,26 @@ public class DefaultActivity extends Activity {
 	 */
     public void refreshDisplay() {
 
-		//get the layout for the windowed view
-	    RelativeLayout contentView = defaultContent;
-	    
-	    //if the alarm is firing then show the alarm controls, otherwise
-	    //if we have a media app widget and media is playing or headphones are connected then display that, otherwise
-	    //if we have a default app widget to use then display that, if not then display our default clock screen
-	    //(which is part of the default layout so will show anyway)
-	    //will do this simply by setting the widgetType
-	    String widgetType = "default";
-	    if (hmAppWidgetManager.doesWidgetExist("media") && (mWiredHeadSetPlugged || audioManager.isMusicActive())) {
-	    	widgetType = "media";
-	    }
+        //get the layout for the windowed view
+        RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
+
+        //hide or show the torch button as required
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false))
+        {
+            torchButton.setVisibility(View.VISIBLE);
+        } else {
+            torchButton.setVisibility(View.INVISIBLE);
+        }
+
+        //if the alarm is firing then show the alarm controls, otherwise
+        //if we have a media app widget and media is playing or headphones are connected then display that, otherwise
+        //if we have a default app widget to use then display that, if not then display our default clock screen
+        //(which is part of the default layout so will show anyway)
+        //will do this simply by setting the widgetType
+        String widgetType = "default";
+        if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
+            widgetType = "media";
+        }
 	    
 	    if (alarm_firing) {
 	    	Log.d(LOG_TAG, "refreshDisplay: alarm_firing");
@@ -401,7 +413,7 @@ public class DefaultActivity extends Activity {
 
 
 	/** Called when the user touches the snooze button */
-	private void sendSnooze(View view) {
+	public void sendSnooze(View view) {
 		// Broadcast alarm snooze event
 		Intent alarmSnooze = new Intent(ALARM_SNOOZE_ACTION);
 		sendBroadcast(alarmSnooze);
@@ -412,7 +424,7 @@ public class DefaultActivity extends Activity {
 	}
 
 	/** Called when the user touches the dismiss button */
-    private void sendDismiss(View view) {
+	public void sendDismiss(View view) {
 		// Broadcast alarm dismiss event
 		Intent alarmDismiss = new Intent(ALARM_DISMISS_ACTION);
 		sendBroadcast(alarmDismiss);
@@ -421,8 +433,8 @@ public class DefaultActivity extends Activity {
 		//refresh the display
 		refreshDisplay();
 	}
-
-    private void sendHangUp(View view) {
+	
+	public void sendHangUp(View view) {
 		Functions.Actions.hangup_call();
 	}
 	
@@ -432,14 +444,7 @@ public class DefaultActivity extends Activity {
 
     //toggle the torch
     public void sendToggleTorch(View view) {
-        Intent intent = new Intent(TOGGLE_FLASHLIGHT);
-        intent.putExtra("strobe", false);
-        intent.putExtra("period", 100);
-        intent.putExtra("bright", false);
-        sendBroadcast(intent);
-        torchIsOn = !torchIsOn;
-        if (torchIsOn) torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
-        else torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
+        Functions.Actions.toggle_torch(this);
     }
 
     private void updateBatteryStatus() {
