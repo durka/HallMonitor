@@ -566,7 +566,7 @@ public class Functions {
 		}
 
 
-		public static void incoming_call(final Context ctx, String number) {
+		public static void incoming_call(final Context ctx, final String number) {
 			Log.d("phone", "call from " + number);
 			if (Functions.Is.cover_closed(ctx)) {
 				Log.d("phone", "but the screen is closed. screen my calls");

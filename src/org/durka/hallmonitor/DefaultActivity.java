@@ -263,16 +263,7 @@ public class DefaultActivity extends Activity {
 		Log.d(LOG_TAG + "-oS", "starting");
 		on_screen = true;
 
-		if (findViewById(R.id.default_battery) != null) {
-			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
-					|| battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery_charge);
-			} else {
-				((ImageView)findViewById(R.id.default_battery)).setImageResource(R.drawable.stat_sys_battery);
-			}
-			((ImageView)findViewById(R.id.default_battery)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
-		}
+        updateBatteryStatus();
 
 		if (NotificationService.that != null) {
 			// notification listener service is running, show the current notifications
@@ -410,7 +401,7 @@ public class DefaultActivity extends Activity {
 
 
 	/** Called when the user touches the snooze button */
-	public void sendSnooze(View view) {
+	private void sendSnooze(View view) {
 		// Broadcast alarm snooze event
 		Intent alarmSnooze = new Intent(ALARM_SNOOZE_ACTION);
 		sendBroadcast(alarmSnooze);
@@ -421,7 +412,7 @@ public class DefaultActivity extends Activity {
 	}
 
 	/** Called when the user touches the dismiss button */
-	public void sendDismiss(View view) {
+    private void sendDismiss(View view) {
 		// Broadcast alarm dismiss event
 		Intent alarmDismiss = new Intent(ALARM_DISMISS_ACTION);
 		sendBroadcast(alarmDismiss);
@@ -430,8 +421,8 @@ public class DefaultActivity extends Activity {
 		//refresh the display
 		refreshDisplay();
 	}
-	
-	public void sendHangUp(View view) {
+
+    private void sendHangUp(View view) {
 		Functions.Actions.hangup_call();
 	}
 	
@@ -449,6 +440,19 @@ public class DefaultActivity extends Activity {
         torchIsOn = !torchIsOn;
         if (torchIsOn) torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
         else torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
+    }
+
+    private void updateBatteryStatus() {
+        if (findViewById(R.id.default_battery_picture) != null) {
+            Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            if (   battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_CHARGING
+                    || battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1) == BatteryManager.BATTERY_STATUS_FULL) {
+                ((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
+            } else {
+                ((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
+            }
+            ((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel((int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100));
+        }
     }
 
     /**

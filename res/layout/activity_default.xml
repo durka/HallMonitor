@@ -97,8 +97,7 @@
                android:id="@+id/default_widget"
                android:layout_width="match_parent"
                android:layout_height="75dp"
-               android:layout_centerHorizontal="true"
-               android:gravity="center" >
+               android:gravity="center">
 
                <TextClock
                    android:id="@+id/default_text_clock"
@@ -107,28 +106,32 @@
                    android:keepScreenOn="true"
                    android:textColor="#33b5e5"
                    android:textSize="50sp"
-                   android:textStyle="bold" />
+                   android:textStyle="bold"
+                   android:gravity="center_vertical" />
 
-	           <TextView
-	               android:id="@+id/default_battery_percent"
-	               android:layout_width="wrap_content"
-	               android:layout_height="wrap_content"
-	               android:layout_alignParentRight="true"
-	               android:layout_alignParentTop="true"
-	               android:text="100%"
-	               android:textAppearance="?android:attr/textAppearanceLarge" />
-
-	           <ImageView
+               <ImageView
 	               android:id="@+id/default_battery_picture"
 	               android:layout_width="wrap_content"
 	               android:layout_height="wrap_content"
-	               android:layout_alignParentTop="true"
+	               android:layout_alignParentTop="false"
 	               android:layout_marginTop="3dp"
 	               android:layout_marginRight="8dp"
 	               android:layout_toLeftOf="@+id/default_battery_percent"
-	               android:src="@drawable/stat_sys_battery" />
+	               android:src="@drawable/stat_sys_battery"
+                   android:layout_alignParentBottom="false"
+                   android:layout_alignParentLeft="false" />
 
-	       </RelativeLayout>
+               <TextView
+                   android:id="@+id/default_battery_percent"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentRight="true"
+                   android:layout_alignParentTop="true"
+                   android:text="100%"
+                   android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:visibility="invisible" />
+
+           </RelativeLayout>
 	              
 	       <GridView
 	           android:id="@+id/default_icon_container"
@@ -146,13 +149,14 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/default_widget"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="18dp"
                 android:onClick="sendToggleTorch"
-                android:src="@drawable/ic_appwidget_torch_off" />
+                android:src="@drawable/ic_appwidget_torch_off"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentEnd="false"
+                android:visibility="invisible" />
 
-       </RelativeLayout>
+        </RelativeLayout>
 
     </RelativeLayout>
 
