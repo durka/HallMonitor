@@ -36,25 +36,17 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources.NotFoundException;
 import android.os.Build;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.service.notification.StatusBarNotification;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,9 +79,9 @@ public class Functions {
 	 */
 	public static class Actions {
 		
-		//used for the timer to turn off the screen on a delay
-        public static Timer timer = new Timer();
-        public static TimerTask timerTask;
+		// used for the timer to turn off the screen on a delay
+        private static Timer timer = new Timer();
+        private static TimerTask timerTaskScreenOff;
 		
         
         /**
@@ -168,7 +160,7 @@ public class Functions {
             
             
             //using the handler is causing a problem, seems to lock up the app, hence replaced with a Timer
-            timer.schedule(timerTask = new TimerTask() {
+            timer.schedule(timerTaskScreenOff = new TimerTask() {
 			//handler.postDelayed(new Runnable() {
 				@Override
 				public void run() {	
@@ -187,10 +179,10 @@ public class Functions {
 		
 		public static void stopScreenOffTimer(String info)
 		{
-			Log.d("F.Act.stopScreenOffTimer", "active: " + (timerTask != null) + (info != null ? " (" + info + ")" : ""));
-			if (timerTask != null) {
-				timerTask.cancel();
-				timerTask = null;
+			Log.d("F.Act.stopScreenOffTimer", "active: " + (timerTaskScreenOff != null) + (info != null ? " (" + info + ")" : ""));
+			if (timerTaskScreenOff != null) {
+				timerTaskScreenOff.cancel();
+				timerTaskScreenOff = null;
 			}
 		}
 		
@@ -200,7 +192,6 @@ public class Functions {
          * Wakes the screen up.
          * @param ctx Application context.
 		 */
-		@SuppressWarnings("deprecation")
 		public static void open_cover(Context ctx) {
 			
 			Log.d("F.Act.open_cover", "Open cover event receieved.");
@@ -210,18 +201,12 @@ public class Functions {
 	        //we also don't want to see the default activity
 	        if (defaultActivity != null)  defaultActivity.moveTaskToBack(true);
 	        
-			//needed to let us wake the screen
-			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
-			
 			// step 1: if we were going to turn the screen off, cancel that
-			if (timerTask != null) timerTask.cancel();
-			
+			stopScreenOffTimer();
+
 			// step 2: wake the screen
-			//FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
-			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
-	        wl.acquire();
-	        wl.release();
-			
+            wakeUpScreen(ctx);
+
 			//save the cover state
 			Events.set_cover(false);
 			
@@ -234,6 +219,16 @@ public class Functions {
 			 }
 		}
 
+        @SuppressWarnings("deprecation")
+        public static void wakeUpScreen(Context ctx) {
+            //needed to let us wake the screen
+            PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+
+            //FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
+            wl.acquire();
+            wl.release();
+        }
 		
 		/**
 		 * Starts the HallMonitor service. Service state is dependent on admin permissions.
@@ -380,7 +375,7 @@ public class Functions {
 	        Is.torchIsOn = !Is.torchIsOn;
 	        if (Is.torchIsOn) {
 	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
-	        	if (timerTask != null) timerTask.cancel();
+	        	stopScreenOffTimer();
 	        } else {
 	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
 	        	close_cover(da);
@@ -391,27 +386,27 @@ public class Functions {
 			StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
 			Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
 			GridView grid = (GridView)defaultActivity.findViewById(R.id.default_icon_container);
-			grid.setNumColumns(notifs.length);
-			grid.setAdapter(new NotificationAdapter(defaultActivity, notifs));
+
+            final NotificationAdapter nA = new NotificationAdapter(defaultActivity, notifs);
+            grid.setNumColumns(nA.getCount());
+            grid.setAdapter(nA);
 		}
 		
 		public static void refresh_notifications() {
 			final GridView grid = (GridView)defaultActivity.findViewById(R.id.default_icon_container);
 			final NotificationAdapter adapter = (NotificationAdapter)grid.getAdapter();
-			final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
-			adapter.update(notifs);
+			adapter.update(NotificationService.that.getActiveNotifications());
 			defaultActivity.runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
 					
-					grid.setNumColumns(notifs.length);
+					grid.setNumColumns(adapter.getCount());
 					adapter.notifyDataSetChanged();
 				}
 				
 			});
 		}
-		
 		
 		public static void debug_notification(Context ctx, boolean showhide) {
 			if (showhide) {
@@ -596,7 +591,7 @@ public class Functions {
 				//a 1 second delay seems to allow this
 				DefaultActivity.phone_ringing = true;
 
-				Timer timer = new Timer();
+                Timer timer = new Timer();
 				timer.schedule(new TimerTask() {
 					@Override
 					public void run() {
@@ -607,7 +602,8 @@ public class Functions {
 						intent.setAction(Intent.ACTION_MAIN);
 						
 						// parameter
-						intent.putExtra("incomingNumber", number);
+                        intent.putExtra(DefaultActivity.INTENT_phoneWidgetShow, true);
+						intent.putExtra(DefaultActivity.INTENT_phoneWidgetIncomingNumber, number);
 						
 						// start
 						ctx.startActivity(intent);

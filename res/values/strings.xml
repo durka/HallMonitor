@@ -78,5 +78,7 @@
     <string name="ACTION_SEND_TO_SPEECH_RECEIVE">org.durka.hallmonitor.sendTextToSpeech</string>
     <string name="ACTION_STOP_TO_SPEECH_RECEIVE">org.durka.hallmonitor.stopTextToSpeech</string>
     <string name="ACTION_RESTART_DEFAULT_ACTIVITY">org.durka.hallmonitor.restartDefaultActivity</string>
+    <string name="styled_12_hour_clock">hh:mm aaa\nEEEE, dd.MM.</string>
+    <string name="styled_24_hour_clock">HH:mm\nEEEE, dd.MM.</string>
 
 </resources>

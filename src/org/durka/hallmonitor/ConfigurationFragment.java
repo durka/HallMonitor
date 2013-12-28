@@ -66,6 +66,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 
         // phone control
         enablePhoneScreen(prefs);
+        setTtsDelaySummary(prefs);
     }
 
 	@Override
@@ -143,6 +144,8 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
             findPreference("pref_phone_controls_tts").setEnabled(prefs.getBoolean(key, false));
             findPreference("pref_phone_controls_tts_delay").setEnabled(prefs.getBoolean(key, false));
             findPreference("pref_phone_controls_speaker").setEnabled(prefs.getBoolean(key, false));
+        } else if (key.equals("pref_phone_controls_tts_delay")) {
+            setTtsDelaySummary(prefs);
 		} else
 		// if the flash controls are being enabled/disabled the key will be pref_widget	
 		if (key.equals("pref_flash_controls")) {
@@ -171,5 +174,17 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
             phoneControl.setEnabled(phoneControlState);
             ((SwitchPreference)findPreference("pref_phone_controls")).setChecked(phoneControlState);
         }
+    }
+
+    private void setTtsDelaySummary(SharedPreferences prefs) {
+        final String key = "pref_phone_controls_tts_delay";
+
+        ListPreference ttsDelay = (ListPreference)findPreference("pref_phone_controls_tts_delay");
+        String[] ttsValues = getResources().getStringArray(R.array.ttsDelayValues);
+        String[] ttsNames = getResources().getStringArray(R.array.ttsDelayNames);
+
+        for (int idx=0; idx < ttsValues.length; idx++)
+            if (ttsValues[idx].equals(prefs.getString(key, "750")))
+                ttsDelay.setSummary(ttsNames[idx]);
     }
 }
