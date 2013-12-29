@@ -117,7 +117,7 @@
                    android:format12Hour="HH:mm\ndd.MM.yyyy" />
 
                <ImageView
-                   android:id="@id/default_battery_picture"
+                   android:id="@+id/default_battery_picture"
                    android:layout_width="13dp"
 	               android:layout_height="wrap_content"
 	               android:layout_alignParentTop="true"

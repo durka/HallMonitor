@@ -31,6 +31,7 @@ import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
+import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.text.SpannableString;
@@ -108,6 +109,7 @@ public class DefaultActivity extends Activity {
     protected View mAcceptSlide;
     protected View mRejectButton;
     protected View mRejectSlide;
+    protected MyPhoneStateListener mMyPhoneStateListener = null;
 
     private boolean mViewNeedsReset = false;
 
@@ -243,9 +245,6 @@ public class DefaultActivity extends Activity {
 		//set default view
 		setContentView(R.layout.activity_default);
 
-        // showPhoneWidget
-        initPhoneWidget();
-
 		//add screen on and alarm fired intent receiver
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 		IntentFilter filter = new IntentFilter();
@@ -281,7 +280,10 @@ public class DefaultActivity extends Activity {
         spanString.setSpan(new StyleSpan(Typeface.BOLD), 1, 5, 0);
         spanString.setSpan(new RelativeSizeSpan(0.8f), 6, spanString.length(), 0);
         defaultTextClock.setFormat24Hour(spanString);
-	}
+
+        // showPhoneWidget (overtake control if phone state in ringing or offhook)
+        initPhoneWidget();
+    }
 
 	@Override
 	protected void onStart() {
@@ -328,6 +330,11 @@ public class DefaultActivity extends Activity {
 	protected void onDestroy() {
         //tidy up our receiver when we are destroyed
         unregisterReceiver(receiver);
+
+        if (mMyPhoneStateListener != null) {
+            TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+            telephonyManager.listen(mMyPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+        }
 
         super.onDestroy();
 	}
@@ -518,6 +525,32 @@ public class DefaultActivity extends Activity {
 	 */
 
     private void initPhoneWidget() {
+        final TelephonyManager telephonyManager = (TelephonyManager)getBaseContext().getSystemService(TELEPHONY_SERVICE);
+
+        if (mMyPhoneStateListener == null) {
+            mMyPhoneStateListener = new MyPhoneStateListener();
+            telephonyManager.listen(mMyPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR);
+        }
+        // check phone state (if not invoked by intent)
+        if (!showPhoneWidget) {
+            if (telephonyManager.getCallState() == TelephonyManager.CALL_STATE_RINGING || telephonyManager.getCallState() == TelephonyManager.CALL_STATE_OFFHOOK) {
+                final String incomingNumber = "";
+                //telephonyManager.notify();
+
+                Log.d(LOG_TAG, "initPhoneWidget: callState = " + telephonyManager.getCallState() + " number = " + incomingNumber);
+                getIntent().putExtra(INTENT_phoneWidgetShow, true);
+                getIntent().putExtra(INTENT_phoneWidgetIncomingNumber, incomingNumber);
+                getIntent().putExtra(INTENT_phoneWidgetTtsNotified, true);
+                resetPhoneWidgetMakeVisible();
+                setIncomingNumber(incomingNumber);
+
+                if (telephonyManager.getCallState() == TelephonyManager.CALL_STATE_OFFHOOK) {
+                    getIntent().putExtra(INTENT_phoneWidgetInitialized, true);
+                    callAcceptedPhoneWidget(false);
+                }
+            }
+        }
+
         setShowPhoneWidget(getIntent().getBooleanExtra(INTENT_phoneWidgetShow, false));
         if (showPhoneWidget) {
             Log.d(LOG_TAG, INTENT_phoneWidgetIncomingNumber + " = '" + getIntent().getStringExtra(INTENT_phoneWidgetIncomingNumber) + "'");
@@ -584,8 +617,7 @@ public class DefaultActivity extends Activity {
 	    return (name != null);
 	}
 
-    private boolean onTouchEvent_PhoneWidgetHandler(MotionEvent motionEvent)
-    {
+    private boolean onTouchEvent_PhoneWidgetHandler(MotionEvent motionEvent) {
         float maxSwipe = 150;
         float swipeTolerance = 0.95f;
         int defaultOffset = 10;
@@ -674,8 +706,7 @@ public class DefaultActivity extends Activity {
         return true;
     }
 
-    private void moveCallButton(View button, int offset)
-    {
+    private void moveCallButton(View button, int offset) {
         if (!mAcceptButton.equals(button) && !mRejectButton.equals(button))
             return;
 
@@ -707,8 +738,16 @@ public class DefaultActivity extends Activity {
 
     private void setShowPhoneWidget(boolean show) {
         Log.d(LOG_TAG, "setShowPhoneWidget: " + show);
-        getIntent().putExtra(INTENT_phoneWidgetShow, show);
         showPhoneWidget = show;
+
+        if (showPhoneWidget) {
+            getIntent().putExtra(INTENT_phoneWidgetShow, show);
+        } else { // clean up extra info's from intent
+            getIntent().removeExtra(INTENT_phoneWidgetShow);
+            getIntent().removeExtra(INTENT_phoneWidgetIncomingNumber);
+            getIntent().removeExtra(INTENT_phoneWidgetInitialized);
+            getIntent().removeExtra(INTENT_phoneWidgetTtsNotified);
+        }
     }
 
     private void callAcceptedPhoneWidget() {
@@ -764,8 +803,28 @@ public class DefaultActivity extends Activity {
         mCallerNumber.setText("");
     }
 
-    private static class TouchEventProcessor
-    {
+    private class  MyPhoneStateListener extends PhoneStateListener {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+        switch (state) {
+            case TelephonyManager.CALL_STATE_IDLE:
+                break;
+            case TelephonyManager.CALL_STATE_OFFHOOK:
+                break;
+            case TelephonyManager.CALL_STATE_RINGING:
+                final boolean showPhoneWidget = getIntent().getBooleanExtra(DefaultActivity.INTENT_phoneWidgetShow, false);
+                final String intentIncomingNumber = getIntent().getStringExtra(DefaultActivity.INTENT_phoneWidgetIncomingNumber);
+
+                if (showPhoneWidget && (intentIncomingNumber == null || intentIncomingNumber.equals(""))) {
+                    getIntent().putExtra(DefaultActivity.INTENT_phoneWidgetIncomingNumber, incomingNumber);
+                    setIncomingNumber(incomingNumber);
+                }
+                break;
+        }
+    }
+}
+
+    private static class TouchEventProcessor {
         private static View mTrackObj = null;
         private static Point mTrackStartPoint;
 
