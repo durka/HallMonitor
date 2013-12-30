@@ -22,13 +22,16 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 import android.util.Log;
 import android.widget.Toast;
 
 public class ConfigurationFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
-	
 
+    private final static String LOG_TAG = "CF";
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,18 +44,30 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onResume() {
 	    super.onResume();
-	    
-	    
-	    getPreferenceManager().getSharedPreferences()
+
+        // close pref_phone_screen preferenceScreen
+        try {
+            ((PreferenceScreen)getPreferenceScreen().findPreference("pref_phone_screen")).getDialog().dismiss();
+        } catch (Exception e) {
+            ;
+        }
+
+	    SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
+
+        prefs
 	    		.edit()
 	    		.putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
 	    		.putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(),"default"))
 	    		.putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(),"media"))
 	    		.commit();
-	    
-	    getPreferenceManager().getSharedPreferences()
+
+        prefs
         	.registerOnSharedPreferenceChangeListener(this);
-	}
+
+        // phone control
+        enablePhoneScreen(prefs);
+        setTtsDelaySummary(prefs);
+    }
 
 	@Override
 	public void onPause() {
@@ -71,7 +86,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 		
-		Log.d("CF-oSPC", "changed key " + key);
+		Log.d(LOG_TAG + "-oSPC", "changed key " + key);
 		
 		// update display
 		if (findPreference(key) instanceof CheckBoxPreference) {
@@ -125,11 +140,15 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 				Toast.makeText(getActivity(), "okay uncheck the box", Toast.LENGTH_SHORT).show();
 				//getActivity().startService(new Intent(getActivity(), NotificationService.class));
 			}
-		}
-		
-		
-		// if the flash controls are being enabled/disabled the key will be pref_flash_controls	
-		else if (key.equals("pref_flash_controls")) {
+		} else if (key.equals("pref_phone_controls")) {
+            findPreference("pref_phone_controls_tts").setEnabled(prefs.getBoolean(key, false));
+            findPreference("pref_phone_controls_tts_delay").setEnabled(prefs.getBoolean(key, false));
+            findPreference("pref_phone_controls_speaker").setEnabled(prefs.getBoolean(key, false));
+        } else if (key.equals("pref_phone_controls_tts_delay")) {
+            setTtsDelaySummary(prefs);
+		} else
+		// if the flash controls are being enabled/disabled the key will be pref_widget	
+		if (key.equals("pref_flash_controls")) {
 			
 			if (prefs.getBoolean(key, false) ) {
 				try {
@@ -143,6 +162,29 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 			}
 		}
 		
-	}
+        // phone control
+        enablePhoneScreen(prefs);
+    }
 
+    private void enablePhoneScreen(SharedPreferences prefs) {
+        boolean phoneControlState = prefs.getBoolean("pref_enabled", false) && prefs.getBoolean("pref_runasroot", false);
+        PreferenceScreen phoneControl = (PreferenceScreen)findPreference("pref_phone_screen");
+
+        if (phoneControl.isEnabled() != phoneControlState) {
+            phoneControl.setEnabled(phoneControlState);
+            ((SwitchPreference)findPreference("pref_phone_controls")).setChecked(phoneControlState);
+        }
+    }
+
+    private void setTtsDelaySummary(SharedPreferences prefs) {
+        final String key = "pref_phone_controls_tts_delay";
+
+        ListPreference ttsDelay = (ListPreference)findPreference("pref_phone_controls_tts_delay");
+        String[] ttsValues = getResources().getStringArray(R.array.ttsDelayValues);
+        String[] ttsNames = getResources().getStringArray(R.array.ttsDelayNames);
+
+        for (int idx=0; idx < ttsValues.length; idx++)
+            if (ttsValues[idx].equals(prefs.getString(key, "750")))
+                ttsDelay.setSummary(ttsNames[idx]);
+    }
 }

@@ -36,25 +36,17 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources.NotFoundException;
 import android.os.Build;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.service.notification.StatusBarNotification;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,9 +79,9 @@ public class Functions {
 	 */
 	public static class Actions {
 		
-		//used for the timer to turn off the screen on a delay
-        public static Timer timer = new Timer();
-        public static TimerTask timerTask;
+		// used for the timer to turn off the screen on a delay
+        private static Timer timer = new Timer();
+        private static TimerTask timerTaskScreenOff;
 		
         
         /**
@@ -129,15 +121,33 @@ public class Functions {
 
 				 Log.d("F.Act.close_cover", "...Sensitivity boosted, hold onto your hats!");
 			 }
+
+			 rearmScreenOffTimer(ctx);
+		}
+
+		/**
+		 * ScreenOnTimer
+		 */
+		public static void rearmScreenOffTimer(Context ctx)
+		{
+			boolean coverClosed = Is.cover_closed(ctx);
 			
-			//need this to let us lock the phone
+			// don't let run more than 1 timer
+			stopScreenOffTimer("called from rearmScreenOffTimer");
+			
+			Log.d("F.Act.rearmScreenOffTimer", "cover_closed = " + coverClosed);
+			
+			if (!coverClosed)
+				return;
+
+            //need this to let us lock the phone
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
 			//final PowerManager pm = (PowerManager)ctx.getSystemService(Context.POWER_SERVICE);
 			
 			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 			if (!dpm.isAdminActive(me)) {
 				// if we're not an admin, we can't do anything
-				Log.d("F.Act.close_cover", "We are not an admin so cannot do anything.");
+				Log.d("F.Act.rearmScreenOffTimer", "We are not an admin so cannot do anything.");
 				return;
 			}
 			
@@ -146,31 +156,42 @@ public class Functions {
             //step 2: wait for the delay period and turn the screen off
             int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000);
             
-            Log.d("F.Act.close_cover", "Delay set to: " + delay);
+            Log.d("F.Act.rearmScreenOffTimer", "Delay set to: " + delay);
             
             
             //using the handler is causing a problem, seems to lock up the app, hence replaced with a Timer
-            timer.schedule(timerTask = new TimerTask() {
+            timer.schedule(timerTaskScreenOff = new TimerTask() {
 			//handler.postDelayed(new Runnable() {
 				@Override
 				public void run() {	
-					Log.d("F.Act.close_cover", "Locking screen now.");
+					Log.d("F.Act.rearmScreenOffTimer", "Locking screen now.");
 					dpm.lockNow();
 					//FIXME Would it be better to turn the screen off rather than actually locking
 					//presumably then it will auto lock as per phone configuration
 					//I can't work out how to do it though!
 				}
 			}, delay);
-            
 		}
-
+		
+		public static void stopScreenOffTimer() {
+			stopScreenOffTimer(null);
+		}
+		
+		public static void stopScreenOffTimer(String info)
+		{
+			Log.d("F.Act.stopScreenOffTimer", "active: " + (timerTaskScreenOff != null) + (info != null ? " (" + info + ")" : ""));
+			if (timerTaskScreenOff != null) {
+				timerTaskScreenOff.cancel();
+				timerTaskScreenOff = null;
+			}
+		}
+		
 		/**
 		 * Called from within the Functions.Event.Proximity method.
          * If we are running root enabled reverts the screen sensitivity.
          * Wakes the screen up.
          * @param ctx Application context.
 		 */
-		@SuppressWarnings("deprecation")
 		public static void open_cover(Context ctx) {
 			
 			Log.d("F.Act.open_cover", "Open cover event receieved.");
@@ -180,18 +201,12 @@ public class Functions {
 	        //we also don't want to see the default activity
 	        if (defaultActivity != null)  defaultActivity.moveTaskToBack(true);
 	        
-			//needed to let us wake the screen
-			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
-			
 			// step 1: if we were going to turn the screen off, cancel that
-			if (timerTask != null) timerTask.cancel();
-			
+			stopScreenOffTimer();
+
 			// step 2: wake the screen
-			//FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
-			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
-	        wl.acquire();
-	        wl.release();
-			
+            wakeUpScreen(ctx);
+
 			//save the cover state
 			Events.set_cover(false);
 			
@@ -204,6 +219,16 @@ public class Functions {
 			 }
 		}
 
+        @SuppressWarnings("deprecation")
+        public static void wakeUpScreen(Context ctx) {
+            //needed to let us wake the screen
+            PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+
+            //FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
+            wl.acquire();
+            wl.release();
+        }
 		
 		/**
 		 * Starts the HallMonitor service. Service state is dependent on admin permissions.
@@ -274,6 +299,8 @@ public class Functions {
 		public static String run_commands_as_root(String[] cmds) { return run_commands_as_root(cmds, true); }
 		
 		public static String run_commands_as_root(String[] cmds, boolean want_output) {
+            String result = "";
+
 	        try {
 	        	Process p = Runtime.getRuntime().exec("su");
 	        	
@@ -314,15 +341,14 @@ public class Functions {
 		              error += currentLine + "\n";
 		            }	           
 		            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
-		            
-		            return output.trim();
-	            }
-	            return "";
 
+                    result = output.trim();
+                }
 	        } catch (IOException ioe) {
 	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
-	        	return "";
 	        }
+
+            return result;
 		}
 
 
@@ -349,7 +375,7 @@ public class Functions {
 	        Is.torchIsOn = !Is.torchIsOn;
 	        if (Is.torchIsOn) {
 	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
-	        	if (timerTask != null) timerTask.cancel();
+	        	stopScreenOffTimer();
 	        } else {
 	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
 	        	close_cover(da);
@@ -360,27 +386,27 @@ public class Functions {
 			StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
 			Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
 			GridView grid = (GridView)defaultActivity.findViewById(R.id.default_icon_container);
-			grid.setNumColumns(notifs.length);
-			grid.setAdapter(new NotificationAdapter(defaultActivity, notifs));
+
+            final NotificationAdapter nA = new NotificationAdapter(defaultActivity, notifs);
+            grid.setNumColumns(nA.getCount());
+            grid.setAdapter(nA);
 		}
 		
 		public static void refresh_notifications() {
 			final GridView grid = (GridView)defaultActivity.findViewById(R.id.default_icon_container);
 			final NotificationAdapter adapter = (NotificationAdapter)grid.getAdapter();
-			final StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
-			adapter.update(notifs);
+			adapter.update(NotificationService.that.getActiveNotifications());
 			defaultActivity.runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
 					
-					grid.setNumColumns(notifs.length);
+					grid.setNumColumns(adapter.getCount());
 					adapter.notifyDataSetChanged();
 				}
 				
 			});
 		}
-		
 		
 		public static void debug_notification(Context ctx, boolean showhide) {
 			if (showhide) {
@@ -425,7 +451,6 @@ public class Functions {
 	    		Intent startServiceIntent = new Intent(ctx, ViewCoverService.class);
 	    		ctx.startService(startServiceIntent);
 	    	}
-
         }
 		
 		
@@ -555,7 +580,7 @@ public class Functions {
 		}
 
 
-		public static void incoming_call(final Context ctx, String number) {
+		public static void incoming_call(final Context ctx, final String number) {
 			Log.d("phone", "call from " + number);
 			if (Functions.Is.cover_closed(ctx)) {
 				Log.d("phone", "but the screen is closed. screen my calls");
@@ -565,9 +590,8 @@ public class Functions {
 				//to guarantee that we need to hold off until the dialer activity is running
 				//a 1 second delay seems to allow this
 				DefaultActivity.phone_ringing = true;
-				DefaultActivity.call_from = number;
 
-				Timer timer = new Timer();
+                Timer timer = new Timer();
 				timer.schedule(new TimerTask() {
 					@Override
 					public void run() {
@@ -576,31 +600,15 @@ public class Functions {
 							          | Intent.FLAG_ACTIVITY_CLEAR_TOP
 							          | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 						intent.setAction(Intent.ACTION_MAIN);
+						
+						// parameter
+                        intent.putExtra(DefaultActivity.INTENT_phoneWidgetShow, true);
+						intent.putExtra(DefaultActivity.INTENT_phoneWidgetIncomingNumber, number);
+						
+						// start
 						ctx.startActivity(intent);
-
 					}
 				}, 500);
-				
-				/*
-				new Handler().postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						Process process;
-						try {
-							process = Runtime.getRuntime().exec(new String[]{ "su","-c","input keyevent 6"});
-							process.waitFor();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					    
-					}
-				}, 500);
-				*/
-				
 			}
 		}
 		
@@ -683,11 +691,6 @@ public class Functions {
 			
 			return widgetEnabled;
 		}
-		
-		
-		
-		
-		
 	}
 	
 	public static class Util {
