@@ -6,38 +6,50 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
-import android.graphics.PixelFormat;
+import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.PreviewCallback;
+import android.hardware.Camera.Size;
+import android.media.CameraProfile;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 public class CameraHelper {
 
 	private Camera mCamera;
 	public static final int MEDIA_TYPE_IMAGE = 1;
-	private static final int IMAGE_W = 310;
-	private static final int IMAGE_H = 125;
 	private final DefaultActivity defaultActivity;
-	private Button captureButton = null;
+	private ImageButton captureButton = null;
+	private ImageButton backButton = null;
 	
     private RelativeLayout preview = null;
     private CameraPreview mPreview = null;
+    
+    public static final String KEY_PICTURE_SIZE = "pref_camera_picturesize_key";
 	
 
 public CameraHelper(final DefaultActivity theDefaultActivity) {
     
 	defaultActivity = theDefaultActivity;
 	
-    captureButton = new Button(theDefaultActivity.getApplicationContext());
+    captureButton = new ImageButton(theDefaultActivity.getApplicationContext());
+    captureButton.setImageResource(R.drawable.ic_notification);
+    
+    backButton = new ImageButton(theDefaultActivity.getApplicationContext());
+    RelativeLayout.LayoutParams params = 
+    	    new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+    	        RelativeLayout.LayoutParams.WRAP_CONTENT);
+	params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+	backButton.setLayoutParams(params);
+	backButton.setImageResource(R.drawable.ic_menu_trash_holo_light);
+    
     Log.d("ch.constructor", "CameraHelper Starting");
 
     final PictureCallback mPicture = new PictureCallback() {
@@ -72,10 +84,31 @@ public CameraHelper(final DefaultActivity theDefaultActivity) {
                 public void onClick(View v) {
                     // get an image from the camera   
                     System.out.println("Photo Taking!");
+                    
+                    CameraPreview.setCameraDisplayOrientation(defaultActivity, 0, mCamera);
+                    
                     mCamera.takePicture(null, null, mPicture);
                     //revert to the standard display
                     preview.removeView(mPreview);
                     preview.removeView(captureButton);
+                    preview.removeView(backButton);
+                    
+                    //set the lock timer back to the default
+                    Functions.Actions.setLockTimer(defaultActivity.getApplicationContext());
+                   
+                }
+            }
+        );
+        
+      //Add a listener to the back button
+        backButton.setOnClickListener(
+
+            new View.OnClickListener() {
+
+                public void onClick(View v) {
+                    preview.removeView(mPreview);
+                    preview.removeView(captureButton);
+                    preview.removeView(backButton);
                     
                     //set the lock timer back to the default
                     Functions.Actions.setLockTimer(defaultActivity.getApplicationContext());
@@ -90,20 +123,23 @@ public CameraHelper(final DefaultActivity theDefaultActivity) {
 		 Log.d("ch.startPreview", "Starting camera preview");
 		 
 		 // Create an instance of Camera
-		 mCamera = getCameraInstance();
+		 if (mCamera == null) {
+			 mCamera = getCameraInstance();
+			 updateCameraParametersPreference();
+		 }
 		 
 		 if (mCamera != null) {
 			 
 			 Log.d("ch.startPreview", "Camera retrieved.");
 
 		     // Create our Preview view and set it as the content of our activity.
-		     mPreview = new CameraPreview(defaultActivity.getApplicationContext(), mCamera);
+		     mPreview = new CameraPreview(defaultActivity, mCamera);
              
              //Create our Preview view and set it as the content of our activity.
      	     preview = (RelativeLayout) defaultActivity.findViewById(R.id.default_content);
-     	     //preview.removeAllViews();
      	     preview.addView(mPreview);
      	     preview.addView(captureButton);
+     	     preview.addView(backButton);
      	    
      	     Log.d("ch.startPreview", "Preview added to view.");
          }
@@ -165,6 +201,78 @@ public CameraHelper(final DefaultActivity theDefaultActivity) {
 	
 	    return mediaFile;
 	}
+	
+	
+	   public static void initialCameraPictureSize(
+	            Context context, Parameters parameters) {
+	        // When launching the camera app first time, we will set the picture
+	        // size to the first one in the list defined in "arrays.xml" and is also
+	        // supported by the driver.
+	        List<Size> supported = parameters.getSupportedPictureSizes();
+	        if (supported == null) return;
+	        for (String candidate : context.getResources().getStringArray(
+	                R.array.pref_camera_picturesize_entryvalues)) {
+	            if (setCameraPictureSize(candidate, supported, parameters)) {
+	                return;
+	            }
+	        }
+	        Log.e("ch.initCPS", "No supported picture size found");
+	    }
+	   
+	    public static boolean setCameraPictureSize(
+	            String candidate, List<Size> supported, Parameters parameters) {
+	        int index = candidate.indexOf('x');
+	        if (index == -1) return false;
+	        int width = Integer.parseInt(candidate.substring(0, index));
+	        int height = Integer.parseInt(candidate.substring(index + 1));
+	        for (Size size : supported) {
+	            if (size.width == width && size.height == height) {
+	                parameters.setPictureSize(width, height);
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+	
+	
+    private void updateCameraParametersPreference() {
+
+    	
+    	// get Camera parameters
+    	Camera.Parameters params = mCamera.getParameters();
+
+    	List<String> focusModes = params.getSupportedFocusModes();
+    	if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+    		// set the focus mode
+    		params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+    	}
+    	
+    	//set the camera picture size
+    	initialCameraPictureSize(defaultActivity, params);
+
+    	// Set JPEG quality.
+        int jpegQuality = CameraProfile.getJpegEncodingQualityParameter(0,
+                CameraProfile.QUALITY_HIGH);
+        params.setJpegQuality(jpegQuality);
+        
+        List<String> flashModes = params.getSupportedFlashModes();
+    	if (flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+    		// set the focus mode
+    		params.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+    	}
+    	
+    	List<String> whiteBalanceModes = params.getSupportedWhiteBalance();
+    	if (whiteBalanceModes.contains(Camera.Parameters.WHITE_BALANCE_AUTO)) {
+    		// set the focus mode
+    		params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
+    	}
+    	
+		// set Camera parameters
+		mCamera.setParameters(params);
+
+    }
+	
+	
 }
 
 

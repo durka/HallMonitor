@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright (C) 2008 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+
+<resources>
+
+
+    <!-- These values correspond to the time interval between frame capture in millseconds
+    for time lapse recording -->
+    <string-array name="pref_video_time_lapse_frame_interval_entryvalues" translatable="false">
+        <item>0</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>1500</item>
+        <item>2000</item>
+        <item>2500</item>
+        <item>3000</item>
+        <item>4000</item>
+        <item>5000</item>
+        <item>6000</item>
+        <item>10000</item>
+        <item>12000</item>
+        <item>15000</item>
+        <item>24000</item>
+        <item>30000</item>
+        <item>60000</item>
+        <item>90000</item>
+        <item>120000</item>
+        <item>150000</item>
+        <item>180000</item>
+        <item>240000</item>
+        <item>300000</item>
+        <item>360000</item>
+        <item>600000</item>
+        <item>720000</item>
+        <item>900000</item>
+        <item>1440000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>5400000</item>
+        <item>7200000</item>
+        <item>9000000</item>
+        <item>10800000</item>
+        <item>14400000</item>
+        <item>18000000</item>
+        <item>21600000</item>
+        <item>36000000</item>
+        <item>43200000</item>
+        <item>54000000</item>
+        <item>86400000</item>
+    </string-array>
+
+
+    <!-- These values correspond to the time interval between frame capture
+    for time lapse recording -->
+    <string-array name="pref_video_time_lapse_frame_interval_duration_values" translatable="false">
+        <item>0.5</item>
+        <item>1</item>
+        <item>1.5</item>
+        <item>2</item>
+        <item>2.5</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>10</item>
+        <item>12</item>
+        <item>15</item>
+        <item>24</item>
+    </string-array>
+
+    <!-- When launching the camera app first time, we will set the picture
+         size to the first one in the list that is also supported by the
+         driver -->
+    <string-array name="pref_camera_picturesize_entryvalues" translatable="false">
+        <item>5248x3936</item>
+        <item>4992x3744</item>
+        <item>4208x3120</item>
+        <item>4160x3120</item>
+        <item>4128x3096</item>
+        <item>4128x3088</item>
+        <item>4000x3000</item>
+        <item>3920x2940</item>
+        <item>4128x2528</item>
+        <item>3920x2204</item>
+        <item>3840x2160</item>
+        <item>3264x2448</item>
+        <item>3200x2400</item>
+        <item>3264x1968</item>
+        <item>3264x1836</item>
+        <item>2592x1944</item>
+        <item>2592x1936</item>
+        <item>2560x1920</item>
+        <item>2592x1728</item>
+        <item>2688x1520</item>
+        <item>2560x1536</item>
+        <item>2560x1440</item>
+        <item>2048x1536</item>
+        <item>2048x1232</item>
+        <item>1920x1080</item>
+        <item>1600x1200</item>
+        <item>1920x1088</item>
+        <item>1392x1392</item>
+        <item>1600x960</item>
+        <item>1280x960</item>
+        <item>1024x768</item>
+        <item>1280x720</item>
+        <item>1024x600</item>
+        <item>800x600</item>
+        <item>800x480</item>
+        <item>640x480</item>
+        <item>480x320</item>
+        <item>320x240</item>
+    </string-array>
+
+
+    <string-array name="pref_camera_focusmode_entryvalues" translatable="false">
+        <item>auto</item>
+        <item>infinity</item>
+        <item>macro</item>
+    </string-array>
+
+
+    <string-array name="pref_camera_flashmode_entryvalues" translatable="false">
+        <item>off</item>
+        <item>auto</item>
+        <item>on</item>
+    </string-array>
+
+
+
+    <string-array name="pref_camera_whitebalance_entryvalues" translatable="false">
+        <item>incandescent</item>
+        <item>fluorescent</item>
+        <item>auto</item>
+        <item>daylight</item>
+        <item>cloudy-daylight</item>
+    </string-array>
+
+    <string-array name="pref_camera_scenemode_entryvalues" translatable="false">
+        <item>action</item>
+        <item>night</item>
+        <item>auto</item>
+        <item>sunset</item>
+        <item>party</item>
+    </string-array>
+
+</resources>
