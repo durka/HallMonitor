@@ -29,13 +29,13 @@ public class CameraHelper {
 	private final DefaultActivity defaultActivity;
 	private Button captureButton = null;
 	
+    private RelativeLayout preview = null;
+    private CameraPreview mPreview = null;
+	
 
 public CameraHelper(final DefaultActivity theDefaultActivity) {
     
 	defaultActivity = theDefaultActivity;
-	
-	 // Create an instance of Camera
-	 mCamera = getCameraInstance();
 	
     captureButton = new Button(theDefaultActivity.getApplicationContext());
     Log.d("ch.constructor", "CameraHelper Starting");
@@ -73,7 +73,13 @@ public CameraHelper(final DefaultActivity theDefaultActivity) {
                     // get an image from the camera   
                     System.out.println("Photo Taking!");
                     mCamera.takePicture(null, null, mPicture);
-
+                    //revert to the standard display
+                    preview.removeView(mPreview);
+                    preview.removeView(captureButton);
+                    
+                    //set the lock timer back to the default
+                    Functions.Actions.setLockTimer(defaultActivity.getApplicationContext());
+                   
                 }
             }
         );
@@ -83,15 +89,18 @@ public CameraHelper(final DefaultActivity theDefaultActivity) {
 		
 		 Log.d("ch.startPreview", "Starting camera preview");
 		 
+		 // Create an instance of Camera
+		 mCamera = getCameraInstance();
+		 
 		 if (mCamera != null) {
 			 
 			 Log.d("ch.startPreview", "Camera retrieved.");
 
 		     // Create our Preview view and set it as the content of our activity.
-		     CameraPreview mPreview = new CameraPreview(defaultActivity.getApplicationContext(), mCamera);
+		     mPreview = new CameraPreview(defaultActivity.getApplicationContext(), mCamera);
              
              //Create our Preview view and set it as the content of our activity.
-     	     RelativeLayout preview = (RelativeLayout) defaultActivity.findViewById(R.id.default_content);
+     	     preview = (RelativeLayout) defaultActivity.findViewById(R.id.default_content);
      	     //preview.removeAllViews();
      	     preview.addView(mPreview);
      	     preview.addView(captureButton);

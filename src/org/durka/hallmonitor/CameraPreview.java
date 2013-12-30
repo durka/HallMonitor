@@ -57,6 +57,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         // set preview size and make any resize, rotate or
         // reformatting changes here
+        mCamera.setDisplayOrientation(90);
 
         // start preview with new settings
         try {

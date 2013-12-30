@@ -355,6 +355,8 @@ public class DefaultActivity extends Activity {
 	//fire up the camera
 	public void sendFireCamera(View view) {
 		if (cameraHelper != null) cameraHelper.startPreview();
+		//reset the lock timer to 30 seconds
+		Functions.Actions.setLockTimer(getApplicationContext(), 30000);
 	}
 	
 	@Override
