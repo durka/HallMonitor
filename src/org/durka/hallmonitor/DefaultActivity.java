@@ -820,9 +820,9 @@ public class DefaultActivity extends Activity {
                     setIncomingNumber(incomingNumber);
                 }
                 break;
+            }
         }
     }
-}
 
     private static class TouchEventProcessor {
         private static View mTrackObj = null;

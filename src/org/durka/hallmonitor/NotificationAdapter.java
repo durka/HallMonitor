@@ -3,6 +3,7 @@ package org.durka.hallmonitor;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
+import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
@@ -31,7 +32,7 @@ public class NotificationAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		return (notifs.length < numOfItems ? numOfItems  + (notifs.length % 2) : notifs.length);
+		return (notifs.length < numOfItems ? numOfItems  + (notifs.length % 2) : notifs.length + (isAirPlaneMode() ? 1 : 0));
 	}
 
 	@Override
@@ -64,6 +65,9 @@ public class NotificationAdapter extends BaseAdapter {
 				        view.setImageDrawable(that.createPackageContext(sBN.getPackageName(), 0).getResources().getDrawable(sBN.getNotification().icon));
                     }
                 }
+                if (position == getCount() - 1 && isAirPlaneMode()) {
+                    view.setImageDrawable(that.getResources().getDrawable(R.drawable.ic_phone_flight_mode));
+                }
 			} catch (NotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -74,7 +78,11 @@ public class NotificationAdapter extends BaseAdapter {
 		}
 
 		return view;
-	}	    		
+	}
+
+    public boolean isAirPlaneMode() {
+        return Settings.Global.getInt(that.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+    }
 
 
 }
