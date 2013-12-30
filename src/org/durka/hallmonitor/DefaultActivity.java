@@ -76,6 +76,10 @@ public class DefaultActivity extends Activity {
     private RelativeLayout defaultContent = null;
     private TextClock defaultTextClock = null;
     public ImageButton torchButton = null;
+    private ImageButton cameraButton = null;
+    
+    //camera helper
+    private CameraHelper cameraHelper = null;
     
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -177,6 +181,9 @@ public class DefaultActivity extends Activity {
 
 		//get the audio manager
 		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+		
+		//create our camera helper
+		cameraHelper = new CameraHelper(this);
 
 		//pass a reference back to the Functions class so it can finish us when it wants to
 		//FIXME Presumably there is a better way to do this
@@ -211,6 +218,7 @@ public class DefaultActivity extends Activity {
 	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
 	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
 	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
+	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
 
 	}  
 
@@ -221,7 +229,7 @@ public class DefaultActivity extends Activity {
 
 		Log.d("DA.onResume", "On resume called.");
 
-		refreshDisplay(); // TODO is this necessary to do here?
+		refreshDisplay(); // TODO is this necessary to do here?`
 	}
 
 	/**
@@ -231,6 +239,7 @@ public class DefaultActivity extends Activity {
 
 		//get the layout for the windowed view
 		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
+		contentView.setVisibility(View.VISIBLE);
 		
 		//hide or show the torch button as required
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false))
@@ -238,6 +247,14 @@ public class DefaultActivity extends Activity {
 			torchButton.setVisibility(View.VISIBLE);
 		} else {
 			torchButton.setVisibility(View.INVISIBLE);
+		}
+		
+		//hide or show the torch button as required
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_camera_controls", false))
+		{
+			cameraButton.setVisibility(View.VISIBLE);
+		} else {
+			cameraButton.setVisibility(View.INVISIBLE);
 		}
 		
 		//if the alarm is firing then show the alarm controls, otherwise
@@ -275,7 +292,7 @@ public class DefaultActivity extends Activity {
 			if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
 
 				//remove the TextClock from the contentview
-				contentView.removeAllViews();
+				contentView.setVisibility(View.INVISIBLE);
 
 				//get the widget
 				AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
@@ -335,6 +352,11 @@ public class DefaultActivity extends Activity {
 		Functions.Actions.toggle_torch(this);
 	}
 	
+	//fire up the camera
+	public void sendFireCamera(View view) {
+		if (cameraHelper != null) cameraHelper.startPreview();
+	}
+	
 	@Override
 	protected void onStart() {
 	    super.onStart();
@@ -361,6 +383,13 @@ public class DefaultActivity extends Activity {
 		}
 	}
 
+	
+	@Override
+	protected void onPause() {
+	    super.onPause();
+	    if (cameraHelper != null) cameraHelper.releaseCamera();              // release the camera immediately on pause event
+	}
+	
 	@Override
 	protected void onStop() {
 		super.onStop();

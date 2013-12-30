@@ -141,8 +141,7 @@ public class ConfigurationFragment extends PreferenceFragment implements OnShare
 					prefs.edit().putBoolean(key, false).commit();
 				}
 			}
-		}
-		
+		}	
 	}
 
 }

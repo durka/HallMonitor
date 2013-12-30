@@ -148,6 +148,18 @@
                    android:layout_marginRight="18dp"
                    android:onClick="sendToggleTorch"
                    android:src="@drawable/ic_appwidget_torch_off" />
+               
+               <ImageButton
+                   android:id="@+id/camerabutton"
+                   style="?android:attr/buttonBarButtonStyle"
+                   android:layout_width="40dp"
+                   android:layout_height="wrap_content"
+                   android:layout_alignBottom="@+id/default_widget"
+                   android:layout_alignParentRight="true"
+                   android:layout_marginRight="68dp"
+                   android:onClick="sendFireCamera"
+                   android:src="@drawable/ic_notification" />
+               
        
        </RelativeLayout>
         
