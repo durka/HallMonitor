@@ -608,6 +608,7 @@ public class Functions {
 			Log.d("phone", "call is over, cleaning up");
 			DefaultActivity.phone_ringing = false;
 			((TextView)defaultActivity.findViewById(R.id.call_from)).setText(ctx.getString(R.string.unknown_caller));
+			Actions.close_cover(ctx);
 		}
 	}
 	

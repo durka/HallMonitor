@@ -147,7 +147,7 @@ public class DefaultActivity extends Activity {
 					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 						Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 					} else {
-						if (state.equals(TelephonyManager.CALL_STATE_IDLE)) {
+						if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 							Functions.Events.call_finished(context);
 							refreshDisplay();
 						}
@@ -228,6 +228,9 @@ public class DefaultActivity extends Activity {
 	 * Refresh the display taking account of device and application state
 	 */
 	public void refreshDisplay() {
+		
+		// we might have missed a phone-state revelation
+		phone_ringing = ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).getCallState() == TelephonyManager.CALL_STATE_RINGING;
 
 		//get the layout for the windowed view
 		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
