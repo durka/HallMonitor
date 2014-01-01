@@ -41,6 +41,7 @@ import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * This is the activity that is displayed by default - it is displayed for the configurable delay number of milliseconds when the case is closed,
@@ -54,6 +55,7 @@ public class DefaultActivity extends Activity {
 	// states for alarm and phone
 	public static boolean alarm_firing = false;
 	public static boolean phone_ringing = false;
+	public static boolean camera_up = false;
 	public static String call_from = "";
 
 	//audio manager to detect media state
@@ -77,9 +79,6 @@ public class DefaultActivity extends Activity {
     private TextClock defaultTextClock = null;
     public ImageButton torchButton = null;
     private ImageButton cameraButton = null;
-    
-    //camera helper
-    private CameraHelper cameraHelper = null;
     
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -181,9 +180,6 @@ public class DefaultActivity extends Activity {
 
 		//get the audio manager
 		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-		
-		//create our camera helper
-		cameraHelper = new CameraHelper(this);
 
 		//pass a reference back to the Functions class so it can finish us when it wants to
 		//FIXME Presumably there is a better way to do this
@@ -279,14 +275,23 @@ public class DefaultActivity extends Activity {
 			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.VISIBLE);
 			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_camera).setVisibility(View.INVISIBLE);
 			
 			((TextView)findViewById(R.id.call_from)).setText(Functions.Util.getContactName(this, call_from));
+			
+		} else if (camera_up) {
+			
+			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_camera).setVisibility(View.VISIBLE);
 
 		} else {
 			//normal view
 			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_normal).setVisibility(View.VISIBLE);
+			findViewById(R.id.default_content_camera).setVisibility(View.INVISIBLE);
 
 			//add the required widget based on the widgetType
 			if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
@@ -353,10 +358,17 @@ public class DefaultActivity extends Activity {
 	}
 	
 	//fire up the camera
-	public void sendFireCamera(View view) {
-		if (cameraHelper != null) cameraHelper.startPreview();
-		//reset the lock timer to 30 seconds
-		Functions.Actions.setLockTimer(getApplicationContext(), 30000);
+	public void camera_start(View view) {
+		Functions.Actions.start_camera(this);
+	}
+	
+	public void camera_capture(View view) {
+		Log.d("hm-cam", "say cheese");
+		((CameraPreview)findViewById(R.id.default_camera)).capture();
+	}
+	
+	public void camera_back(View view) {
+		Functions.Actions.end_camera(this);
 	}
 	
 	@Override
@@ -389,7 +401,6 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onPause() {
 	    super.onPause();
-	    if (cameraHelper != null) cameraHelper.releaseCamera();              // release the camera immediately on pause event
 	}
 	
 	@Override
@@ -398,6 +409,10 @@ public class DefaultActivity extends Activity {
 		Log.d("DA-oS", "stopping");
 		if (Functions.Actions.timerTask != null) {
 			Functions.Actions.timerTask.cancel();
+		}
+
+		if (camera_up) {
+			Functions.Actions.end_camera(this, false);
 		}
 		on_screen = false;
 	}

@@ -367,6 +367,30 @@ public class Functions {
 	        }
 		}
 		
+		public static void start_camera(DefaultActivity da) {
+			DefaultActivity.camera_up = true;
+			da.refreshDisplay();
+			da.findViewById(R.id.default_camera).setVisibility(View.VISIBLE);
+			if (timerTask != null) timerTask.cancel();
+		}
+		
+		public static void end_camera(DefaultActivity da) { end_camera(da, true); }
+		
+		public static void end_camera(DefaultActivity da, boolean should_close) {
+			da.findViewById(R.id.default_camera).setVisibility(View.INVISIBLE);
+			DefaultActivity.camera_up = false;
+			da.refreshDisplay();
+			if (should_close) close_cover(da);
+		}
+		
+		public static void start_camera_preview() {
+			
+		}
+		
+		public static void stop_camera_preview() {
+			
+		}
+		
 		public static void setup_notifications() {
 			StatusBarNotification[] notifs = NotificationService.that.getActiveNotifications();
 			Log.d("DA-oC", Integer.toString(notifs.length) + " notifications");
