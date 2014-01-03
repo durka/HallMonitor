@@ -8,13 +8,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.Size;
+import android.location.Location;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
+import android.provider.MediaStore.Images.ImageColumns;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
@@ -29,20 +36,64 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera = null;
     public static final int MEDIA_TYPE_IMAGE = 1;
     
+    public static final String DCIM =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
+
+    public static final String DIRECTORY = DCIM + "/Camera";
+    
     final PictureCallback mPicture = new PictureCallback() {
 
         public void onPictureTaken(byte[] data, Camera camera) {
 
             Log.d("hm-cam", "saving picture to gallery");
+            
+            // Create a media file name
+            String title = "IMG_"+ new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            
+            String path = DIRECTORY + '/' + title + ".jpg";
+            
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(path);
+                out.write(data);
+            } catch (Exception e) {
+                Log.e("cp.pictureTaken", "Failed to write data", e);
+            } finally {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                    Log.e("cp.pictureTaken", "Failed to close file after write", e);
+                }
+            }
+                      
+            // Insert into MediaStore.
+            ContentValues values = new ContentValues(5);
+            values.put(ImageColumns.TITLE, title);
+            values.put(ImageColumns.DISPLAY_NAME, title + ".jpg");
+            values.put(ImageColumns.DATE_TAKEN, System.currentTimeMillis());
+            values.put(ImageColumns.DATA, path);
+            // Clockwise rotation in degrees. 0, 90, 180, or 270.
+            values.put(ImageColumns.ORIENTATION, Functions.defaultActivity.getWindowManager().getDefaultDisplay()
+                    .getRotation() + 90);
 
-            MediaStore.Images.Media.insertImage(Functions.defaultActivity.getContentResolver(),
-            									BitmapFactory.decodeByteArray(data, 0, data.length),
-            									null, null);
+            Uri uri = null;
+            try {
+                uri = Functions.defaultActivity.getContentResolver().insert(Images.Media.EXTERNAL_CONTENT_URI, values);
+            } catch (Throwable th)  {
+                // This can happen when the external volume is already mounted, but
+                // MediaScanner has not notify MediaProvider to add that volume.
+                // The picture is still safe and MediaScanner will find it and
+                // insert it into MediaProvider. The only problem is that the user
+                // cannot click the thumbnail to review the picture.
+                Log.e("cp.pictureTaken", "Failed to write MediaStore" + th);
+            }
             
             Functions.Actions.end_camera(Functions.defaultActivity);
           }
         };
     
+
+        
     public CameraPreview(Context ctx, AttributeSet as) {
     	super(ctx, as);
     	

@@ -25,10 +25,11 @@
 	            
 	        <org.durka.hallmonitor.CameraPreview
 	            android:id="@+id/default_camera"
-	            android:layout_width="match_parent"
-	            android:layout_height="match_parent"
+        		android:layout_width="125dp"
+        		android:layout_height="125dp"
 	            android:layout_marginLeft="50dp"
 	            android:layout_marginRight="50dp"
+	            android:layout_centerHorizontal="true"
 	            android:visibility="invisible" />
 	        
 	        <ImageButton
