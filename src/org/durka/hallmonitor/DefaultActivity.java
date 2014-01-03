@@ -71,12 +71,6 @@ public class DefaultActivity extends Activity {
     public static final String ALARM_DONE_ACTION = "com.android.deskclock.ALARM_DONE";
     
     //all the views we need
-    private GridView grid = null;
-    private View snoozeButton = null;
-    private View dismissButton = null;
-    private View defaultWidget = null;
-    private RelativeLayout defaultContent = null;
-    private TextClock defaultTextClock = null;
     public ImageButton torchButton = null;
     private ImageButton cameraButton = null;
     
@@ -207,12 +201,6 @@ public class DefaultActivity extends Activity {
 		registerReceiver(receiver, filter);
 		
 		//get the views we need
-		grid = (GridView)findViewById(R.id.default_icon_container);
-	    snoozeButton = findViewById(R.id.snoozebutton);
-	    dismissButton = findViewById(R.id.dismissbutton);
-	    defaultWidget = findViewById(R.id.default_widget);
-	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
-	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
 	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
 	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
 
@@ -232,10 +220,12 @@ public class DefaultActivity extends Activity {
 	 * Refresh the display taking account of device and application state
 	 */
 	public void refreshDisplay() {
-
-		//get the layout for the windowed view
-		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
-		contentView.setVisibility(View.VISIBLE);
+		
+		//set the colours based on the picker values
+		Drawable rounded = getResources().getDrawable(R.drawable.rounded);
+		rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
+		((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
+		((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
 		
 		//hide or show the torch button as required
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false))
@@ -268,6 +258,7 @@ public class DefaultActivity extends Activity {
 			findViewById(R.id.default_content_alarm).setVisibility(View.VISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_camera).setVisibility(View.INVISIBLE);
 			
 		} else if (phone_ringing) {
 			
@@ -296,9 +287,6 @@ public class DefaultActivity extends Activity {
 			//add the required widget based on the widgetType
 			if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
 
-				//remove the TextClock from the contentview
-				contentView.setVisibility(View.INVISIBLE);
-
 				//get the widget
 				AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
 
@@ -310,14 +298,8 @@ public class DefaultActivity extends Activity {
 				}    
 
 				//add the widget to the view
-				contentView.addView(hostView);
-			} else {
-
-				Drawable rounded = getResources().getDrawable(R.drawable.rounded);
-				rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
-				((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
-				((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
-			}
+				((RelativeLayout)findViewById(R.id.default_content)).addView(hostView);
+			} 
 		}
 	}
 
