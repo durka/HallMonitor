@@ -16,6 +16,7 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
@@ -24,6 +25,7 @@ import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Images.ImageColumns;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -34,6 +36,8 @@ import android.widget.RelativeLayout;
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera = null;
+    private OrientationEventListener mOrientationListener;
+    private int mOrientation;
     public static final int MEDIA_TYPE_IMAGE = 1;
     
     public static final String DCIM =
@@ -73,8 +77,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             values.put(ImageColumns.DATE_TAKEN, System.currentTimeMillis());
             values.put(ImageColumns.DATA, path);
             // Clockwise rotation in degrees. 0, 90, 180, or 270.
-            values.put(ImageColumns.ORIENTATION, Functions.defaultActivity.getWindowManager().getDefaultDisplay()
-                    .getRotation() + 90);
+            Log.d("hm-cam", "DA rotation = " + Functions.defaultActivity.getWindowManager().getDefaultDisplay().getRotation());
+            values.put(ImageColumns.ORIENTATION, mOrientation);
 
             Uri uri = null;
             try {
@@ -91,8 +95,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             Functions.Actions.end_camera(Functions.defaultActivity);
           }
         };
-    
-
         
     public CameraPreview(Context ctx, AttributeSet as) {
     	super(ctx, as);
@@ -101,6 +103,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     	
     	mHolder = getHolder();
     	mHolder.addCallback(this);
+    	
+    	mOrientationListener = new OrientationEventListener(ctx, SensorManager.SENSOR_DELAY_NORMAL) {
+
+			@Override
+			public void onOrientationChanged(int angle) {
+				mOrientation = (int)(Math.round(angle/90.0)*90) + 90;
+			}
+    		
+    	};
     }
     
     public void capture() {
@@ -111,6 +122,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
     	Log.d("hm-cam", "surface created!");
+    	
+    	mOrientationListener.enable();
     	
     	// Create an instance of Camera
 		if (mCamera == null) {
@@ -129,6 +142,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder holder) {
         // empty. Take care of releasing the Camera preview in your activity.
     	Log.d("hm-cam", "surface destroyed!");
+    	
+    	mOrientationListener.disable();
     	
     	if (mCamera != null){
 	        mCamera.release();        // release the camera for other applications
