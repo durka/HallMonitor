@@ -41,6 +41,7 @@ import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * This is the activity that is displayed by default - it is displayed for the configurable delay number of milliseconds when the case is closed,
@@ -54,6 +55,7 @@ public class DefaultActivity extends Activity {
 	// states for alarm and phone
 	public static boolean alarm_firing = false;
 	public static boolean phone_ringing = false;
+	public static boolean camera_up = false;
 	public static String call_from = "";
 
 	//audio manager to detect media state
@@ -69,13 +71,8 @@ public class DefaultActivity extends Activity {
     public static final String ALARM_DONE_ACTION = "com.android.deskclock.ALARM_DONE";
     
     //all the views we need
-    private GridView grid = null;
-    private View snoozeButton = null;
-    private View dismissButton = null;
-    private View defaultWidget = null;
-    private RelativeLayout defaultContent = null;
-    private TextClock defaultTextClock = null;
     public ImageButton torchButton = null;
+    private ImageButton cameraButton = null;
     
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -204,13 +201,8 @@ public class DefaultActivity extends Activity {
 		registerReceiver(receiver, filter);
 		
 		//get the views we need
-		grid = (GridView)findViewById(R.id.default_icon_container);
-	    snoozeButton = findViewById(R.id.snoozebutton);
-	    dismissButton = findViewById(R.id.dismissbutton);
-	    defaultWidget = findViewById(R.id.default_widget);
-	    defaultContent = (RelativeLayout) findViewById(R.id.default_content);
-	    defaultTextClock = (TextClock) findViewById(R.id.default_text_clock);
 	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
+	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
 
 	}  
 
@@ -221,7 +213,7 @@ public class DefaultActivity extends Activity {
 
 		Log.d("DA.onResume", "On resume called.");
 
-		refreshDisplay(); // TODO is this necessary to do here?
+		refreshDisplay(); // TODO is this necessary to do here?`
 	}
 
 	/**
@@ -234,6 +226,12 @@ public class DefaultActivity extends Activity {
 
 		//get the layout for the windowed view
 		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
+
+		//set the colours based on the picker values
+		Drawable rounded = getResources().getDrawable(R.drawable.rounded);
+		rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
+		((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
+		((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
 		
 		//hide or show the torch button as required
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false))
@@ -241,6 +239,14 @@ public class DefaultActivity extends Activity {
 			torchButton.setVisibility(View.VISIBLE);
 		} else {
 			torchButton.setVisibility(View.INVISIBLE);
+		}
+		
+		//hide or show the torch button as required
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_camera_controls", false))
+		{
+			cameraButton.setVisibility(View.VISIBLE);
+		} else {
+			cameraButton.setVisibility(View.INVISIBLE);
 		}
 		
 		//if the alarm is firing then show the alarm controls, otherwise
@@ -258,6 +264,7 @@ public class DefaultActivity extends Activity {
 			findViewById(R.id.default_content_alarm).setVisibility(View.VISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_camera).setVisibility(View.INVISIBLE);
 			
 		} else if (phone_ringing) {
 			
@@ -265,20 +272,26 @@ public class DefaultActivity extends Activity {
 			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.VISIBLE);
 			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_camera).setVisibility(View.INVISIBLE);
 			
 			((TextView)findViewById(R.id.call_from)).setText(Functions.Util.getContactName(this, call_from));
+			
+		} else if (camera_up) {
+			
+			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_content_camera).setVisibility(View.VISIBLE);
 
 		} else {
 			//normal view
 			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_normal).setVisibility(View.VISIBLE);
+			findViewById(R.id.default_content_camera).setVisibility(View.INVISIBLE);
 
 			//add the required widget based on the widgetType
 			if (hmAppWidgetManager.doesWidgetExist(widgetType)) {
-
-				//remove the TextClock from the contentview
-				contentView.removeAllViews();
 
 				//get the widget
 				AppWidgetHostView hostView = hmAppWidgetManager.getAppWidgetHostViewByType(widgetType);
@@ -291,14 +304,8 @@ public class DefaultActivity extends Activity {
 				}    
 
 				//add the widget to the view
-				contentView.addView(hostView);
-			} else {
-
-				Drawable rounded = getResources().getDrawable(R.drawable.rounded);
-				rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
-				((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
-				((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
-			}
+				((RelativeLayout)findViewById(R.id.default_content)).addView(hostView);
+			} 
 		}
 	}
 
@@ -338,6 +345,20 @@ public class DefaultActivity extends Activity {
 		Functions.Actions.toggle_torch(this);
 	}
 	
+	//fire up the camera
+	public void camera_start(View view) {
+		Functions.Actions.start_camera(this);
+	}
+	
+	public void camera_capture(View view) {
+		Log.d("hm-cam", "say cheese");
+		((CameraPreview)findViewById(R.id.default_camera)).capture();
+	}
+	
+	public void camera_back(View view) {
+		Functions.Actions.end_camera(this);
+	}
+	
 	@Override
 	protected void onStart() {
 	    super.onStart();
@@ -364,12 +385,22 @@ public class DefaultActivity extends Activity {
 		}
 	}
 
+	
+	@Override
+	protected void onPause() {
+	    super.onPause();
+	}
+	
 	@Override
 	protected void onStop() {
 		super.onStop();
 		Log.d("DA-oS", "stopping");
 		if (Functions.Actions.timerTask != null) {
 			Functions.Actions.timerTask.cancel();
+		}
+
+		if (camera_up) {
+			Functions.Actions.end_camera(this, false);
 		}
 		on_screen = false;
 	}

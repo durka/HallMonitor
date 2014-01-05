@@ -80,6 +80,12 @@
         android:defaultValue="false" />
     
     <CheckBoxPreference
+        android:key="pref_camera_controls"
+        android:title="@string/pref_camera_controls"
+        android:summary="@string/pref_camera_controls_summary"
+        android:defaultValue="false" />
+    
+    <CheckBoxPreference
         android:key="pref_media_widget"
         android:title="@string/pref_media_widget"
         android:summary="@string/pref_media_widget_summary"

@@ -141,15 +141,25 @@ public class Functions {
 				return;
 			}
 			
-			
-			
             //step 2: wait for the delay period and turn the screen off
-            int delay = PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000);
-            
-            Log.d("F.Act.close_cover", "Delay set to: " + delay);
-            
-            
-            //using the handler is causing a problem, seems to lock up the app, hence replaced with a Timer
+            setLockTimer(ctx);
+          
+		}
+
+		
+		public static void setLockTimer(Context ctx) {
+			setLockTimer(ctx, PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000));
+		}
+		
+		public static void setLockTimer(Context ctx, int delay) {
+			timer.cancel();
+			
+			timer = new Timer();
+			
+			//need this to let us lock the phone
+			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
+			
+			//using the handler is causing a problem, seems to lock up the app, hence replaced with a Timer
             timer.schedule(timerTask = new TimerTask() {
 			//handler.postDelayed(new Runnable() {
 				@Override
@@ -162,8 +172,9 @@ public class Functions {
 				}
 			}, delay);
             
+            Log.d("F.Act.set_lock_timer", "Delay set to: " + delay);
 		}
-
+		
 		/**
 		 * Called from within the Functions.Event.Proximity method.
          * If we are running root enabled reverts the screen sensitivity.
@@ -354,6 +365,22 @@ public class Functions {
 	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
 	        	close_cover(da);
 	        }
+		}
+		
+		public static void start_camera(DefaultActivity da) {
+			if (timerTask != null) timerTask.cancel();
+			DefaultActivity.camera_up = true;
+			da.refreshDisplay();
+			da.findViewById(R.id.default_camera).setVisibility(View.VISIBLE);
+		}
+		
+		public static void end_camera(DefaultActivity da) { end_camera(da, true); }
+		
+		public static void end_camera(DefaultActivity da, boolean should_close) {
+			da.findViewById(R.id.default_camera).setVisibility(View.INVISIBLE);
+			DefaultActivity.camera_up = false;
+			da.refreshDisplay();
+			if (should_close) close_cover(da);
 		}
 		
 		public static void setup_notifications() {
