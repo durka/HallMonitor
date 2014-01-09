@@ -15,7 +15,7 @@ Screenshots:
 
 ![Configuration screen (okay, it's the only screen)](https://raw.github.com/durka/HallMonitor/master/screenshot.png "Configuration screen (okay, it's the only screen)") ![GIF of opening and closing the cover](https://raw.github.com/durka/HallMonitor/master/animation_trimmed.gif "GIF of opening and closing the cover")
 
-**Important**: The preponderance of the evidence so far indicates that there should be no problem running this app on any Galaxy S4, and even on the S4 mini. However, I have only _personally_ tested it under the following configuration(s):
+**Important**: The preponderance of the evidence so far indicates that there should be no problem running this app on any Galaxy S4, and even on the S4 mini/mega. However, I have only _personally_ tested it under the following configuration(s):
 
 - Samsung Galaxy S4 T-Mobile (jfltetmo / SGH-M919), CyanogenMod 10.1.3 (based on Android 4.2.2)
 - Samsung Galaxy S4 T-Mobile (jfltetmo / SGH-M919), CyanogenMod 10.2 (based on Android 4.3)
@@ -26,6 +26,7 @@ Others have tested this under the following configuration(s):
 - Samsung Galaxy S4 international (jfltexx / GT-I9505), CyanogenMod 10.2
 - _[Mostly working]_ S4 Exynos octacore international (GT-I9500), unofficial CyanogenMod 10.2
 - _[Mostly working]_ S4 mini international (serranoltexx / GT-I9195), CyanogenMod 10.2
+- S4 mega, CyanogenMod (unknown carrier/version)
 
 If you test this on something other than the above (including another carrier's S4) and it works, please let me know! You can contact me at [android@alexburka.com](mailto:android@alexburka.com). If it doesn't work, please file an issue here. But no promises, because I can't really do tech support for devices I don't own.
 
