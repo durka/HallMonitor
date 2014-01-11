@@ -7,10 +7,12 @@ import java.io.IOException;
 import org.durka.hallmonitor.Functions.Util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
@@ -50,7 +52,9 @@ import android.widget.Toast;
 public class DefaultActivity extends Activity {
 	private HMAppWidgetManager hmAppWidgetManager = Functions.hmAppWidgetManager;
 
-	public static boolean on_screen;
+    private static boolean mDebug = false;
+
+    public static boolean on_screen;
 
 	// states for alarm and phone
 	public static boolean alarm_firing = false;
@@ -211,9 +215,28 @@ public class DefaultActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 
+        // load debug setting
+        mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
+
 		Log.d("DA.onResume", "On resume called.");
 
-		refreshDisplay(); // TODO is this necessary to do here?`
+        refreshDisplay(); // TODO is this necessary to do here?`
+
+        // check preview (extras are configured in xml)
+        if (getIntent().getExtras() != null && !getIntent().getExtras().getString("preview", "").equals("")) {
+            String preview = getIntent().getExtras().getString("preview");
+
+            if (preview.equals("phoneWidget")) {
+                new AlertDialog.Builder(this)
+                        .setMessage("search AlertDialog in DefaultActivity to place your code for preview of '" + preview + "' there!")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .show();
+            }
+        }
 	}
 
 	/**
@@ -411,4 +434,9 @@ public class DefaultActivity extends Activity {
 		//tidy up our receiver when we are destroyed
 		unregisterReceiver(receiver);
 	}
+
+    public static boolean isDebug() {
+        return mDebug;
+    }
+
 }

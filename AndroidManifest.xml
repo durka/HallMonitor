@@ -22,9 +22,9 @@
     android:versionCode="4"
     android:versionName="0.0.2a" >
 
-    <uses-sdk
-        android:minSdkVersion="18"
-        android:targetSdkVersion="19" />
+     <uses-sdk
+         android:minSdkVersion="18"
+         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -34,7 +34,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -57,13 +57,13 @@
         </activity>
 
         <service android:name="org.durka.hallmonitor.ViewCoverService" />
-        
+
         <service android:name=".NotificationService"
                  android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-     		<intent-filter>
-        		<action android:name="android.service.notification.NotificationListenerService" />
-     		</intent-filter>
- 		</service>
+           <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
         <receiver
             android:name="org.durka.hallmonitor.AdminReceiver"
@@ -91,7 +91,7 @@
             android:theme="@style/FullscreenTheme"
             android:noHistory="true" >
         </activity>
-      
+
     </application>
 
 </manifest>

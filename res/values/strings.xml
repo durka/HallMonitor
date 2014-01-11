@@ -45,8 +45,18 @@
     <string name="pref_media_widget_summary">Whether to use a 3rd party widget inside the cover window to show when media is playing / headphones are connected</string>
     <string name="pref_alarm_controls">Alarm Controls Enable</string>
     <string name="pref_alarm_controls_summary">Whether to show alarm dismiss and snooze buttons in the cover window if the alarm goes off whilst the cover is closed</string>
+    <string name="pref_phone_screen">Phone Controls</string>
+    <string name="pref_phone_screen_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed</string>
     <string name="pref_phone_controls">Phone Controls Enable</string>
     <string name="pref_phone_controls_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed</string>
+    <string name="pref_phone_controls_tts">Text-To-Speech Enable</string>
+    <string name="pref_phone_controls_tts_summary">Speaks the caller id of incoming calls based on your phone´s stored contacts. connected headset is required.</string>
+    <string name="pref_phone_controls_tts_delay">Text-To-Speech Delay</string>
+    <string name="pref_phone_controls_tts_delay_summary">Before speak the caller id of incoming calls.</string>
+    <string name="pref_phone_controls_speaker">Speaker Enable</string>
+    <string name="pref_phone_controls_speaker_summary">suppress headset check</string>
+    <string name="pref_phone_preview_summary">Enter a number and verify your setup.</string>
+    <string name="pref_phone_preview_input_message">enter a number</string>
     <string name="pref_flash_controls">Torch Control Enable</string>
     <string name="pref_flash_controls_summary">Whether to include a button to turn the torch on and off on the default screen</string>
     <string name="pref_camera_controls">Camera Control Enable</string>
@@ -57,6 +67,9 @@
     <string name="pref_default_fgcolor_summary">Text color for the clock you will see through the closed cover</string>
     <string name="pref_about">About Hall Monitor</string>
 	<string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+    <string name="pref_settings">Settings</string>
+    <string name="pref_preview">Preview</string>
+    <string name="pref_test">Test</string>
     <string name="title_activity_window">WindowActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_fullscreen">FullscreenActivity</string>
@@ -64,6 +77,8 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="snooze">SNOOZE</string>
     <string name="dismiss">DISMISS</string>
+    <string name="caller_name">Caller Name</string>
+    <string name="caller_number">+49 30 1234 5678</string>
     <string name="unknown_caller">Unknown caller</string>
 
 </resources>
