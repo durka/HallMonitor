@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/preference_phone"
+    android:paddingRight="?android:attr/scrollbarSize"
+    android:paddingLeft="8dip"
+    android:paddingTop="6dip"
+    android:paddingBottom="6dip">
+
+    <ImageView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:id="@android:id/icon"
+        android:focusable="false"
+        android:clickable="false"
+        android:layout_gravity="center_vertical" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:focusable="false"
+        android:clickable="false">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@android:id/title"
+            android:focusable="false"
+            android:clickable="false"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@android:id/summary"
+            android:clickable="false"
+            android:focusable="false"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@android:id/title" />
+
+    </RelativeLayout>
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/prefEnableSwitch"
+        android:clickable="true"
+        android:focusable="false"
+        android:gravity="end"
+        android:layout_gravity="center_vertical" />
+
+</LinearLayout>
