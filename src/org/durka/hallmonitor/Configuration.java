@@ -74,7 +74,7 @@ public class Configuration extends PreferenceActivity {
                 PreferenceFragment preferenceFragment = (PreferenceFragment)object;
                 preferenceFragment.setArguments(preference.getExtras());
 
-                getFragmentManager().beginTransaction().replace(android.R.id.content, preferenceFragment).addToBackStack((String) preference.getTitle()).commit();
+                getFragmentManager().beginTransaction().replace(android.R.id.content, preferenceFragment).addToBackStack((String) getActionBar().getTitle()).commit();
                 getFragmentManager().executePendingTransactions();
 
                 // update action bar
