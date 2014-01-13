@@ -7,8 +7,6 @@ import java.lang.ref.WeakReference;
 
 import org.durka.hallmonitor.Functions.Util;
 
-import com.android.internal.telephony.PhoneStateIntentReceiver;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetHostView;
@@ -63,7 +61,6 @@ import android.widget.Toast;
  */
 public class DefaultActivity extends Activity {
 	private HMAppWidgetManager hmAppWidgetManager = Functions.hmAppWidgetManager;
-	private PhoneStateIntentReceiver mPSIR = null;
 
     private static boolean mDebug = false;
 
@@ -91,38 +88,7 @@ public class DefaultActivity extends Activity {
     public ImageButton torchButton = null;
     private ImageButton cameraButton = null;
     
-    private static class PSIRHandler extends Handler {
-    	private WeakReference<DefaultActivity> da;
-    	
-    	public PSIRHandler(DefaultActivity da_) {
-    		da = new WeakReference<DefaultActivity>(da_);
-    	}
-    	
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case 200:
-            case 300:
-                if (da.get() != null) {
-                	if (da.get().findViewById(R.id.default_data) != null) {
-                		int dbm = da.get().mPSIR.getSignalStrengthDbm();
-                		if (dbm == -1) dbm = da.get().mPSIR.getSignalStrengthLevelAsu();
-                		if (dbm == -1) dbm = 0;
-                		
-                		int level;
-                		if (dbm < 2 || dbm == 99)	level = 0;
-                		else if (dbm >= 12)			level = 4;
-                		else if (dbm >= 8)			level = 3;
-                		else if (dbm >= 5)			level = 2;
-                		else						level = 1;
-                		
-                		((ImageView)da.get().findViewById(R.id.default_data)).getDrawable().setLevel(level);
-                	}
-                }
-                break;
-			}
-		}
-	}
+    private PhoneStateListener mPSL = null;
     
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -265,8 +231,8 @@ public class DefaultActivity extends Activity {
 
 		Log.d("DA.onResume", "On resume called.");
 		
-		if (mPSIR != null) {
-			mPSIR.registerIntent();
+		if (mPSL != null) {
+			((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).listen(mPSL, PhoneStateListener.LISTEN_NONE);
 		}
 
         refreshDisplay(); // TODO is this necessary to do here?`
@@ -458,9 +424,15 @@ public class DefaultActivity extends Activity {
 		}
 		
 		if (findViewById(R.id.default_data) != null) {
-			mPSIR = new PhoneStateIntentReceiver(this, new PSIRHandler(this));
-			mPSIR.notifySignalStrength(200);
-			mPSIR.notifyServiceState(300);
+			mPSL = new PhoneStateListener() {
+				@Override
+				public void onSignalStrengthsChanged(SignalStrength signal) {
+					Log.d("DA-PSL", "new signal strength: " + signal.getLevel() + " that is " + signal.getDbm() + "dbm");
+					if (findViewById(R.id.default_data) != null) {
+						((ImageView)findViewById(R.id.default_data)).getDrawable().setLevel(signal.getLevel());
+					}
+				}
+			};
 		}
 
 		if (NotificationService.that != null) {
@@ -474,8 +446,8 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onPause() {
 	    super.onPause();
-	    if (mPSIR != null) {
-	    	mPSIR.unregisterIntent();
+	    if (mPSL != null) {
+	    	((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).listen(mPSL, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 	    }
 	}
 	
