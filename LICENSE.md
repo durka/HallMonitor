@@ -1,3 +1,18 @@
+Most of this project is licensed under the Apache License v2.0 (text below).
+There should be a license disclaimer at the top of every file, where possible.
+
+
+Some icons [1] were created with the Android Asset Studio [2] with my own small
+modifications, and those licensed under the CC-BY 3.0 [3].
+
+1: res/drawable-{m,h,xh,xxh}dpi/ic_device_access_network_{cell,wifi}_{0,1,2,3,4}.png
+2: http://android-ui-utils.googlecode.com/hg/asset-studio/dist/index.html
+3: https://creativecommons.org/licenses/by/3.0/
+
+
+Some of the other icons come from the Android source itself, and they are also
+Apache 2.0 licensed.
+
 
                                  Apache License
                            Version 2.0, January 2004
