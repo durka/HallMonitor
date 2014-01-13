@@ -138,7 +138,7 @@
 	               android:layout_height="match_parent"
 	               android:keepScreenOn="true"
 	               android:textColor="#33b5e5"
-	               android:textSize="50sp"
+	               android:textSize="45sp"
 	               android:textStyle="bold" />
 
 	           <TextView
@@ -148,6 +148,7 @@
 	               android:layout_alignParentRight="true"
 	               android:layout_alignParentTop="true"
 	               android:text="100%"
+	               android:textSize="18sp"
 	               android:textAppearance="?android:attr/textAppearanceLarge" />
 
 	           <ImageView
@@ -159,6 +160,21 @@
 	               android:layout_marginRight="8dp"
 	               android:layout_toLeftOf="@+id/default_battery_percent"
 	               android:src="@drawable/stat_sys_battery" />
+	           
+	           <ImageView
+	               android:id="@+id/default_wifi"
+	               android:layout_width="wrap_content"
+	               android:layout_height="wrap_content"
+	               android:layout_toLeftOf="@+id/default_battery_picture"
+	               android:src="@drawable/stat_wifi" />
+	           
+	           <ImageView
+	               android:id="@+id/default_data"
+	               android:layout_width="wrap_content"
+	               android:layout_height="wrap_content"
+	               android:layout_toLeftOf="@+id/default_battery_picture"
+	               android:layout_below="@+id/default_wifi"
+	               android:src="@drawable/stat_data" />
 
 	       </RelativeLayout>
 	              

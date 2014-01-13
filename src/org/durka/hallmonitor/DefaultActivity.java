@@ -3,8 +3,11 @@ package org.durka.hallmonitor;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import org.durka.hallmonitor.Functions.Util;
+
+import com.android.internal.telephony.PhoneStateIntentReceiver;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,6 +20,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
@@ -26,11 +31,18 @@ import android.graphics.drawable.Drawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.service.notification.StatusBarNotification;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellLocation;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +63,7 @@ import android.widget.Toast;
  */
 public class DefaultActivity extends Activity {
 	private HMAppWidgetManager hmAppWidgetManager = Functions.hmAppWidgetManager;
+	private PhoneStateIntentReceiver mPSIR = null;
 
     private static boolean mDebug = false;
 
@@ -77,6 +90,39 @@ public class DefaultActivity extends Activity {
     //all the views we need
     public ImageButton torchButton = null;
     private ImageButton cameraButton = null;
+    
+    private static class PSIRHandler extends Handler {
+    	private WeakReference<DefaultActivity> da;
+    	
+    	public PSIRHandler(DefaultActivity da_) {
+    		da = new WeakReference<DefaultActivity>(da_);
+    	}
+    	
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 200:
+            case 300:
+                if (da.get() != null) {
+                	if (da.get().findViewById(R.id.default_data) != null) {
+                		int dbm = da.get().mPSIR.getSignalStrengthDbm();
+                		if (dbm == -1) dbm = da.get().mPSIR.getSignalStrengthLevelAsu();
+                		if (dbm == -1) dbm = 0;
+                		
+                		int level;
+                		if (dbm < 2 || dbm == 99)	level = 0;
+                		else if (dbm >= 12)			level = 4;
+                		else if (dbm >= 8)			level = 3;
+                		else if (dbm >= 5)			level = 2;
+                		else						level = 1;
+                		
+                		((ImageView)da.get().findViewById(R.id.default_data)).getDrawable().setLevel(level);
+                	}
+                }
+                break;
+			}
+		}
+	}
     
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -171,7 +217,6 @@ public class DefaultActivity extends Activity {
 		}
 	};
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -219,6 +264,10 @@ public class DefaultActivity extends Activity {
         mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
 
 		Log.d("DA.onResume", "On resume called.");
+		
+		if (mPSIR != null) {
+			mPSIR.registerIntent();
+		}
 
         refreshDisplay(); // TODO is this necessary to do here?`
 
@@ -400,6 +449,19 @@ public class DefaultActivity extends Activity {
 			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
 			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
 		}
+		
+		if (findViewById(R.id.default_wifi) != null) {
+			WifiManager wifi = (WifiManager) getSystemService(WIFI_SERVICE);
+			WifiInfo info = wifi.getConnectionInfo();
+			
+			((ImageView)findViewById(R.id.default_wifi)).getDrawable().setLevel(WifiManager.calculateSignalLevel(info.getRssi(), 4));
+		}
+		
+		if (findViewById(R.id.default_data) != null) {
+			mPSIR = new PhoneStateIntentReceiver(this, new PSIRHandler(this));
+			mPSIR.notifySignalStrength(200);
+			mPSIR.notifyServiceState(300);
+		}
 
 		if (NotificationService.that != null) {
 			// notification listener service is running, show the current notifications
@@ -412,6 +474,9 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onPause() {
 	    super.onPause();
+	    if (mPSIR != null) {
+	    	mPSIR.unregisterIntent();
+	    }
 	}
 	
 	@Override
