@@ -232,7 +232,7 @@ public class DefaultActivity extends Activity {
 		Log.d("DA.onResume", "On resume called.");
 		
 		if (mPSL != null) {
-			((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).listen(mPSL, PhoneStateListener.LISTEN_NONE);
+			((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).listen(mPSL, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		}
 
         refreshDisplay(); // TODO is this necessary to do here?`
@@ -447,7 +447,7 @@ public class DefaultActivity extends Activity {
 	protected void onPause() {
 	    super.onPause();
 	    if (mPSL != null) {
-	    	((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).listen(mPSL, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+	    	((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).listen(mPSL, PhoneStateListener.LISTEN_NONE);
 	    }
 	}
 	
