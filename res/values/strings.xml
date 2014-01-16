@@ -18,9 +18,8 @@
 
 <resources>
 
-    <!-- random stuff -->
+    <!-- titles and such -->
     <string name="app_name">Hall Monitor</string>
-    <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
     <string name="title_activity_configuration">Configuration</string>
     <string name="action_settings">Settings</string>
 
@@ -34,37 +33,44 @@
     <string name="pref_enabled">Enable</string>
     <string name="pref_enabled_summary">Whether the view cover service is enabled and runs at boot</string>
     <string name="pref_delay">Covered lock screen timeout</string>
-    <string name="pref_delay_summary">When the cover is closed, the lock screen shows for this many milliseconds. If set to 0, or if you have no screen lock, the screen turns off immediately.</string>
+    <string name="pref_delay_summary">When the cover is closed, Hall Monitor stays up for this many milliseconds. If set to 0, the screen turns off immediately.</string>
     <string name="pref_dim">Dim covered lock screen</string>
-    <string name="pref_dim_summary">When the cover is closed and the lock screen displays (see above), should the screen dim?</string>
-    <string name="pref_runasroot">Root Enable</string>
-    <string name="pref_runasroot_summary">Should the app run with root permissions (required for through screen activities) - allow permanent root access for best results.</string>
-    <string name="pref_default_widget">Default Widget Enable</string>
+    <string name="pref_dim_summary">When the cover is closed and Hall Monitor is up (see above), should the screen dim?</string>
+    
+    <string name="pref_runasroot">Root Features</string>
+    <string name="pref_runasroot_summary">Should the app run with root permissions (required for most features) - allow permanent root access for best results.</string>
+    <string name="pref_default_widget">Show alternative widget</string>
     <string name="pref_default_widget_summary">Whether to use a 3rd party widget inside the cover window as the default view</string>
-    <string name="pref_media_widget">Media Widget Enable</string>
-    <string name="pref_media_widget_summary">Whether to use a 3rd party widget inside the cover window to show when media is playing / headphones are connected</string>
-    <string name="pref_alarm_controls">Alarm Controls Enable</string>
+    <string name="pref_media_widget">Media Widget</string>
+    <string name="pref_media_widget_summary">Whether to use a 3rd party widget inside the cover window to show when media is playing or headphones are connected</string>
+    <string name="pref_alarm_controls">Alarm Controls</string>
     <string name="pref_alarm_controls_summary">Whether to show alarm dismiss and snooze buttons in the cover window if the alarm goes off whilst the cover is closed</string>
+    
     <string name="pref_phone_screen">Phone Controls</string>
-    <string name="pref_phone_screen_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed</string>
+    <string name="pref_phone_screen_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed (touch for more)</string>
     <string name="pref_phone_controls">Phone Controls Enable</string>
     <string name="pref_phone_controls_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed</string>
-    <string name="pref_phone_controls_tts">Text-To-Speech Enable</string>
-    <string name="pref_phone_controls_tts_summary">Speaks the caller id of incoming calls based on your phone´s stored contacts. connected headset is required.</string>
+    <string name="pref_phone_controls_tts">Text-To-Speech</string>
+    <string name="pref_phone_controls_tts_summary">Speaks the caller ID of incoming calls based on your phone´s stored contacts. connected headset is required.</string>
     <string name="pref_phone_controls_tts_delay">Text-To-Speech Delay</string>
-    <string name="pref_phone_controls_tts_delay_summary">Before speak the caller id of incoming calls.</string>
+    <string name="pref_phone_controls_tts_delay_summary">Delay before speaking the caller ID of incoming calls.</string>
     <string name="pref_phone_controls_speaker">Speaker Enable</string>
     <string name="pref_phone_controls_speaker_summary">suppress headset check</string>
     <string name="pref_phone_preview_summary">Enter a number and verify your setup.</string>
     <string name="pref_phone_preview_input_message">enter a number</string>
-    <string name="pref_flash_controls">Torch Control Enable</string>
-    <string name="pref_flash_controls_summary">Whether to include a button to turn the torch on and off on the default screen</string>
-    <string name="pref_camera_controls">Camera Control Enable</string>
-    <string name="pref_camera_controls_summary">Whether to include a button to activate the camera on the default screen</string>
+    
+    <string name="pref_flash_controls">Torch Controls</string>
+    <string name="pref_flash_controls_summary">Whether to include a button to turn the torch on and off on the lock screen</string>
+    <string name="pref_camera_controls">Camera Controls</string>
+    <string name="pref_camera_controls_summary">Whether to include a button to activate the camera on the lock screen</string>
+    
     <string name="pref_default_bgcolor">Background color</string>
     <string name="pref_default_bgcolor_summary">Background of the view you will see through the closed cover</string>
     <string name="pref_default_fgcolor">Foreground color</string>
     <string name="pref_default_fgcolor_summary">Text color for the clock you will see through the closed cover</string>
+    
+    <!-- random strings -->
+    <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
     <string name="pref_about">About Hall Monitor</string>
 	<string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Settings</string>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.hlidskialf.android.preference.SeekBarPreference
+        android:key="pref_delay"
+        android:title="@string/pref_delay"
+	    android:summary="@string/pref_delay_summary"
+	    android:dependency="pref_enabled"
+	    android:dialogMessage="@string/pref_delay_summary"
+        android:defaultValue="10000"
+        android:max="30000"/>
+    
+    <CheckBoxPreference
+        android:key="pref_dim"
+        android:title="@string/pref_dim"
+        android:summary="@string/pref_dim_summary"
+        android:dependency="pref_delay"
+        android:defaultValue="true" />
+    
+    <afzkl.development.colorpickerview.preference.ColorPickerPreference
+        android:key="pref_default_bgcolor"
+        android:title="@string/pref_default_bgcolor"
+        android:summary="@string/pref_default_bgcolor_summary"
+        android:defaultValue="0xFFA5C8F2"
+        android:dependency="pref_default_widget" />
+    <afzkl.development.colorpickerview.preference.ColorPickerPreference
+        android:key="pref_default_fgcolor"
+        android:title="@string/pref_default_fgcolor"
+        android:summary="@string/pref_default_fgcolor_summary"
+        android:defaultValue="0xFF33B5E5"
+        android:dependency="pref_default_widget" />
+
+</PreferenceScreen>
