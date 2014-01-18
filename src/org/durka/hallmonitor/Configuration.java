@@ -31,8 +31,6 @@ import java.util.List;
 public class Configuration extends PreferenceActivity {
     private final String LOG_TAG = "Configuration";
 
-    private int mDefaultTextColor = Color.BLACK;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
