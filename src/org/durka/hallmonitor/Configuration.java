@@ -56,6 +56,7 @@ public class Configuration extends PreferenceActivity {
 	
 	@Override
 	public void onActivityResult(int request, int result, Intent data) {
+		super.onActivityResult(request, result, data);
 		Functions.Events.activity_result(this, request, result, data);
 	}
 
@@ -83,7 +84,7 @@ public class Configuration extends PreferenceActivity {
             Log_d(LOG_TAG, "onPreferenceStartFragment: exception occurred! " + e.getMessage());
         }
 
-        return false;
+        return true; // the default implementation returns true. documentation is silent. FIXME
     }
 
     @Override

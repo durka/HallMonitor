@@ -67,8 +67,8 @@ public class Functions {
 	public static final int DEVICE_ADMIN_WAITING = 42;
 	public static final int REQUEST_PICK_APPWIDGET = 9;
 	public static final int REQUEST_CONFIGURE_APPWIDGET = 5;
-	public static final int NOTIFICATION_LISTENER_ON = 0xDEADBEEF;
-	public static final int NOTIFICATION_LISTENER_OFF = 0xDEADBEEF + 1;
+	public static final int NOTIFICATION_LISTENER_ON = 0xDEAD;
+	public static final int NOTIFICATION_LISTENER_OFF = 0xBEEF;
 	
     //this action will let us toggle the flashlight
     public static final String TOGGLE_FLASHLIGHT = "net.cactii.flash2.TOGGLE_FLASHLIGHT";
@@ -223,7 +223,6 @@ public class Functions {
 		 */
 		public static void start_service(Activity act) {
 			Log.d("F.Act.start_service", "Start service called.");
-			new Exception().printStackTrace();
 			// Become device admin
 			DevicePolicyManager dpm = (DevicePolicyManager) act.getSystemService(Context.DEVICE_POLICY_SERVICE);
 			ComponentName me = new ComponentName(act, AdminReceiver.class);
@@ -254,8 +253,15 @@ public class Functions {
 		}
 		
 		public static void do_notifications(Activity act, boolean enable) {
-			Toast.makeText(act, enable ? "check this box then" : "okay uncheck this box", Toast.LENGTH_SHORT).show();
-			act.startActivityForResult(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), enable ? NOTIFICATION_LISTENER_ON : NOTIFICATION_LISTENER_OFF);
+			
+			if (enable && !Is.service_running(act, NotificationService.class)) {
+				Toast.makeText(act, act.getString(R.string.notif_please_check), Toast.LENGTH_SHORT).show();
+				act.startActivityForResult(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), NOTIFICATION_LISTENER_ON);
+			} else if (!enable && Is.service_running(act, NotificationService.class)) {
+				Toast.makeText(act, act.getString(R.string.notif_please_uncheck), Toast.LENGTH_SHORT).show();
+				act.startActivityForResult(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), NOTIFICATION_LISTENER_OFF);
+			}
+			
 		}
 		
 		/**
@@ -520,10 +526,12 @@ public class Functions {
 					}
 				}
 				break;
+				
+			
 			case NOTIFICATION_LISTENER_ON:
 				Log.d("F-oAR", "return from checking the box");
 				if (!Functions.Is.service_running(ctx, NotificationService.class)) {
-                	Toast.makeText(ctx, "you didn't check the box", Toast.LENGTH_SHORT).show();
+                	Toast.makeText(ctx, ctx.getString(R.string.notif_left_unchecked), Toast.LENGTH_SHORT).show();
                 	PreferenceManager.getDefaultSharedPreferences(ctx)
                 		.edit()
                 		.putBoolean("pref_do_notifications", false)
@@ -533,7 +541,7 @@ public class Functions {
 			case NOTIFICATION_LISTENER_OFF:
 				Log.d("F-oAR", "return from unchecking the box");
 				if (Functions.Is.service_running(ctx, NotificationService.class)) {
-                	Toast.makeText(ctx, "you didn't uncheck the box", Toast.LENGTH_SHORT).show();
+                	Toast.makeText(ctx, ctx.getString(R.string.notif_left_checked), Toast.LENGTH_SHORT).show();
                 	PreferenceManager.getDefaultSharedPreferences(ctx)
                 		.edit()
                 		.putBoolean("pref_do_notifications", true)

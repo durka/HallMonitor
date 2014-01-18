@@ -94,6 +94,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
 
         prefs.edit()
             .putBoolean("pref_enabled", Functions.Is.service_running(getActivity(), ViewCoverService.class))
+            .putBoolean("pref_do_notifications", Functions.Is.service_running(getActivity(), NotificationService.class))
             .putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(), "default"))
             .putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(), "media"))
             .commit();

@@ -46,10 +46,12 @@
         android:defaultValue="false"
         android:disableDependentsState="true" />
     
-    <CheckBoxPreference
+    <!-- FIXME I want to move this to preferences_general.xml. But when I do that two copies of the
+         notification listener activity end up on the back stack. Not sure why. -->
+    <org.durka.hallmonitor.PreferenceSwitchable
         android:key="pref_do_notifications"
-        android:title="When closed: notifications"
-        android:summary="TODO"
+        android:title="@string/pref_notifications"
+        android:summary="@string/pref_notifications_summary"
         android:defaultValue="false" />
     
     <CheckBoxPreference

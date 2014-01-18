@@ -28,11 +28,19 @@
     <string name="admin_granted">Hall Monitor admin status granted!</string>
     <string name="admin_revoked">Hall Monitor admin status revoked!</string>
     <string name="admin_refused">View cover service requires admin status</string>
+    
+    <!-- notification listener -->
+    <string name="notif_please_check">To enable this setting, check the Hall Monitor box and hit the back button.</string>
+    <string name="notif_please_uncheck">To disable this setting, uncheck the Hall Monitor box and hit the back button.</string>
+    <string name="notif_left_checked">You didn\'t uncheck the box, so the notification service is still running.</string>
+    <string name="notif_left_unchecked">You didn\'t check the box! Are you trying to make me crash?</string>
 
     <!-- preferences -->
     <string name="pref_enabled">Enable</string>
     <string name="pref_enabled_summary">Whether the view cover service is enabled and runs at boot</string>
     <string name="pref_enabled_title">General Settings</string>
+    <string name="pref_notifications">Show notification icons</string>
+    <string name="pref_notifications_summary">If this is enabled, you will see the current notifications icons when the screen turns on while the cover is closed.</string>
     <string name="pref_delay">Covered lock screen timeout</string>
     <string name="pref_delay_summary">When the cover is closed, Hall Monitor stays up for this many milliseconds. If set to 0, the screen turns off immediately.</string>
     <string name="pref_dim">Dim covered lock screen</string>
