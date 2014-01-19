@@ -14,7 +14,9 @@
  */
 package org.durka.hallmonitor;
 
+import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -25,9 +27,14 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 public class PreferenceFragmentLoader extends PreferenceFragment  implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -235,5 +242,46 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         spannableString.setSpan(new ForegroundColorSpan(alpha), 0, text.length(), 0);
 
         return spannableString;
+    }
+    
+    @Override
+    public boolean onPreferenceTreeClick(PreferenceScreen screen, Preference pref)
+    {
+    	super.onPreferenceTreeClick(screen, pref);
+    	
+    	if (pref != null && pref instanceof PreferenceScreen) {
+    		// make the back button on the action bar work (why doesn't it work by default???)
+    		// FIXME this is another hack
+    		// thanks be to https://stackoverflow.com/questions/16374820/action-bar-home-button-not-functional-with-nested-preferencescreen
+    		
+    		final PreferenceScreen ps = (PreferenceScreen)pref;
+    		if (ps.getDialog() != null) {
+    			ps.getDialog().getActionBar().setDisplayHomeAsUpEnabled(true);
+    			
+    			// carefully walk up two levels from the home button
+    			View v = ps.getDialog().findViewById(android.R.id.home);
+    			if (v != null)
+    			{
+    				if (v.getParent() != null && v.getParent() instanceof View) {
+    					v = (View)v.getParent();
+    					if (v.getParent() != null && v.getParent() instanceof View) {
+    						v = (View)v.getParent();
+    						
+    						// found the view we want, make it so
+    						v.setOnClickListener(new OnClickListener() {
+
+    							@Override
+    							public void onClick(View view) {
+    								ps.getDialog().dismiss();
+    							}
+    		    				
+    		    			});
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
+    	return false;
     }
 }
