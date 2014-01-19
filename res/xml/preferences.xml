@@ -39,12 +39,25 @@
         android:summary="@string/pref_runasroot_summary"
         android:defaultValue="false" />
     
-    <CheckBoxPreference
-        android:key="pref_default_widget"
-        android:title="@string/pref_default_widget"
-        android:summary="@string/pref_default_widget_summary"
-        android:defaultValue="false"
-        android:disableDependentsState="true" />
+    <PreferenceScreen
+        android:title="Widget Settings"
+        android:summary="Click through to configure widgets">
+    
+	    <CheckBoxPreference
+	        android:key="pref_default_widget"
+	        android:title="@string/pref_default_widget"
+	        android:summary="@string/pref_default_widget_summary"
+	        android:defaultValue="false"
+	        android:disableDependentsState="true" />
+	    
+	    <CheckBoxPreference
+	        android:key="pref_media_widget"
+	        android:title="@string/pref_media_widget"
+	        android:summary="@string/pref_media_widget_summary"
+	        android:defaultValue="false" />
+    
+    
+    </PreferenceScreen>
     
     <!-- FIXME I want to move this to preferences_general.xml. But when I do that two copies of the
          notification listener activity end up on the back stack. Not sure why. -->
@@ -54,25 +67,19 @@
         android:summary="@string/pref_notifications_summary"
         android:defaultValue="false" />
     
-    <CheckBoxPreference
+    <org.durka.hallmonitor.PreferenceSwitchable
         android:key="pref_flash_controls"
         android:title="@string/pref_flash_controls"
         android:summary="@string/pref_flash_controls_summary"
         android:defaultValue="false" />
     
-    <CheckBoxPreference
+    <org.durka.hallmonitor.PreferenceSwitchable
         android:key="pref_camera_controls"
         android:title="@string/pref_camera_controls"
         android:summary="@string/pref_camera_controls_summary"
         android:defaultValue="false" />
 
-    <CheckBoxPreference
-        android:key="pref_media_widget"
-        android:title="@string/pref_media_widget"
-        android:summary="@string/pref_media_widget_summary"
-        android:defaultValue="false" />
-    
-    <CheckBoxPreference
+    <org.durka.hallmonitor.PreferenceSwitchable
         android:key="pref_alarm_controls"
         android:title="@string/pref_alarm_controls"
         android:summary="@string/pref_alarm_controls_summary"
