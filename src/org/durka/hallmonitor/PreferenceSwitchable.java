@@ -46,12 +46,12 @@ public class PreferenceSwitchable extends Preference {
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                setChecked(b);
+                setChecked(b, false);
                 persistBoolean(b);
             }
         });
 
-        setChecked(mSwitchState);
+        setChecked(mSwitchState, false);
 
         return view;
     }
@@ -108,11 +108,29 @@ public class PreferenceSwitchable extends Preference {
         return a.getBoolean(index, false);
     }
 
-    protected void setChecked(boolean checked) {
-        //Log.d(LOG_TAG, "setChecked: " + checked);
-        mSwitchState = checked;
+    protected void setChecked(boolean checked) { setChecked(checked, true); }
+    protected void setChecked(boolean checked, boolean notify) {
+        //Log.d(LOG_TAG, getTitle() + " setChecked: " + checked);
+        //new Exception().printStackTrace();
+        
+    	mSwitchState = checked;
         setSelectable(mSwitchState);
-        mSwitch.setChecked(mSwitchState);
+        
+        if (mSwitch != null) mSwitch.setChecked(mSwitchState);
+        	
+        if (notify) notifyDependencyChange(shouldDisableDependents());
+    }
+    
+    @Override
+    public boolean shouldDisableDependents() {
+    	return !mSwitchState;
+    }
+    
+    @Override
+    public void onDependencyChanged(Preference dependency, boolean disableDependent) {
+    	Log.d(LOG_TAG, getTitle() + " oDP from " + dependency.getTitle() + ", dD=" + disableDependent);
+    	setChecked(!disableDependent);
+    	setEnabled(!disableDependent);
     }
 
 }
