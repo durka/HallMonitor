@@ -281,6 +281,9 @@ public class DefaultActivity extends Activity {
 		if (hmAppWidgetManager.doesWidgetExist("media") && (audioManager.isWiredHeadsetOn() || audioManager.isMusicActive())) {
 			widgetType = "media";
 		}
+		// reset to showing the clock, but in a second we might hide it and attach a widget
+		findViewById(R.id.default_text_clock).setVisibility(View.VISIBLE);
+		((RelativeLayout)findViewById(R.id.default_widget_area)).removeAllViews();
 
 		if (alarm_firing) {
 			// show the alarm controls
@@ -327,8 +330,9 @@ public class DefaultActivity extends Activity {
 				}    
 
 				//add the widget to the view
-				((RelativeLayout)findViewById(R.id.default_content)).addView(hostView);
-			} 
+				findViewById(R.id.default_text_clock).setVisibility(View.INVISIBLE);
+				((RelativeLayout)findViewById(R.id.default_widget_area)).addView(hostView);
+			}
 		}
 	}
 

@@ -14,7 +14,9 @@
  */
 package org.durka.hallmonitor;
 
+import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -25,9 +27,14 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 public class PreferenceFragmentLoader extends PreferenceFragment  implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -72,9 +79,8 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                     if (mAboutClicked == mAboutClickCount) {
                         mAboutClicked = 0;
                         SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
-
-                        mDebug = prefs.getBoolean("pref_dev_opts_debug", false);
-                        prefs.edit().putBoolean("pref_dev_opts_debug", !mDebug).commit();
+                        mDebug = !prefs.getBoolean("pref_dev_opts_debug", false); // toggle debug
+                        prefs.edit().putBoolean("pref_dev_opts_debug", mDebug).commit();
                         Toast.makeText(getActivity(), "debug is " + (prefs.getBoolean("pref_dev_opts_debug", false) ? "enabled" : "disabled") + " now!", Toast.LENGTH_LONG).show();
                     }
 
@@ -97,8 +103,9 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
 
         prefs.edit()
             .putBoolean("pref_enabled", Functions.Is.service_running(getActivity(), ViewCoverService.class))
-            .putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(), "default"))
-            .putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(), "media"))
+            .putBoolean("pref_do_notifications", Functions.Is.service_running(getActivity(), NotificationService.class))
+            .putBoolean("pref_default_widget", Functions.Is.widget_enabled(getActivity(), "default"))
+            .putBoolean("pref_media_widget", Functions.Is.widget_enabled(getActivity(), "media"))
             .commit();
 
         // phone control
@@ -151,18 +158,18 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         // if the default screen widget is being enabled/disabled the key will be pref_default_widget
         } else if (key.equals("pref_default_widget")) {
 
-            if (prefs.getBoolean(key, false)) {
+            if (prefs.getBoolean(key, false) && !Functions.Is.widget_enabled(getActivity(), "default")) {
                 Functions.Actions.register_widget(getActivity(), "default");
-            } else {
+            } else if (!prefs.getBoolean(key, false) && Functions.Is.widget_enabled(getActivity(), "default")) {
                 Functions.Actions.unregister_widget(getActivity(), "default");
             }
 
             // if the media screen widget is being enabled/disabled the key will be pref_media_widget
         } else if (key.equals("pref_media_widget")) {
 
-            if (prefs.getBoolean(key, false)) {
+            if (prefs.getBoolean(key, false) && !Functions.Is.widget_enabled(getActivity(), "media")) {
                 Functions.Actions.register_widget(getActivity(), "media");
-            } else {
+            } else if (!prefs.getBoolean(key, false) && Functions.Is.widget_enabled(getActivity(), "media")) {
                 Functions.Actions.unregister_widget(getActivity(), "media");
             }
 
@@ -235,5 +242,46 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         spannableString.setSpan(new ForegroundColorSpan(alpha), 0, text.length(), 0);
 
         return spannableString;
+    }
+    
+    @Override
+    public boolean onPreferenceTreeClick(PreferenceScreen screen, Preference pref)
+    {
+    	super.onPreferenceTreeClick(screen, pref);
+    	
+    	if (pref != null && pref instanceof PreferenceScreen) {
+    		// make the back button on the action bar work (why doesn't it work by default???)
+    		// FIXME this is another hack
+    		// thanks be to https://stackoverflow.com/questions/16374820/action-bar-home-button-not-functional-with-nested-preferencescreen
+    		
+    		final PreferenceScreen ps = (PreferenceScreen)pref;
+    		if (ps.getDialog() != null) {
+    			ps.getDialog().getActionBar().setDisplayHomeAsUpEnabled(true);
+    			
+    			// carefully walk up two levels from the home button
+    			View v = ps.getDialog().findViewById(android.R.id.home);
+    			if (v != null)
+    			{
+    				if (v.getParent() != null && v.getParent() instanceof View) {
+    					v = (View)v.getParent();
+    					if (v.getParent() != null && v.getParent() instanceof View) {
+    						v = (View)v.getParent();
+    						
+    						// found the view we want, make it so
+    						v.setOnClickListener(new OnClickListener() {
+
+    							@Override
+    							public void onClick(View view) {
+    								ps.getDialog().dismiss();
+    							}
+    		    				
+    		    			});
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
+    	return false;
     }
 }

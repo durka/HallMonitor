@@ -19,6 +19,7 @@ import java.util.TimerTask;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -33,6 +34,7 @@ import android.view.InputDevice;
 public class ViewCoverService extends Service implements SensorEventListener {
 	
 	private SensorManager       mSensorManager;
+	private HeadsetReceiver		mHeadset;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -56,6 +58,11 @@ public class ViewCoverService extends Service implements SensorEventListener {
 			InputDevice dev = im.getInputDevice(id);
 			Log.d("VCS-oSC", "\t" + dev.toString());
 		}
+		
+		mHeadset = new HeadsetReceiver();
+		IntentFilter intfil = new IntentFilter();
+		intfil.addAction("android.intent.action.HEADSET_PLUG");
+		registerReceiver(mHeadset, intfil);
 
 		return START_STICKY;
 	}
@@ -71,6 +78,8 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		
 		//unregisterReceiver(receiver);
 		mSensorManager.unregisterListener(this);
+		
+		unregisterReceiver(mHeadset);
 	}
 
 	@Override
