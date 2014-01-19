@@ -97,8 +97,8 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         prefs.edit()
             .putBoolean("pref_enabled", Functions.Is.service_running(getActivity(), ViewCoverService.class))
             .putBoolean("pref_do_notifications", Functions.Is.service_running(getActivity(), NotificationService.class))
-            .putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(), "default"))
-            .putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(), "media"))
+            .putBoolean("pref_default_widget", Functions.Is.widget_enabled(getActivity(), "default"))
+            .putBoolean("pref_media_widget", Functions.Is.widget_enabled(getActivity(), "media"))
             .commit();
 
         // phone control
@@ -151,18 +151,18 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         // if the default screen widget is being enabled/disabled the key will be pref_default_widget
         } else if (key.equals("pref_default_widget")) {
 
-            if (prefs.getBoolean(key, false)) {
+            if (prefs.getBoolean(key, false) && !Functions.Is.widget_enabled(getActivity(), "default")) {
                 Functions.Actions.register_widget(getActivity(), "default");
-            } else {
+            } else if (!prefs.getBoolean(key, false) && Functions.Is.widget_enabled(getActivity(), "default")) {
                 Functions.Actions.unregister_widget(getActivity(), "default");
             }
 
             // if the media screen widget is being enabled/disabled the key will be pref_media_widget
         } else if (key.equals("pref_media_widget")) {
 
-            if (prefs.getBoolean(key, false)) {
+            if (prefs.getBoolean(key, false) && !Functions.Is.widget_enabled(getActivity(), "media")) {
                 Functions.Actions.register_widget(getActivity(), "media");
-            } else {
+            } else if (!prefs.getBoolean(key, false) && Functions.Is.widget_enabled(getActivity(), "media")) {
                 Functions.Actions.unregister_widget(getActivity(), "media");
             }
 

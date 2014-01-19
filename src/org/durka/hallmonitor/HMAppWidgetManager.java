@@ -26,7 +26,7 @@ public class HMAppWidgetManager {
 	
 	//track which widget we are currently dealing with - holds state across the events firing
 	//this is a bit clunky, but there's no need to worry about thread safety so should be fine
-	private String currentWidgetType;
+	public String currentWidgetType;
 	
 	//app widget management classes we need
 	public AppWidgetManager mAppWidgetManager;
@@ -46,6 +46,7 @@ public class HMAppWidgetManager {
 	public void register_widget(Activity act, String widgetType) {
 	
 		Log.d("HMAWM.register_widget","Register widget called with type: " + widgetType);
+		new Exception().printStackTrace();
 		
 		//if we haven't yet created an app widget manager and app widget host instance then do so
 		if (mAppWidgetManager == null) mAppWidgetManager = AppWidgetManager.getInstance(act);

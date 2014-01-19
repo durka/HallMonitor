@@ -509,10 +509,15 @@ public class Functions {
 					int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
 					if (appWidgetId != -1) {
 						hmAppWidgetManager.deleteAppWidgetId(appWidgetId);
+						PreferenceManager.getDefaultSharedPreferences(ctx)
+							.edit()
+							.putBoolean("pref_" + hmAppWidgetManager.currentWidgetType + "_widget", false) // FIXME this is a huge hack
+							.commit();
 					}
+					
 				}
 				break;		
-				//call back for appwidget configure
+			//call back for appwidget configure
 			case REQUEST_CONFIGURE_APPWIDGET:
 				//widget configured
 				if (result == Activity.RESULT_OK) {
@@ -520,10 +525,17 @@ public class Functions {
 					hmAppWidgetManager.createWidget(data, ctx);
 				} else {
 					//configure dialog cancelled so clean up
-					int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-					if (appWidgetId != -1) {
-						hmAppWidgetManager.deleteAppWidgetId(appWidgetId);
+					if (data != null) {
+						int appWidgetId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+						if (appWidgetId != -1) {
+							hmAppWidgetManager.deleteAppWidgetId(appWidgetId);
+							PreferenceManager.getDefaultSharedPreferences(ctx)
+								.edit()
+								.putBoolean("pref_" + hmAppWidgetManager.currentWidgetType + "_widget", false) // FIXME this is a huge hack
+								.commit();
+						}
 					}
+					
 				}
 				break;
 				

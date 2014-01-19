@@ -40,8 +40,8 @@
         android:defaultValue="false" />
     
     <PreferenceScreen
-        android:title="Widget Settings"
-        android:summary="Click through to configure widgets">
+        android:title="@string/pref_widgets"
+        android:summary="@string/pref_widgets_summary">
     
 	    <CheckBoxPreference
 	        android:key="pref_default_widget"

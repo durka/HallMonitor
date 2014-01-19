@@ -48,6 +48,9 @@
     
     <string name="pref_runasroot">Root Features</string>
     <string name="pref_runasroot_summary">Should the app run with root permissions (required for most features) - allow permanent root access for best results.</string>
+    
+    <string name="pref_widgets">Widget Settings</string>
+    <string name="pref_widgets_summary">Click through to configure widgets</string>
     <string name="pref_default_widget">Show alternative widget</string>
     <string name="pref_default_widget_summary">Whether to use a 3rd party widget inside the cover window as the default view</string>
     <string name="pref_media_widget">Media Widget</string>
