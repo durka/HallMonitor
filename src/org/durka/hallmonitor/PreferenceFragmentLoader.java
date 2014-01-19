@@ -93,25 +93,30 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
 
         prefs.edit()
-            .putBoolean("pref_enabled", Functions.Is.service_running(getActivity()))
+            .putBoolean("pref_enabled", Functions.Is.service_running(getActivity(), ViewCoverService.class))
             .putBoolean("pref_default_widget_enabled", Functions.Is.widget_enabled(getActivity(), "default"))
             .putBoolean("pref_media_widget_enabled", Functions.Is.widget_enabled(getActivity(), "media"))
             .commit();
 
-        prefs.registerOnSharedPreferenceChangeListener(this);
-
         // phone control
         enablePhoneScreen(prefs);
         updatePhoneControlTtsDelay(prefs);
+        
+        prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log_d(LOG_TAG, "onPause: ");
-        // don't unregister, because we still want to receive the notification when
-        // pref_enabled is changed in onActivityResult
-        // FIXME is it okay to just never unregister??
+        
+    }
+    
+    @Override
+    public void onDestroy() {
+    	super.onDestroy();
+    	Log_d(LOG_TAG, "onDestroy: ");
+    	
         getPreferenceManager().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
@@ -122,11 +127,17 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
 
         // update display
         if (findPreference(key) instanceof CheckBoxPreference) {
+        	Log.d(LOG_TAG + "-oSPC", "toggling check box");
             ((CheckBoxPreference)findPreference(key)).setChecked(prefs.getBoolean(key, false));
+        } else if (findPreference(key) instanceof PreferenceSwitchable) {
+        	Log.d(LOG_TAG + "-oSPC", "toggling switch");
+        	((PreferenceSwitchable)findPreference(key)).setChecked(prefs.getBoolean(key, false));
         }
 
         // if the service is being enabled/disabled the key will be pref_enabled
         if (key.equals("pref_enabled")) {
+        	
+        	Log.d(LOG_TAG, "pref_enabled is now " + prefs.getBoolean(key, false));
 
             if (prefs.getBoolean(key, false)) {
                 Functions.Actions.start_service(getActivity());
@@ -134,7 +145,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                 Functions.Actions.stop_service(getActivity());
             }
 
-            // if the default screen widget is being enabled/disabled the key will be pref_default_widget
+        // if the default screen widget is being enabled/disabled the key will be pref_default_widget
         } else if (key.equals("pref_default_widget")) {
 
             if (prefs.getBoolean(key, false)) {
@@ -164,15 +175,8 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
             }
 
         } else if (key.equals("pref_do_notifications")) {
-            startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
-            if (prefs.getBoolean(key, false)) {
-                Toast.makeText(getActivity(), "check this box then", Toast.LENGTH_SHORT).show();
-                //getActivity().startService(new Intent(getActivity(), NotificationService.class));
-            } else {
-                Toast.makeText(getActivity(), "okay uncheck the box", Toast.LENGTH_SHORT).show();
-                //getActivity().startService(new Intent(getActivity(), NotificationService.class));
-            }
-            // if the flash controls are being enabled/disabled the key will be pref_widget
+            Functions.Actions.do_notifications(getActivity(), prefs.getBoolean(key, false));
+        // if the flash controls are being enabled/disabled the key will be pref_widget
         } else if (key.equals("pref_flash_controls")) {
 
                 if (prefs.getBoolean(key, false) ) {
@@ -214,7 +218,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
     }
 
     private void Log_d(String tag, String message) {
-        if (mDebug)
+        //if (mDebug)
             Log.d(tag, message);
     }
 

@@ -28,6 +28,9 @@
         <extra
             android:name="resource"
             android:value="preferences_general" />
+        <extra
+            android:name="title"
+            android:value="@string/pref_enabled_title" />
     </org.durka.hallmonitor.PreferenceSwitchable>
     
     <org.durka.hallmonitor.PreferenceSwitchable
@@ -82,6 +85,9 @@
         <extra
             android:name="resource"
             android:value="preferences_phone" />
+        <extra
+            android:name="title"
+            android:value="@string/pref_phone_screen_title" />
     </org.durka.hallmonitor.PreferenceSwitchable>
 
     <!-- spacer -->

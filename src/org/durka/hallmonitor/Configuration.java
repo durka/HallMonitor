@@ -76,7 +76,7 @@ public class Configuration extends PreferenceActivity {
                 getFragmentManager().executePendingTransactions();
 
                 // update action bar
-                updateHeaderTitle(preference.getTitle());
+                updateHeaderTitle(preference.getExtras().getString("title"));
             } else
                 Log_d(LOG_TAG, "onPreferenceStartFragment: given class is not a PreferenceFragment");
         } catch (Exception e) {
