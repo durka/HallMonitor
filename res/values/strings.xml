@@ -49,6 +49,9 @@
     <string name="pref_runasroot">Root Features</string>
     <string name="pref_runasroot_summary">Should the app run with root permissions (required for most features) - allow permanent root access for best results.</string>
     
+    <string name="pref_optional">Optional Features</string>
+    <string name="pref_optional_summary">Click through to enable/disable features</string>
+    
     <string name="pref_widgets">Widget Settings</string>
     <string name="pref_widgets_summary">Click through to configure widgets</string>
     <string name="pref_default_widget">Show alternative widget</string>
