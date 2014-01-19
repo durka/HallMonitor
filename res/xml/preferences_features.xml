@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+		<org.durka.hallmonitor.PreferenceSwitchable
+	        android:key="pref_do_notifications"
+	        android:title="@string/pref_notifications"
+	        android:summary="@string/pref_notifications_summary"
+	        android:defaultValue="false" />
+	    
+	    <org.durka.hallmonitor.PreferenceSwitchable
+	        android:key="pref_flash_controls"
+	        android:title="@string/pref_flash_controls"
+	        android:summary="@string/pref_flash_controls_summary"
+	        android:defaultValue="false" />
+	    
+	    <org.durka.hallmonitor.PreferenceSwitchable
+	        android:key="pref_camera_controls"
+	        android:title="@string/pref_camera_controls"
+	        android:summary="@string/pref_camera_controls_summary"
+	        android:defaultValue="false"/>
+	
+	    <org.durka.hallmonitor.PreferenceSwitchable
+	        android:key="pref_alarm_controls"
+	        android:title="@string/pref_alarm_controls"
+	        android:summary="@string/pref_alarm_controls_summary"
+	        android:defaultValue="false"/>
+	
+	    <org.durka.hallmonitor.PreferenceSwitchable
+	        android:key="pref_phone_controls_user"
+	        android:title="@string/pref_phone_screen"
+	        android:summary="@string/pref_phone_screen_summary"
+	        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader"
+	        android:defaultValue="false">
+	        <extra
+	            android:name="resource"
+	            android:value="preferences_phone" />
+	        <extra
+	            android:name="title"
+	            android:value="@string/pref_phone_screen_title" />
+	    </org.durka.hallmonitor.PreferenceSwitchable>
+	    
+</PreferenceScreen>

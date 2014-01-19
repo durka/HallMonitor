@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+		 <CheckBoxPreference
+	        android:key="pref_default_widget"
+	        android:title="@string/pref_default_widget"
+	        android:summary="@string/pref_default_widget_summary"
+	        android:defaultValue="false"
+	        android:disableDependentsState="true" />
+	    
+	    <CheckBoxPreference
+	        android:key="pref_media_widget"
+	        android:title="@string/pref_media_widget"
+	        android:summary="@string/pref_media_widget_summary"
+	        android:defaultValue="false" />
+	    
+</PreferenceScreen>

@@ -222,6 +222,7 @@ public class DefaultActivity extends Activity {
 
         refreshDisplay(); // TODO is this necessary to do here?`
 
+        /*
         // check preview (extras are configured in xml)
         if (getIntent().getExtras() != null && !getIntent().getExtras().getString("preview", "").equals("")) {
             String preview = getIntent().getExtras().getString("preview");
@@ -237,6 +238,7 @@ public class DefaultActivity extends Activity {
                         .show();
             }
         }
+        */
 	}
 
 	/**
