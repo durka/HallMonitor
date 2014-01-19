@@ -24,6 +24,7 @@
             android:defaultValue="false" />
     </PreferenceCategory>
 
+    <!--
     <PreferenceCategory
         android:title="@string/pref_test">
         <PreferenceScreen
@@ -40,5 +41,6 @@
             </intent>
         </PreferenceScreen>
     </PreferenceCategory>
+    -->
 
 </PreferenceScreen>
