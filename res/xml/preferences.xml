@@ -43,70 +43,30 @@
     <PreferenceScreen
         android:title="@string/pref_widgets"
         android:summary="@string/pref_widgets_summary"
-        android:dependency="pref_enabled">
-    
-	    <CheckBoxPreference
-	        android:key="pref_default_widget"
-	        android:title="@string/pref_default_widget"
-	        android:summary="@string/pref_default_widget_summary"
-	        android:defaultValue="false"
-	        android:disableDependentsState="true" />
-	    
-	    <CheckBoxPreference
-	        android:key="pref_media_widget"
-	        android:title="@string/pref_media_widget"
-	        android:summary="@string/pref_media_widget_summary"
-	        android:defaultValue="false" />
-    
+        android:dependency="pref_enabled"
+        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader">
+        
+        <extra
+	        android:name="resource"
+	        android:value="preferences_widgets" />
+	    <extra
+	        android:name="title"
+	        android:value="@string/pref_optional" />
     
     </PreferenceScreen>
     
     <PreferenceScreen
         android:title="@string/pref_optional"
         android:summary="@string/pref_optional_summary"
-        android:dependency="pref_enabled">
+        android:dependency="pref_enabled"
+        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader">
 	    
-	    <org.durka.hallmonitor.PreferenceSwitchable
-	        android:key="pref_do_notifications"
-	        android:title="@string/pref_notifications"
-	        android:summary="@string/pref_notifications_summary"
-	        android:defaultValue="false" />
-	    
-	    <org.durka.hallmonitor.PreferenceSwitchable
-	        android:key="pref_flash_controls"
-	        android:title="@string/pref_flash_controls"
-	        android:summary="@string/pref_flash_controls_summary"
-	        android:defaultValue="false"
-	        android:dependency="pref_runasroot" />
-	    
-	    <org.durka.hallmonitor.PreferenceSwitchable
-	        android:key="pref_camera_controls"
-	        android:title="@string/pref_camera_controls"
-	        android:summary="@string/pref_camera_controls_summary"
-	        android:defaultValue="false"
-	        android:dependency="pref_runasroot" />
-	
-	    <org.durka.hallmonitor.PreferenceSwitchable
-	        android:key="pref_alarm_controls"
-	        android:title="@string/pref_alarm_controls"
-	        android:summary="@string/pref_alarm_controls_summary"
-	        android:defaultValue="false"
-	        android:dependency="pref_enabled" />
-	
-	    <org.durka.hallmonitor.PreferenceSwitchable
-	        android:key="pref_phone_controls_user"
-	        android:title="@string/pref_phone_screen"
-	        android:summary="@string/pref_phone_screen_summary"
-	        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader"
-	        android:defaultValue="false"
-	        android:dependency="pref_enabled">
-	        <extra
-	            android:name="resource"
-	            android:value="preferences_phone" />
-	        <extra
-	            android:name="title"
-	            android:value="@string/pref_phone_screen_title" />
-	    </org.durka.hallmonitor.PreferenceSwitchable>
+	    <extra
+	        android:name="resource"
+	        android:value="preferences_features" />
+	    <extra
+	        android:name="title"
+	        android:value="@string/pref_optional" />
 	    
 	</PreferenceScreen>
 

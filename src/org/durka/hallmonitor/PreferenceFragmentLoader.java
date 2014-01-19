@@ -47,9 +47,12 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        Log.d(LOG_TAG, "PFL-oC");
 
         try {
             final String resourceName = getArguments().getString("resource", "");
+            Log.d(LOG_TAG, "loading preferences from " + resourceName + ".xml");
 
             Context context = getActivity().getApplicationContext();
 
