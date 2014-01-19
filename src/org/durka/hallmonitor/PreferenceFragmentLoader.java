@@ -72,8 +72,9 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                     if (mAboutClicked == mAboutClickCount) {
                         mAboutClicked = 0;
                         SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
-                        boolean debug = prefs.getBoolean("pref_dev_opts_debug", false);
-                                prefs.edit().putBoolean("pref_dev_opts_debug", !debug).commit();
+
+                        mDebug = prefs.getBoolean("pref_dev_opts_debug", false);
+                        prefs.edit().putBoolean("pref_dev_opts_debug", !mDebug).commit();
                         Toast.makeText(getActivity(), "debug is " + (prefs.getBoolean("pref_dev_opts_debug", false) ? "enabled" : "disabled") + " now!", Toast.LENGTH_LONG).show();
                     }
 
