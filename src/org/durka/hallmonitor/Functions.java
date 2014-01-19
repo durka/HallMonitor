@@ -626,6 +626,23 @@ public class Functions {
 			//Log.d(ctx.getString(R.string.app_name), String.format("cover_closed = %b", cover_closed));
 		}
 
+		public static void headset(final Context ctx, int state) {
+			if (state != 0) {
+				// headset was just inserted
+				if (Is.cover_closed(ctx)) {
+					new Handler().postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							ctx.getApplicationContext().startActivity(new Intent(ctx.getApplicationContext(), DefaultActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+						}
+					}, 500); // FIXME this is by far the biggest hack yet
+				}
+			}
+			
+			if (defaultActivity.on_screen) {
+				defaultActivity.refreshDisplay();
+			}
+		}
 
 		public static void incoming_call(final Context ctx, String number) {
 			Log.d("phone", "call from " + number);
