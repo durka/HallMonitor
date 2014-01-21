@@ -189,18 +189,12 @@ public class Functions {
 			if (configurationActivity != null) configurationActivity.moveTaskToBack(true);
 	        //we also don't want to see the default activity
 	        if (defaultActivity != null)  defaultActivity.moveTaskToBack(true);
-	        
-			//needed to let us wake the screen
-			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
 			
 			// step 1: if we were going to turn the screen off, cancel that
 			if (timerTask != null) timerTask.cancel();
 			
 			// step 2: wake the screen
-			//FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
-			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
-	        wl.acquire();
-	        wl.release();
+			Util.rise_and_shine(ctx);
 			
 			//save the cover state
 			Events.set_cover(false);
@@ -667,6 +661,7 @@ public class Functions {
 						intent.setAction(Intent.ACTION_MAIN);
 						ctx.startActivity(intent);
 
+						Util.rise_and_shine(ctx); // make sure the screen is on
 					}
 				}, 500);
 				
@@ -809,6 +804,15 @@ public class Functions {
 
 		    Log.d("phone", "...result is " + name);
 		    return name;
+		}
+
+		public static void rise_and_shine(Context ctx) {
+			//FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
+			Log.d("F.Util.rs", "aww why can't I hit snooze");
+			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
+	        wl.acquire();
+	        wl.release();
 		}
 	}
 
