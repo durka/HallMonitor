@@ -70,6 +70,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         }
 
         // setup about preference for debug
+        SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
         Preference about = findPreference("pref_about");
         if (about != null) {
             // init onClick listener
@@ -95,6 +96,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
             about.setTitle(getTextDisabledFormatted(about.getTitle()));
             about.setSummary(getTextDisabledFormatted(about.getSummary()));
         }
+
+        // phone control
+        enablePhoneScreen(prefs);
+        updatePhoneControlTtsDelay(prefs);
     }
 
     @Override
@@ -184,6 +189,9 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                     // if "whoami" doesn't work, refuse to set preference
                     Toast.makeText(getActivity(), "Root access not granted - cannot enable root features!", Toast.LENGTH_SHORT).show();
                     prefs.edit().putBoolean(key, false).commit();
+
+                    // check
+                    setCheckedPreferenceSwitchable(key, false);
                 }
             }
 
@@ -224,10 +232,16 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         boolean phoneControlConfig = prefs.getBoolean("pref_phone_controls", false);
         Preference phoneControl = findPreference("pref_phone_controls_user");
 
-        if (phoneControlConfig != phoneControlState && phoneControl != null)
+        if (phoneControl != null && (phoneControlConfig != phoneControlState || phoneControl.isEnabled() != phoneControlState))
             phoneControl.setEnabled(phoneControlState);
         if (phoneControlConfig != (phoneControlState && prefs.getBoolean("pref_phone_controls_user", false)))
             prefs.edit().putBoolean("pref_phone_controls", !phoneControlConfig).commit();
+    }
+
+    private void setCheckedPreferenceSwitchable(String key, boolean checked) {
+        Preference preference = findPreference(key);
+        if (preference != null && PreferenceSwitchable.class.isAssignableFrom(preference.getClass()))
+            ((PreferenceSwitchable)preference).setChecked(checked);
     }
 
     private void Log_d(String tag, String message) {
