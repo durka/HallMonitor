@@ -10,9 +10,8 @@ Things to do when making a release:
 4. Update the strings
     - `pref_about_summary`
 5. git
-
-    git add bin/HallMonitor.apk
-    git commit -m "releasing version $VERSION"
-    git tag $VERSION
-    git push
-    git push --tags
+    - `git add bin/HallMonitor.apk`
+    - `git commit -m "releasing version $VERSION"`
+    - `git tag $VERSION`
+    - `git push`
+    - `git push --tags`
