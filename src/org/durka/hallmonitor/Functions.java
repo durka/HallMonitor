@@ -81,6 +81,8 @@ public class Functions {
 	public static DefaultActivity defaultActivity;
 	public static Configuration configurationActivity;
 	
+	private static boolean notification_settings_ongoing = false;
+	
 	/**
 	 * Provides methods for performing actions. (e.g. what to do when the cover is opened and closed etc.)
 	 */
@@ -248,10 +250,12 @@ public class Functions {
 		
 		public static void do_notifications(Activity act, boolean enable) {
 			
-			if (enable && !Is.service_running(act, NotificationService.class)) {
+			if (enable && !notification_settings_ongoing && !Is.service_running(act, NotificationService.class)) {
+				notification_settings_ongoing = true;
 				Toast.makeText(act, act.getString(R.string.notif_please_check), Toast.LENGTH_SHORT).show();
 				act.startActivityForResult(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), NOTIFICATION_LISTENER_ON);
-			} else if (!enable && Is.service_running(act, NotificationService.class)) {
+			} else if (!enable && !notification_settings_ongoing && Is.service_running(act, NotificationService.class)) {
+				notification_settings_ongoing = true;
 				Toast.makeText(act, act.getString(R.string.notif_please_uncheck), Toast.LENGTH_SHORT).show();
 				act.startActivityForResult(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), NOTIFICATION_LISTENER_OFF);
 			}
@@ -536,6 +540,7 @@ public class Functions {
 			
 			case NOTIFICATION_LISTENER_ON:
 				Log.d("F-oAR", "return from checking the box");
+				notification_settings_ongoing = false;
 				if (!Functions.Is.service_running(ctx, NotificationService.class)) {
                 	Toast.makeText(ctx, ctx.getString(R.string.notif_left_unchecked), Toast.LENGTH_SHORT).show();
                 	PreferenceManager.getDefaultSharedPreferences(ctx)
@@ -546,6 +551,7 @@ public class Functions {
 				break;
 			case NOTIFICATION_LISTENER_OFF:
 				Log.d("F-oAR", "return from unchecking the box");
+				notification_settings_ongoing = false;
 				if (Functions.Is.service_running(ctx, NotificationService.class)) {
                 	Toast.makeText(ctx, ctx.getString(R.string.notif_left_checked), Toast.LENGTH_SHORT).show();
                 	PreferenceManager.getDefaultSharedPreferences(ctx)
