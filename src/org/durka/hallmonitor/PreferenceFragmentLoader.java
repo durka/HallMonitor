@@ -14,12 +14,16 @@
  */
 package org.durka.hallmonitor;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -103,6 +107,33 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         Log_d(LOG_TAG, "onResume: ");
 
         SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
+        
+        try {
+        	Activity act = getActivity();
+        	PackageInfo info = act.getPackageManager().getPackageInfo(act.getPackageName(), 0);
+        	
+        	Log.d(LOG_TAG, "versionCode = " + info.versionCode);
+        	
+        	if (prefs.getInt("version", 3) < info.versionCode) {
+            	prefs.edit()
+            		.putInt("version", info.versionCode)
+            		.commit();
+            	
+            	Log.d(LOG_TAG, "stored version code");
+            	
+            	new AlertDialog.Builder(act)
+            		.setMessage(String.format(getResources().getString(R.string.firstrun_message), info.versionName))
+            		.setPositiveButton(R.string.firstrun_ok, new DialogInterface.OnClickListener() {
+            			public void onClick(DialogInterface dialog, int id) {
+            				// User clicked OK button
+            			}
+            		})
+            		.create()
+            		.show();
+            }
+		} catch (NameNotFoundException e) {
+			// this can't happen
+		}
 
         prefs.registerOnSharedPreferenceChangeListener(this);
 
