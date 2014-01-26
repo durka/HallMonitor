@@ -30,7 +30,14 @@
 	        android:key="pref_phone_controls_user"
 	        android:title="@string/pref_phone_screen"
 	        android:summary="@string/pref_phone_screen_summary"
+	        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader"
 	        android:defaultValue="false">
+	        <extra
+	            android:name="resource"
+	            android:value="preferences_phone" />
+	        <extra
+	            android:name="title"
+	            android:value="@string/pref_phone_screen_title" />
 	    </org.durka.hallmonitor.PreferenceSwitchable>
 	    
 </PreferenceScreen>
