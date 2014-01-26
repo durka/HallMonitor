@@ -82,6 +82,7 @@ public class Functions {
 	public static Configuration configurationActivity;
 	
 	private static boolean notification_settings_ongoing = false;
+	public static boolean widget_settings_ongoing = false;
 	
 	/**
 	 * Provides methods for performing actions. (e.g. what to do when the cover is opened and closed etc.)
@@ -271,7 +272,11 @@ public class Functions {
 			
 			Log.d("F.Act.register_widget", "Register widget called for type: " + widgetType);
 			//hand off to the HM App Widget Manager for processing
-			hmAppWidgetManager.register_widget(act, widgetType);
+			if (widget_settings_ongoing) {
+				Log.d("F.Act.register_widget", "skipping, already inflight");
+			} else {
+				hmAppWidgetManager.register_widget(act, widgetType);
+			}
 		}
 		
 		/**
@@ -499,6 +504,7 @@ public class Functions {
 				//call back for appwidget pick	
 			case REQUEST_PICK_APPWIDGET:
 				//widget picked
+				widget_settings_ongoing = false;
 				if (result == Activity.RESULT_OK) {
 					//widget chosen so launch configurator
 					hmAppWidgetManager.configureWidget(data, ctx);
@@ -517,6 +523,7 @@ public class Functions {
 				break;		
 			//call back for appwidget configure
 			case REQUEST_CONFIGURE_APPWIDGET:
+				widget_settings_ongoing = false;
 				//widget configured
 				if (result == Activity.RESULT_OK) {
 					//widget configured successfully so create it

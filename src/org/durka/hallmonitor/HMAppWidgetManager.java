@@ -72,6 +72,7 @@ public class HMAppWidgetManager {
 	    currentWidgetType = widgetType;
 	    
 	    //kick off the widget picker, the call back will be picked up in Functions.Events
+	    Functions.widget_settings_ongoing = true;
 	    act.startActivityForResult(pickIntent, Functions.REQUEST_PICK_APPWIDGET);
 		
 	}
@@ -100,6 +101,7 @@ public class HMAppWidgetManager {
 	        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
 	        intent.setComponent(appWidgetInfo.configure);
 	        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+	        Functions.widget_settings_ongoing = true;
 	        ((Activity)ctx).startActivityForResult(intent, Functions.REQUEST_CONFIGURE_APPWIDGET);
 	    } else {
 	    	
