@@ -104,6 +104,8 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
 
         SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
 
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
         prefs.edit()
             .putBoolean("pref_enabled", Functions.Is.service_running(getActivity(), ViewCoverService.class))
             .putBoolean("pref_do_notifications", Functions.Is.service_running(getActivity(), NotificationService.class))
@@ -115,7 +117,6 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         enablePhoneScreen(prefs);
         updatePhoneControlTtsDelay(prefs);
         
-        prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
