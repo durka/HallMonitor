@@ -1,3 +1,14 @@
+- 0.1
+	- Features
+		- Replacement lock screen!
+			- Configurable display with clock or widget
+			- Shows notifications on lock screen
+			- Touchscreen works through cover
+			- Alarm clock, camera, flashlight controls
+			- Phone answering (TTS coming soon)
+		- Redesigned and reorganized preference screen
+	- Fixes
+		- Too many to count
 - 0.0.2a
     - Features
         - Release checklist

@@ -85,10 +85,14 @@
     <string name="pref_default_fgcolor">Foreground color</string>
     <string name="pref_default_fgcolor_summary">Text color for the clock you will see through the closed cover</string>
     
+    <!-- version upgrade dialog -->
+    <string name="firstrun_message">I see you\'ve upgraded to version %s! Be sure to click on everything, there are tons of new features.</string>
+    <string name="firstrun_ok">OK</string>
+    
     <!-- random strings -->
     <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
     <string name="pref_about">About Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor version 0.0.2a.\nCopyright 2013 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor version 0.1.\nCopyright 2014 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Settings</string>
     <string name="pref_preview">Preview</string>
     <string name="pref_test">Test</string>

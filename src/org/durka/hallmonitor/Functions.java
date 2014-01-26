@@ -81,6 +81,9 @@ public class Functions {
 	public static DefaultActivity defaultActivity;
 	public static Configuration configurationActivity;
 	
+	private static boolean notification_settings_ongoing = false;
+	public static boolean widget_settings_ongoing = false;
+	
 	/**
 	 * Provides methods for performing actions. (e.g. what to do when the cover is opened and closed etc.)
 	 */
@@ -189,18 +192,12 @@ public class Functions {
 			if (configurationActivity != null) configurationActivity.moveTaskToBack(true);
 	        //we also don't want to see the default activity
 	        if (defaultActivity != null)  defaultActivity.moveTaskToBack(true);
-	        
-			//needed to let us wake the screen
-			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
 			
 			// step 1: if we were going to turn the screen off, cancel that
 			if (timerTask != null) timerTask.cancel();
 			
 			// step 2: wake the screen
-			//FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
-			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
-	        wl.acquire();
-	        wl.release();
+			Util.rise_and_shine(ctx);
 			
 			//save the cover state
 			Events.set_cover(false);
@@ -254,10 +251,12 @@ public class Functions {
 		
 		public static void do_notifications(Activity act, boolean enable) {
 			
-			if (enable && !Is.service_running(act, NotificationService.class)) {
+			if (enable && !notification_settings_ongoing && !Is.service_running(act, NotificationService.class)) {
+				notification_settings_ongoing = true;
 				Toast.makeText(act, act.getString(R.string.notif_please_check), Toast.LENGTH_SHORT).show();
 				act.startActivityForResult(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), NOTIFICATION_LISTENER_ON);
-			} else if (!enable && Is.service_running(act, NotificationService.class)) {
+			} else if (!enable && !notification_settings_ongoing && Is.service_running(act, NotificationService.class)) {
+				notification_settings_ongoing = true;
 				Toast.makeText(act, act.getString(R.string.notif_please_uncheck), Toast.LENGTH_SHORT).show();
 				act.startActivityForResult(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"), NOTIFICATION_LISTENER_OFF);
 			}
@@ -273,7 +272,11 @@ public class Functions {
 			
 			Log.d("F.Act.register_widget", "Register widget called for type: " + widgetType);
 			//hand off to the HM App Widget Manager for processing
-			hmAppWidgetManager.register_widget(act, widgetType);
+			if (widget_settings_ongoing) {
+				Log.d("F.Act.register_widget", "skipping, already inflight");
+			} else {
+				hmAppWidgetManager.register_widget(act, widgetType);
+			}
 		}
 		
 		/**
@@ -501,6 +504,7 @@ public class Functions {
 				//call back for appwidget pick	
 			case REQUEST_PICK_APPWIDGET:
 				//widget picked
+				widget_settings_ongoing = false;
 				if (result == Activity.RESULT_OK) {
 					//widget chosen so launch configurator
 					hmAppWidgetManager.configureWidget(data, ctx);
@@ -519,6 +523,7 @@ public class Functions {
 				break;		
 			//call back for appwidget configure
 			case REQUEST_CONFIGURE_APPWIDGET:
+				widget_settings_ongoing = false;
 				//widget configured
 				if (result == Activity.RESULT_OK) {
 					//widget configured successfully so create it
@@ -542,6 +547,7 @@ public class Functions {
 			
 			case NOTIFICATION_LISTENER_ON:
 				Log.d("F-oAR", "return from checking the box");
+				notification_settings_ongoing = false;
 				if (!Functions.Is.service_running(ctx, NotificationService.class)) {
                 	Toast.makeText(ctx, ctx.getString(R.string.notif_left_unchecked), Toast.LENGTH_SHORT).show();
                 	PreferenceManager.getDefaultSharedPreferences(ctx)
@@ -552,6 +558,7 @@ public class Functions {
 				break;
 			case NOTIFICATION_LISTENER_OFF:
 				Log.d("F-oAR", "return from unchecking the box");
+				notification_settings_ongoing = false;
 				if (Functions.Is.service_running(ctx, NotificationService.class)) {
                 	Toast.makeText(ctx, ctx.getString(R.string.notif_left_checked), Toast.LENGTH_SHORT).show();
                 	PreferenceManager.getDefaultSharedPreferences(ctx)
@@ -667,6 +674,7 @@ public class Functions {
 						intent.setAction(Intent.ACTION_MAIN);
 						ctx.startActivity(intent);
 
+						Util.rise_and_shine(ctx); // make sure the screen is on
 					}
 				}, 500);
 				
@@ -809,6 +817,15 @@ public class Functions {
 
 		    Log.d("phone", "...result is " + name);
 		    return name;
+		}
+
+		public static void rise_and_shine(Context ctx) {
+			//FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
+			Log.d("F.Util.rs", "aww why can't I hit snooze");
+			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
+	        wl.acquire();
+	        wl.release();
 		}
 	}
 

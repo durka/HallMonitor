@@ -46,7 +46,6 @@ public class HMAppWidgetManager {
 	public void register_widget(Activity act, String widgetType) {
 	
 		Log.d("HMAWM.register_widget","Register widget called with type: " + widgetType);
-		new Exception().printStackTrace();
 		
 		//if we haven't yet created an app widget manager and app widget host instance then do so
 		if (mAppWidgetManager == null) mAppWidgetManager = AppWidgetManager.getInstance(act);
@@ -72,10 +71,11 @@ public class HMAppWidgetManager {
 	    currentWidgetType = widgetType;
 	    
 	    //kick off the widget picker, the call back will be picked up in Functions.Events
+	    Functions.widget_settings_ongoing = true;
 	    act.startActivityForResult(pickIntent, Functions.REQUEST_PICK_APPWIDGET);
 		
 	}
-   
+    
 	/**
 	 * Launch into configuration dialog if required
 	 * @param data Intent payload, needed for getting app widget id
@@ -100,6 +100,7 @@ public class HMAppWidgetManager {
 	        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
 	        intent.setComponent(appWidgetInfo.configure);
 	        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+	        Functions.widget_settings_ongoing = true;
 	        ((Activity)ctx).startActivityForResult(intent, Functions.REQUEST_CONFIGURE_APPWIDGET);
 	    } else {
 	    	

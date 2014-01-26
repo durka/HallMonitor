@@ -129,7 +129,7 @@ public class PreferenceSwitchable extends Preference {
     @Override
     public void onDependencyChanged(Preference dependency, boolean disableDependent) {
     	Log.d(LOG_TAG, getTitle() + " oDP from " + dependency.getTitle() + ", dD=" + disableDependent);
-    	setChecked(!disableDependent);
+    	
     	setEnabled(!disableDependent);
     }
 
