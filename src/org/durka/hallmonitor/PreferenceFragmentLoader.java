@@ -62,7 +62,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
 
             // debug
             mDebug = getPreferenceManager().getSharedPreferences().getBoolean("pref_dev_opts_debug", mDebug);
-            if (mDebug)
+            if (mDebug && findPreference("pref_about") != null)
                 Toast.makeText(getActivity(), "debug is enabled!", Toast.LENGTH_LONG).show();
 
             final int resourceId = context.getResources().getIdentifier(resourceName, "xml", context.getPackageName());
@@ -221,9 +221,6 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                     // if "whoami" doesn't work, refuse to set preference
                     Toast.makeText(getActivity(), "Root access not granted - cannot enable root features!", Toast.LENGTH_SHORT).show();
                     prefs.edit().putBoolean(key, false).commit();
-
-                    // check
-                    setCheckedPreferenceSwitchable(key, false);
                 }
             }
 
@@ -268,12 +265,6 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
             phoneControl.setEnabled(phoneControlState);
         if (phoneControlConfig != (phoneControlState && prefs.getBoolean("pref_phone_controls_user", false)))
             prefs.edit().putBoolean("pref_phone_controls", !phoneControlConfig).commit();
-    }
-
-    private void setCheckedPreferenceSwitchable(String key, boolean checked) {
-        Preference preference = findPreference(key);
-        if (preference != null && PreferenceSwitchable.class.isAssignableFrom(preference.getClass()))
-            ((PreferenceSwitchable)preference).setChecked(checked);
     }
 
     private void Log_d(String tag, String message) {
