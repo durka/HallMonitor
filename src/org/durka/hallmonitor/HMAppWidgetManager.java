@@ -46,7 +46,6 @@ public class HMAppWidgetManager {
 	public void register_widget(Activity act, String widgetType) {
 	
 		Log.d("HMAWM.register_widget","Register widget called with type: " + widgetType);
-		new Exception().printStackTrace();
 		
 		//if we haven't yet created an app widget manager and app widget host instance then do so
 		if (mAppWidgetManager == null) mAppWidgetManager = AppWidgetManager.getInstance(act);
@@ -76,7 +75,7 @@ public class HMAppWidgetManager {
 	    act.startActivityForResult(pickIntent, Functions.REQUEST_PICK_APPWIDGET);
 		
 	}
-   
+    
 	/**
 	 * Launch into configuration dialog if required
 	 * @param data Intent payload, needed for getting app widget id
