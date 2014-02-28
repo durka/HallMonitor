@@ -51,7 +51,7 @@
 	        android:value="preferences_widgets" />
 	    <extra
 	        android:name="title"
-	        android:value="@string/pref_optional" />
+	        android:value="@string/pref_widgets" />
     
     </PreferenceScreen>
     
