@@ -32,6 +32,7 @@ import android.provider.ContactsContract;
 import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -439,6 +440,49 @@ public class DefaultActivity extends Activity {
 		super.onDestroy();
 		//tidy up our receiver when we are destroyed
 		unregisterReceiver(receiver);
+	}
+	
+	@Override
+	public boolean onKeyDown(int code, KeyEvent evt) {
+		// disable back and menu buttons
+		Log.d("DA-oKD", "key down " + code);
+		switch (code)
+		{
+		case KeyEvent.KEYCODE_BACK:
+		case KeyEvent.KEYCODE_MENU:
+			evt.startTracking(); // catch long presses as well
+			return true;
+		default:
+			return super.onKeyDown(code, evt);
+		}
+	}
+	
+	@Override
+	public boolean onKeyLongPress(int code, KeyEvent evt) {
+		// disable back and menu buttons
+		Log.d("DA-oKLP", "key long press " + code);
+		switch (code)
+		{
+		case KeyEvent.KEYCODE_BACK:
+		case KeyEvent.KEYCODE_MENU:
+			return true;
+		default:
+			return super.onKeyLongPress(code, evt);
+		}
+	}
+	
+	@Override
+	public boolean onKeyUp(int code, KeyEvent evt) {
+		// disable back and menu buttons
+		Log.d("DA-oKU", "key up " + code);
+		switch (code)
+		{
+		case KeyEvent.KEYCODE_BACK:
+		case KeyEvent.KEYCODE_MENU:
+			return true;
+		default:
+			return super.onKeyUp(code, evt);
+		}
 	}
 
     public static boolean isDebug() {
