@@ -27,5 +27,11 @@
         android:title="@string/pref_default_fgcolor"
         android:summary="@string/pref_default_fgcolor_summary"
         android:defaultValue="0xFF33B5E5" />
+    
+    <CheckBoxPreference
+        android:key="pref_keep_admin"
+        android:title="@string/pref_keep_admin"
+        android:summary="@string/pref_keep_admin_summary"
+        android:defaultValue="false" />
 
 </PreferenceScreen>

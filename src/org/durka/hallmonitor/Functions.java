@@ -229,6 +229,9 @@ public class Functions {
 				coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, me);
 				coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, act.getString(R.string.admin_excuse));
 				act.startActivityForResult(coup, DEVICE_ADMIN_WAITING);
+			} else {
+				// we were already admin, just start the service
+				act.startService(new Intent(act, ViewCoverService.class));
 			}
 		}
 		
@@ -243,10 +246,12 @@ public class Functions {
 			ctx.stopService(new Intent(ctx, ViewCoverService.class));
 			ctx.stopService(new Intent(ctx, NotificationService.class));
 			
-			// Relinquish device admin
-			DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
-			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
-			if (dpm.isAdminActive(me)) dpm.removeActiveAdmin(me);
+			// Relinquish device admin (unless asked not to)
+			if (!PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_keep_admin", false)) {
+				DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
+				ComponentName me = new ComponentName(ctx, AdminReceiver.class);
+				if (dpm.isAdminActive(me)) dpm.removeActiveAdmin(me);
+			}
 		}
 		
 		public static void do_notifications(Activity act, boolean enable) {
