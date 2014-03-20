@@ -52,13 +52,6 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		
 		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_NORMAL);
 		
-		Log.d("VCS-oSC", "scanning keyboards...");
-		InputManager im = (InputManager) getSystemService(INPUT_SERVICE);
-		for (int id : im.getInputDeviceIds()) {
-			InputDevice dev = im.getInputDevice(id);
-			Log.d("VCS-oSC", "\t" + dev.toString());
-		}
-		
 		mHeadset = new HeadsetReceiver();
 		IntentFilter intfil = new IntentFilter();
 		intfil.addAction("android.intent.action.HEADSET_PLUG");
