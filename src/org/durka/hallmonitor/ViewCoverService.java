@@ -18,8 +18,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -56,6 +58,37 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		IntentFilter intfil = new IntentFilter();
 		intfil.addAction("android.intent.action.HEADSET_PLUG");
 		registerReceiver(mHeadset, intfil);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if (prefs.getBoolean("pref_default_widget", false)
+				&& !Functions.hmAppWidgetManager.doesWidgetExist("default")) {
+			
+			int id = prefs.getInt("default_widget_id", -1);
+			if (id != -1) {
+				Log.d("VCS-oSC", "creating default widget with id=" + id);
+				
+				Intent data = new Intent();
+				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
+				
+				Functions.hmAppWidgetManager.currentWidgetType = "default";
+				Functions.hmAppWidgetManager.createWidget(data, this);
+			}
+		}
+		if (prefs.getBoolean("pref_default_widget", false)
+				&& !Functions.hmAppWidgetManager.doesWidgetExist("media")) {
+			
+			int id = prefs.getInt("media_widget_id", -1);
+			if (id != -1) {
+				Log.d("VCS-oSC", "creating media widget with id=" + id);
+				
+				Intent data = new Intent();
+				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
+				
+				Functions.hmAppWidgetManager.currentWidgetType = "media";
+				Functions.hmAppWidgetManager.createWidget(data, this);
+			}
+		}
+		
 
 		return START_STICKY;
 	}

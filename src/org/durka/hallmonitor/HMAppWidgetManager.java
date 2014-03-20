@@ -11,6 +11,7 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -52,7 +53,10 @@ public class HMAppWidgetManager {
 		if (mAppWidgetHost == null) mAppWidgetHost = new AppWidgetHost(act, R.id.APPWIDGET_HOST_ID);
 		
 		//get an id for our app widget
-		int appWidgetId = mAppWidgetHost.allocateAppWidgetId();	
+		int appWidgetId = mAppWidgetHost.allocateAppWidgetId();
+		PreferenceManager.getDefaultSharedPreferences(act).edit()
+			.putInt(widgetType + "_widget_id", appWidgetId)
+			.commit();
 		
 		Log.d("HMAWM.register_widget","appWidgetId allocated: " + appWidgetId);
 				
@@ -123,6 +127,11 @@ public class HMAppWidgetManager {
 	    int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
 	    
 	    Log.d("HMAWM.createWidget","Create widget called with id: " + appWidgetId);
+	    
+	    //FIXME put this in the constructor??
+	    //if we haven't yet created an app widget manager and app widget host instance then do so
+	  	if (mAppWidgetManager == null) mAppWidgetManager = AppWidgetManager.getInstance(ctx);
+	  	if (mAppWidgetHost == null) mAppWidgetHost = new AppWidgetHost(ctx, R.id.APPWIDGET_HOST_ID);
 	    
 	    //use the app widget id to get the app widget info
 	    AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
