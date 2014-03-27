@@ -1,3 +1,15 @@
+- 0.2
+	- Features
+		- Option to stay on as Device Administrator when disabled
+			- This may be useful in conjunction with e.g. Tasker
+		- Added instructional text at top of main screen
+		- When cover is closed, disable longpress-back (can't disable longpress-menu)
+	- Fixes
+		- Only display "First run" dialog box if old_version < 0.1 && new_version >= 0.1
+		- Removed unnecessary CALL_PHONE permission
+		- Widget settings screen now has the right title
+		- Widget settings now persist across reboot
+		- Confusing settings button is gone from main screen
 - 0.1
 	- Features
 		- Replacement lock screen!
