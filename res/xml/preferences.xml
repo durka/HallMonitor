@@ -18,6 +18,12 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:robobunny="http://robobunny.com" >
+                  
+    <Preference
+        android:key="pref_instructions"
+        android:title="@string/pref_instructions"
+        android:summary="@string/pref_instructions_summary"
+        android:selectable="false" />
     
     <org.durka.hallmonitor.PreferenceSwitchable
         android:key="pref_enabled"
