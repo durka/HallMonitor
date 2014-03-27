@@ -114,13 +114,16 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         	
         	Log.d(LOG_TAG, "versionCode = " + info.versionCode);
         	
-        	if (prefs.getInt("version", 3) < info.versionCode) {
+        	int old_version = prefs.getInt("version", 3);
+        	if (old_version < info.versionCode) {
             	prefs.edit()
             		.putInt("version", info.versionCode)
             		.commit();
             	
             	Log.d(LOG_TAG, "stored version code");
-            	
+        	}
+            
+        	if (old_version < 5) {
             	new AlertDialog.Builder(act)
             		.setMessage(String.format(getResources().getString(R.string.firstrun_message), info.versionName))
             		.setPositiveButton(R.string.firstrun_ok, new DialogInterface.OnClickListener() {
