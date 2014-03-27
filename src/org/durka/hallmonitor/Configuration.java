@@ -47,13 +47,6 @@ public class Configuration extends PreferenceActivity {
 
         getFragmentManager().beginTransaction().replace(android.R.id.content, preferenceFragment).commit();
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.configuration, menu);
-		return true;
-	}
 	
 	@Override
 	public void onActivityResult(int request, int result, Intent data) {
