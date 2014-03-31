@@ -1,3 +1,9 @@
+- 0.2.1
+	- Fixes
+		- Root features could not be enabled on some phones
+			- No need to update if Hall Monitor is working for you
+	- Notes
+		- Root features (still) may not work with XPrivacy enabled
 - 0.2
 	- Features
 		- Option to stay on as Device Administrator when disabled
