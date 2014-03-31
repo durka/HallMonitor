@@ -215,7 +215,9 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         } else if (key.equals("pref_runasroot")) {
 
             if (prefs.getBoolean(key, false)) {
-                if (!Functions.Actions.run_commands_as_root(new String[]{"whoami"}).equals("root")) {
+            	String output = Functions.Actions.run_commands_as_root(new String[]{"whoami"});
+            	// if we have root, "whoami" either returns "root" on stdout, or "whoami: unknown uid 0" on stderr
+                if (!output.equals("root") && !output.equals("whoami: unknown uid 0")) {
                     // if "whoami" doesn't work, refuse to set preference
                     Toast.makeText(getActivity(), "Root access not granted - cannot enable root features!", Toast.LENGTH_SHORT).show();
                     prefs.edit().putBoolean(key, false).commit();

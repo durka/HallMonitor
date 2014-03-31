@@ -297,12 +297,13 @@ public class Functions {
 		}
 		
 		
+		public static String run_commands_as_root(String[] cmds) { return run_commands_as_root(cmds, true); }
+		
 		/**
 		 * Execute shell commands
 		 * @param cmds Commands to execute
+		 * @param want_output If true, attach to the 'su' binary's stdout and stderr streams, and return anything printed to stdout (if the exit status is nonzero, returns stderr instead)
 		 */
-		public static String run_commands_as_root(String[] cmds) { return run_commands_as_root(cmds, true); }
-		
 		public static String run_commands_as_root(String[] cmds, boolean want_output) {
 	        try {
 	        	Process p = Runtime.getRuntime().exec("su");
@@ -345,14 +346,22 @@ public class Functions {
 		            }	           
 		            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
 		            
-		            return output.trim();
+		            p.waitFor();
+		            if (p.exitValue() == 0) {
+		            	return output.trim();
+		            } else {
+		            	return error.trim();
+		            }
 	            }
 	            return "";
 
 	        } catch (IOException ioe) {
 	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
 	        	return "";
-	        }
+	        } catch (InterruptedException iee) {
+				Log.e("F.Act.run_comm_as_root", "Command interrupt!", iee);
+				return "";
+			}
 		}
 
 
