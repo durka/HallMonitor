@@ -87,6 +87,7 @@
             android:name="org.durka.hallmonitor.DefaultActivity"
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTask"
             android:theme="@style/FullscreenTheme"
             android:noHistory="true" >
         </activity>

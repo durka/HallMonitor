@@ -180,9 +180,6 @@ public class DefaultActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//get the audio manager
-		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-
 		//pass a reference back to the Functions class so it can finish us when it wants to
 		//FIXME Presumably there is a better way to do this
 		Functions.defaultActivity = this;
@@ -197,6 +194,9 @@ public class DefaultActivity extends Activity {
 
 		//set default view
 		setContentView(R.layout.activity_default);
+		
+		//get the audio manager
+		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
 		//add screen on and alarm fired intent receiver
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
