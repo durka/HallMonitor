@@ -1,3 +1,6 @@
+- 0.2.2
+	- Fixes
+		- (#37) Last used app no longer shows up randomly
 - 0.2.1
 	- Fixes
 		- Root features could not be enabled on some phones
