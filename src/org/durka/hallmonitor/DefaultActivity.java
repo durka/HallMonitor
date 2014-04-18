@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.durka.hallmonitor.Functions.Util;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
@@ -95,7 +96,9 @@ public class DefaultActivity extends Activity {
 					Log.d("DA.onReceive", "Cover is open, stopping Default Activity.");
 
 					// when the cover opens, the fullscreen activity goes poof				
-					moveTaskToBack(true);
+					//Log.d("DA.onReceive", "Current task: " + ((ActivityManager)getSystemService(ACTIVITY_SERVICE)).getRunningTasks(1).get(0).topActivity.getPackageName());
+					//moveTaskToBack(true);
+					finish();
 				}
 
 			} else if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
