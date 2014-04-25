@@ -27,6 +27,7 @@ Others have tested this under the following configuration(s):
 - _[Mostly working]_ S4 Exynos octacore international (GT-I9500), unofficial CyanogenMod 10.2 and 11
 - _[Mostly working]_ S4 mini international (serranoltexx / GT-I9195), CyanogenMod 10.2
 - S4 mega, CyanogenMod (unknown carrier/version)
+- Note 3 (SM-N9005), CyanogenMod 11
 
 If you test this on something other than the above (including another carrier's S4) and it works, please let me know! You can contact me at [android@alexburka.com](mailto:android@alexburka.com). If it doesn't work, please file an issue here. But no promises, because I can't really do tech support for devices I don't own.
 
