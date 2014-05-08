@@ -74,7 +74,8 @@ public class Functions {
     //this action will let us toggle the flashlight
     public static final String TOGGLE_FLASHLIGHT = "net.cactii.flash2.TOGGLE_FLASHLIGHT";
 
-    private static final String DEV_SERRANO_LTE = "serranolte"; // GT-I9195
+    private static final String DEV_SERRANO_LTE_CM10 = "serranolte"; 	// GT-I9195 CM10.x
+    private static final String DEV_SERRANO_LTE_CM11 = "serranoltexx"; 	// GT-I9195 CM11.x
 	
 	//Class that handles interaction with 3rd party App Widgets
 	public static final HMAppWidgetManager hmAppWidgetManager = new HMAppWidgetManager();
@@ -125,7 +126,7 @@ public class Functions {
 			 if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
                  Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
 
-                 if (Build.DEVICE.equals(DEV_SERRANO_LTE)) {
+                 if (Build.DEVICE.equals(DEV_SERRANO_LTE_10) || Build.DEVICE.equals(DEV_SERRANO_LTE_11)) {
                      run_commands_as_root(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
                  } else // others devices
                      run_commands_as_root(new String[]{"echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd"});
