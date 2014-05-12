@@ -126,7 +126,7 @@ public class Functions {
 			 if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
                  Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
 
-                 if (Build.DEVICE.equals(DEV_SERRANO_LTE_10) || Build.DEVICE.equals(DEV_SERRANO_LTE_11)) {
+                 if (Build.DEVICE.equals(DEV_SERRANO_LTE_CM10) || Build.DEVICE.equals(DEV_SERRANO_LTE_CM11)) {
                      run_commands_as_root(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
                  } else // others devices
                      run_commands_as_root(new String[]{"echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd"});
