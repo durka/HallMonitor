@@ -76,11 +76,11 @@
 	    
 	</PreferenceScreen>
 
-    <!-- spacer -->
     <Preference
-        android:title=""
-        android:summary=""
-        android:enabled="false" />
+        android:title="@string/pref_security_settings"
+        android:summary="@string/pref_security_settings_summary">
+        <intent android:action="android.settings.SECURITY_SETTINGS" />
+    </Preference>
     
     <Preference
         android:key="pref_about"

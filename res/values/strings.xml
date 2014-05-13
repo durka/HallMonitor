@@ -90,6 +90,9 @@
     <string name="pref_default_fgcolor">Foreground color</string>
     <string name="pref_default_fgcolor_summary">Text color for the clock you will see through the closed cover</string>
     
+    <string name="pref_security_settings">Screen Lock Settings</string>
+    <string name="pref_security_settings_summary">Shortcut to Android screen lock settings</string>
+    
     <string name="pref_about">About Hall Monitor</string>
 	<string name="pref_about_summary">Hall Monitor version 0.2.2.\nCopyright 2014 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Settings</string>
