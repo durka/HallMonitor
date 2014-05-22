@@ -1,3 +1,12 @@
+- 0.3.0
+	- Features
+		- Add real Hall Event
+		- Root is now a requirement
+	- Remove
+		- Proximity sensor use
+	- Notes
+		- Next version add settings to choose between Proximity sensor or Hall Event?
+
 - 0.2.2
 	- Fixes
 		- (#37) Last used app no longer shows up randomly

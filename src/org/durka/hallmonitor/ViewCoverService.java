@@ -14,29 +14,26 @@
  */
 package org.durka.hallmonitor;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.lang.Thread;
 
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.hardware.input.InputManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.InputDevice;
 
+import com.manusfreedom.android.Events;
+import com.manusfreedom.android.Events.InputDevice;
+import net.pocketmagic.android.eventinjector.Shell;
 
-public class ViewCoverService extends Service implements SensorEventListener {
+public class ViewCoverService extends Service implements Runnable {
 	
-	private SensorManager       mSensorManager;
 	private HeadsetReceiver		mHeadset;
+	private Thread				getevent;
+	private Boolean				serviceStarted;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -49,10 +46,6 @@ public class ViewCoverService extends Service implements SensorEventListener {
 		} else {
 			Functions.Actions.open_cover(this);
 		} */
-		
-		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		
-		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_NORMAL);
 		
 		mHeadset = new HeadsetReceiver();
 		IntentFilter intfil = new IntentFilter();
@@ -88,9 +81,81 @@ public class ViewCoverService extends Service implements SensorEventListener {
 				Functions.hmAppWidgetManager.createWidget(data, this);
 			}
 		}
+		serviceStarted = true;
 		
+		getevent = new Thread(this);
+		getevent.start();
 
 		return START_STICKY;
+	}
+	
+	@Override
+	public void run() {
+		String neededDevice = "gpio-keys";
+		Events events = new Events();
+		Log.d("VCS-oSC", "Request root");
+		Shell.isSuAvailable();
+		
+		events.AddAllDevices();
+		String neededDevicePath = "";
+
+		Log.e("VCS-oSC", "Number of device found:" + events.m_Devs.size());
+
+		Log.d("VCS-oSC", "Scan device");
+		for (InputDevice idev:events.m_Devs) {
+			if(!idev.getOpen())
+				idev.Open(true);
+			if(idev.getOpen()) {
+				Log.d("VCS-oSC", " Open: " + idev.getPath() + " / Name: " + idev.getName() + " / Version: " + idev.getVersion() + " / Location: " + idev.getLocation() + " / IdStr: " + idev.getIdStr() + " / Result: " + idev.getOpen());
+				if(idev.getName().equals(neededDevice)){
+					Log.d("VCS-oSC", "Device " + neededDevice + " found");
+					neededDevicePath = idev.getPath();
+					break;
+				}
+			}
+		}
+		events.Release();
+		events = null;
+		System.gc();
+		
+		events = new Events();
+		events.AddDevice(neededDevicePath);
+
+		Log.e("VCS-oSC", "Number of device found:" + events.m_Devs.size());
+		
+		InputDevice currentInputDevice = null;
+		for (InputDevice idev:events.m_Devs) {
+			if(!idev.getOpen())
+				idev.Open(true);
+			currentInputDevice = idev;
+			Log.d("VCS-oSC", "Open: " + currentInputDevice.getPath() + " / Name: " + currentInputDevice.getName() + " / Version: " + currentInputDevice.getVersion() + " / Location: " + currentInputDevice.getLocation() + " / IdStr: " + currentInputDevice.getIdStr() + " / Result: " + currentInputDevice.getOpen());				
+		}
+		
+		if(currentInputDevice == null)
+		{
+			Log.d("VCS-oSC", "No device");
+			return;
+		}				
+
+		Log.d("VCS-oSC", "Start read command");
+		while (serviceStarted) {
+			if(currentInputDevice.getOpen() && (0 == currentInputDevice.getPollingEvent())) {
+				Log.d("VCS-oSC", "Reading command: " + currentInputDevice.getSuccessfulPollingType() + "/" + currentInputDevice.getSuccessfulPollingCode() + "/" + currentInputDevice.getSuccessfulPollingValue());
+				if(currentInputDevice.getSuccessfulPollingCode() == 21 && currentInputDevice.getSuccessfulPollingValue() == 0){					
+					Log.i("VCS-oSC", "Cover closed");
+					Functions.Actions.close_cover(this);
+				}
+				else if(currentInputDevice.getSuccessfulPollingCode() == 21 && currentInputDevice.getSuccessfulPollingValue() == 1){
+					Log.i("VCS-oSC", "Cover open");
+					Functions.Actions.open_cover(this);
+				}
+			}
+		}
+		Log.d("VCS-oSC", "Stop read command");
+		events.Release();
+		events = null;
+		Log.d("VCS-oSC", "Memory cleaned");
+		System.gc();
 	}
 	
 	@Override
@@ -101,44 +166,9 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	@Override
 	public void onDestroy() {
 		Log.d("VCS.onStartCommand", "View cover service stopped");
-		
-		//unregisterReceiver(receiver);
-		mSensorManager.unregisterListener(this);
-		
+		serviceStarted = false;
 		unregisterReceiver(mHeadset);
-	}
-
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// I don't care
-		Log.d("VCS.onAccuracyChanged", "OnAccuracyChanged: Sensor=" + sensor.getName() + ", accuracy=" + accuracy);
-	}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		
-		if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {	
-			Log.d("VCS.onSensorChanged", "Proximity sensor changed, value=" + event.values[0]);
-			Functions.Events.proximity(this, event.values[0]);
-			
-			//improve reliability by refiring the event 200ms afterwards
-			final float val = event.values[0];
-			Timer timer = new Timer();
-			timer.schedule(new TimerTask() {
-				@Override
-				public void run() {	
-					Functions.Events.proximity(getApplicationContext(), val);
-				}
-			}, 200);
-			
-			timer.schedule(new TimerTask() {
-				@Override
-				public void run() {	
-					Functions.Events.proximity(getApplicationContext(), val);
-				}
-			}, 500);
-			
-		}
+		System.gc();
 	}
 
 }
