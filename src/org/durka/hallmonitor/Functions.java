@@ -180,7 +180,7 @@ public class Functions {
 		}
 		
 		/**
-		 * Called from within the Functions.Event.Proximity method.
+		 * Called from within the ViewCoverService.run method.
          * If we are running root enabled reverts the screen sensitivity.
          * Wakes the screen up.
          * @param ctx Application context.
@@ -629,33 +629,6 @@ public class Functions {
 		}
 		
 		
-		/**
-		 * Receives the value of the proximity sensor and reacts accordingly to update the cover state.
-		 * @param ctx Application context.
-		 * @param value Value of the proximity sensor.
-		 */
-		public static void proximity(Context ctx, float value) {
-			
-			Log.d("F.Evt.proximity", "Proximity method called with value: " + value + " ,whilst cover_closed is: " + cover_closed);
-			
-			if (value > 0) {
-				if (cover_closed) {
-					if (!Functions.Is.cover_closed(ctx)) {
-						//proximity false (>0) and cover open - take open_cover action
-						Actions.open_cover(ctx);
-					}
-				}
-			} else {
-				if (!cover_closed) {
-					if (Functions.Is.cover_closed(ctx)) {
-						//proximity true (<=0) and cover closed - take close_cover action
-						Actions.close_cover(ctx);
-					}
-				}
-			}
-			//Log.d(ctx.getString(R.string.app_name), String.format("cover_closed = %b", cover_closed));
-		}
-
 		public static void headset(final Context ctx, int state) {
 			if (state != 0) {
 				// headset was just inserted
