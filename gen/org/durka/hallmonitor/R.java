@@ -138,40 +138,41 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
     }
     public static final class id {
         public static final int APPWIDGET_HOST_ID=0x7f080000;
-        public static final int action_settings=0x7f080022;
-        public static final int button_check=0x7f08001d;
-        public static final int button_start=0x7f08001e;
-        public static final int button_stop=0x7f08001f;
-        public static final int call_from=0x7f080012;
-        public static final int camerabutton=0x7f08001b;
+        public static final int action_settings=0x7f080023;
+        public static final int button_check=0x7f08001e;
+        public static final int button_start=0x7f08001f;
+        public static final int button_stop=0x7f080020;
+        public static final int call_from=0x7f080013;
+        public static final int camerabutton=0x7f08001c;
         public static final int color_panel_new=0x7f080003;
         public static final int color_panel_old=0x7f080002;
         public static final int color_picker_view=0x7f080001;
         public static final int configfrag=0x7f080006;
-        public static final int default_battery_percent=0x7f080017;
-        public static final int default_battery_picture=0x7f080018;
-        public static final int default_camera=0x7f080009;
-        public static final int default_camera_back=0x7f08000b;
-        public static final int default_camera_capture=0x7f08000a;
-        public static final int default_content=0x7f080007;
-        public static final int default_content_alarm=0x7f08000c;
-        public static final int default_content_camera=0x7f080008;
-        public static final int default_content_normal=0x7f080013;
-        public static final int default_content_phone=0x7f08000f;
-        public static final int default_icon_container=0x7f080019;
-        public static final int default_text_clock=0x7f080016;
-        public static final int default_widget=0x7f080014;
-        public static final int default_widget_area=0x7f080015;
+        public static final int default_battery_percent=0x7f080018;
+        public static final int default_battery_picture=0x7f080019;
+        public static final int default_camera=0x7f08000a;
+        public static final int default_camera_back=0x7f08000c;
+        public static final int default_camera_capture=0x7f08000b;
+        public static final int default_content=0x7f080008;
+        public static final int default_content_alarm=0x7f08000d;
+        public static final int default_content_camera=0x7f080009;
+        public static final int default_content_normal=0x7f080014;
+        public static final int default_content_phone=0x7f080010;
+        public static final int default_icon_container=0x7f08001a;
+        public static final int default_main=0x7f080007;
+        public static final int default_text_clock=0x7f080017;
+        public static final int default_widget=0x7f080015;
+        public static final int default_widget_area=0x7f080016;
         public static final int dialog_color_picker_extra_layout_landscape=0x7f080005;
-        public static final int dismissbutton=0x7f08000e;
-        public static final int hangup_button=0x7f080010;
-        public static final int pager=0x7f08001c;
-        public static final int pickup_button=0x7f080011;
-        public static final int prefEnableSwitch=0x7f080021;
-        public static final int preference_phone=0x7f080020;
+        public static final int dismissbutton=0x7f08000f;
+        public static final int hangup_button=0x7f080011;
+        public static final int pager=0x7f08001d;
+        public static final int pickup_button=0x7f080012;
+        public static final int prefEnableSwitch=0x7f080022;
+        public static final int preference_phone=0x7f080021;
         public static final int preference_preview_color_panel=0x7f080004;
-        public static final int snoozebutton=0x7f08000d;
-        public static final int torchbutton=0x7f08001a;
+        public static final int snoozebutton=0x7f08000e;
+        public static final int torchbutton=0x7f08001b;
     }
     public static final class layout {
         public static final int activity_configuration=0x7f030000;
@@ -197,37 +198,37 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         /**  titles and such 
          */
         public static final int app_name=0x7f090000;
-        public static final int caller_name=0x7f09004a;
-        public static final int caller_number=0x7f09004b;
-        public static final int dismiss=0x7f090049;
-        public static final int dummy_button=0x7f090046;
-        public static final int dummy_content=0x7f090047;
+        public static final int caller_name=0x7f09004d;
+        public static final int caller_number=0x7f09004e;
+        public static final int dismiss=0x7f09004c;
+        public static final int dummy_button=0x7f090049;
+        public static final int dummy_content=0x7f09004a;
         /**  version upgrade dialog 
          */
-        public static final int firstrun_message=0x7f090040;
-        public static final int firstrun_ok=0x7f090041;
+        public static final int firstrun_message=0x7f090043;
+        public static final int firstrun_ok=0x7f090044;
         /**  random strings 
          */
-        public static final int hall_file=0x7f090042;
-        public static final int hello_world=0x7f090044;
+        public static final int hall_file=0x7f090045;
+        public static final int hello_world=0x7f090047;
         public static final int notif_left_checked=0x7f090009;
         public static final int notif_left_unchecked=0x7f09000a;
         /**  notification listener 
          */
         public static final int notif_please_check=0x7f090007;
         public static final int notif_please_uncheck=0x7f090008;
-        public static final int pref_about=0x7f09003b;
-        public static final int pref_about_summary=0x7f09003c;
-        public static final int pref_alarm_controls=0x7f090022;
-        public static final int pref_alarm_controls_summary=0x7f090023;
-        public static final int pref_camera_controls=0x7f090033;
-        public static final int pref_camera_controls_summary=0x7f090034;
-        public static final int pref_default_bgcolor=0x7f090035;
-        public static final int pref_default_bgcolor_summary=0x7f090036;
-        public static final int pref_default_fgcolor=0x7f090037;
-        public static final int pref_default_fgcolor_summary=0x7f090038;
-        public static final int pref_default_widget=0x7f09001e;
-        public static final int pref_default_widget_summary=0x7f09001f;
+        public static final int pref_about=0x7f09003e;
+        public static final int pref_about_summary=0x7f09003f;
+        public static final int pref_alarm_controls=0x7f090025;
+        public static final int pref_alarm_controls_summary=0x7f090026;
+        public static final int pref_camera_controls=0x7f090036;
+        public static final int pref_camera_controls_summary=0x7f090037;
+        public static final int pref_default_bgcolor=0x7f090038;
+        public static final int pref_default_bgcolor_summary=0x7f090039;
+        public static final int pref_default_fgcolor=0x7f09003a;
+        public static final int pref_default_fgcolor_summary=0x7f09003b;
+        public static final int pref_default_widget=0x7f090021;
+        public static final int pref_default_widget_summary=0x7f090022;
         public static final int pref_delay=0x7f090012;
         public static final int pref_delay_summary=0x7f090013;
         public static final int pref_dim=0x7f090014;
@@ -235,47 +236,50 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int pref_enabled=0x7f09000d;
         public static final int pref_enabled_summary=0x7f09000e;
         public static final int pref_enabled_title=0x7f09000f;
-        public static final int pref_flash_controls=0x7f090031;
-        public static final int pref_flash_controls_summary=0x7f090032;
+        public static final int pref_flash_controls=0x7f090034;
+        public static final int pref_flash_controls_summary=0x7f090035;
         /**  preferences 
          */
         public static final int pref_instructions=0x7f09000b;
         public static final int pref_instructions_summary=0x7f09000c;
         public static final int pref_keep_admin=0x7f090016;
         public static final int pref_keep_admin_summary=0x7f090017;
-        public static final int pref_media_widget=0x7f090020;
-        public static final int pref_media_widget_summary=0x7f090021;
+        public static final int pref_media_widget=0x7f090023;
+        public static final int pref_media_widget_summary=0x7f090024;
         public static final int pref_notifications=0x7f090010;
         public static final int pref_notifications_summary=0x7f090011;
-        public static final int pref_optional=0x7f09001a;
-        public static final int pref_optional_summary=0x7f09001b;
-        public static final int pref_phone_controls=0x7f090027;
-        public static final int pref_phone_controls_speaker=0x7f09002d;
-        public static final int pref_phone_controls_speaker_summary=0x7f09002e;
-        public static final int pref_phone_controls_summary=0x7f090028;
-        public static final int pref_phone_controls_tts=0x7f090029;
-        public static final int pref_phone_controls_tts_delay=0x7f09002b;
-        public static final int pref_phone_controls_tts_delay_summary=0x7f09002c;
-        public static final int pref_phone_controls_tts_summary=0x7f09002a;
-        public static final int pref_phone_preview_input_message=0x7f090030;
-        public static final int pref_phone_preview_summary=0x7f09002f;
-        public static final int pref_phone_screen=0x7f090024;
-        public static final int pref_phone_screen_summary=0x7f090025;
-        public static final int pref_phone_screen_title=0x7f090026;
-        public static final int pref_preview=0x7f09003e;
+        public static final int pref_optional=0x7f09001d;
+        public static final int pref_optional_summary=0x7f09001e;
+        public static final int pref_phone_controls=0x7f09002a;
+        public static final int pref_phone_controls_speaker=0x7f090030;
+        public static final int pref_phone_controls_speaker_summary=0x7f090031;
+        public static final int pref_phone_controls_summary=0x7f09002b;
+        public static final int pref_phone_controls_tts=0x7f09002c;
+        public static final int pref_phone_controls_tts_delay=0x7f09002e;
+        public static final int pref_phone_controls_tts_delay_summary=0x7f09002f;
+        public static final int pref_phone_controls_tts_summary=0x7f09002d;
+        public static final int pref_phone_preview_input_message=0x7f090033;
+        public static final int pref_phone_preview_summary=0x7f090032;
+        public static final int pref_phone_screen=0x7f090027;
+        public static final int pref_phone_screen_summary=0x7f090028;
+        public static final int pref_phone_screen_title=0x7f090029;
+        public static final int pref_preview=0x7f090041;
+        public static final int pref_realhall=0x7f09001b;
+        public static final int pref_realhall_summary=0x7f09001c;
         public static final int pref_runasroot=0x7f090018;
         public static final int pref_runasroot_summary=0x7f090019;
-        public static final int pref_security_settings=0x7f090039;
-        public static final int pref_security_settings_summary=0x7f09003a;
-        public static final int pref_settings=0x7f09003d;
-        public static final int pref_test=0x7f09003f;
-        public static final int pref_widgets=0x7f09001c;
-        public static final int pref_widgets_summary=0x7f09001d;
-        public static final int snooze=0x7f090048;
+        public static final int pref_runasroot_title=0x7f09001a;
+        public static final int pref_security_settings=0x7f09003c;
+        public static final int pref_security_settings_summary=0x7f09003d;
+        public static final int pref_settings=0x7f090040;
+        public static final int pref_test=0x7f090042;
+        public static final int pref_widgets=0x7f09001f;
+        public static final int pref_widgets_summary=0x7f090020;
+        public static final int snooze=0x7f09004b;
         public static final int title_activity_configuration=0x7f090001;
-        public static final int title_activity_fullscreen=0x7f090045;
-        public static final int title_activity_window=0x7f090043;
-        public static final int unknown_caller=0x7f09004c;
+        public static final int title_activity_fullscreen=0x7f090048;
+        public static final int title_activity_window=0x7f090046;
+        public static final int unknown_caller=0x7f09004f;
     }
     public static final class style {
         /** 
@@ -316,7 +320,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int preferences_features=0x7f040002;
         public static final int preferences_general=0x7f040003;
         public static final int preferences_phone=0x7f040004;
-        public static final int preferences_widgets=0x7f040005;
+        public static final int preferences_root=0x7f040005;
+        public static final int preferences_widgets=0x7f040006;
     }
     public static final class styleable {
         /** 

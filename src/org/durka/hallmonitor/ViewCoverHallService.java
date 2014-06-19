@@ -27,9 +27,9 @@ import android.util.Log;
 
 import com.manusfreedom.android.Events;
 import com.manusfreedom.android.Events.InputDevice;
-import net.pocketmagic.android.eventinjector.Shell;
+import eu.chainfire.libsuperuser.Shell;
 
-public class ViewCoverService extends Service implements Runnable {
+public class ViewCoverHallService extends Service implements Runnable {
 	
 	private HeadsetReceiver		mHeadset;
 	private Thread				getevent;
@@ -37,9 +37,9 @@ public class ViewCoverService extends Service implements Runnable {
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d("VCS.onStartCommand", "View cover service started");
+		Log.d("VCHS.onStartCommand", "View cover Hall service started");
 
-        //We don't want to do this - almost by defninition the cover can't be closed, and we don't actually want to do any open cover functionality
+        //We don't want to do this - almost by definition the cover can't be closed, and we don't actually want to do any open cover functionality
 		//until the cover is closed and then opened again
 		/*if (Functions.Is.cover_closed(this)) {
 			Functions.Actions.close_cover(this);
@@ -58,7 +58,7 @@ public class ViewCoverService extends Service implements Runnable {
 			
 			int id = prefs.getInt("default_widget_id", -1);
 			if (id != -1) {
-				Log.d("VCS-oSC", "creating default widget with id=" + id);
+				Log.d("VCHS-oSC", "creating default widget with id=" + id);
 				
 				Intent data = new Intent();
 				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
@@ -72,7 +72,7 @@ public class ViewCoverService extends Service implements Runnable {
 			
 			int id = prefs.getInt("media_widget_id", -1);
 			if (id != -1) {
-				Log.d("VCS-oSC", "creating media widget with id=" + id);
+				Log.d("VCHS-oSC", "creating media widget with id=" + id);
 				
 				Intent data = new Intent();
 				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
@@ -93,22 +93,22 @@ public class ViewCoverService extends Service implements Runnable {
 	public void run() {
 		String neededDevice = "gpio-keys";
 		Events events = new Events();
-		Log.d("VCS-oSC", "Request root");
-		Shell.isSuAvailable();
+		Log.d("VCHS-oSC", "Request root");
+		Shell.SU.available();
 		
 		events.AddAllDevices();
 		String neededDevicePath = "";
 
-		Log.e("VCS-oSC", "Number of device found:" + events.m_Devs.size());
+		Log.e("VCHS-oSC", "Number of device found:" + events.m_Devs.size());
 
-		Log.d("VCS-oSC", "Scan device");
+		Log.d("VCHS-oSC", "Scan device");
 		for (InputDevice idev:events.m_Devs) {
 			if(!idev.getOpen())
 				idev.Open(true);
 			if(idev.getOpen()) {
-				Log.d("VCS-oSC", " Open: " + idev.getPath() + " / Name: " + idev.getName() + " / Version: " + idev.getVersion() + " / Location: " + idev.getLocation() + " / IdStr: " + idev.getIdStr() + " / Result: " + idev.getOpen());
+				Log.d("VCHS-oSC", " Open: " + idev.getPath() + " / Name: " + idev.getName() + " / Version: " + idev.getVersion() + " / Location: " + idev.getLocation() + " / IdStr: " + idev.getIdStr() + " / Result: " + idev.getOpen());
 				if(idev.getName().equals(neededDevice)){
-					Log.d("VCS-oSC", "Device " + neededDevice + " found");
+					Log.d("VCHS-oSC", "Device " + neededDevice + " found");
 					neededDevicePath = idev.getPath();
 					break;
 				}
@@ -121,40 +121,40 @@ public class ViewCoverService extends Service implements Runnable {
 		events = new Events();
 		events.AddDevice(neededDevicePath);
 
-		Log.e("VCS-oSC", "Number of device found:" + events.m_Devs.size());
+		Log.e("VCHS-oSC", "Number of device found:" + events.m_Devs.size());
 		
 		InputDevice currentInputDevice = null;
 		for (InputDevice idev:events.m_Devs) {
 			if(!idev.getOpen())
 				idev.Open(true);
 			currentInputDevice = idev;
-			Log.d("VCS-oSC", "Open: " + currentInputDevice.getPath() + " / Name: " + currentInputDevice.getName() + " / Version: " + currentInputDevice.getVersion() + " / Location: " + currentInputDevice.getLocation() + " / IdStr: " + currentInputDevice.getIdStr() + " / Result: " + currentInputDevice.getOpen());				
+			Log.d("VCHS-oSC", "Open: " + currentInputDevice.getPath() + " / Name: " + currentInputDevice.getName() + " / Version: " + currentInputDevice.getVersion() + " / Location: " + currentInputDevice.getLocation() + " / IdStr: " + currentInputDevice.getIdStr() + " / Result: " + currentInputDevice.getOpen());				
 		}
 		
 		if(currentInputDevice == null)
 		{
-			Log.d("VCS-oSC", "No device");
+			Log.d("VCHS-oSC", "No device");
 			return;
 		}				
 
-		Log.d("VCS-oSC", "Start read command");
+		Log.d("VCHS-oSC", "Start read command");
 		while (serviceStarted) {
 			if(currentInputDevice.getOpen() && (0 == currentInputDevice.getPollingEvent())) {
-				Log.d("VCS-oSC", "Reading command: " + currentInputDevice.getSuccessfulPollingType() + "/" + currentInputDevice.getSuccessfulPollingCode() + "/" + currentInputDevice.getSuccessfulPollingValue());
+				Log.d("VCHS-oSC", "Reading command: " + currentInputDevice.getSuccessfulPollingType() + "/" + currentInputDevice.getSuccessfulPollingCode() + "/" + currentInputDevice.getSuccessfulPollingValue());
 				if(currentInputDevice.getSuccessfulPollingCode() == 21 && currentInputDevice.getSuccessfulPollingValue() == 0){					
-					Log.i("VCS-oSC", "Cover closed");
+					Log.i("VCHS-oSC", "Cover closed");
 					Functions.Actions.close_cover(this);
 				}
 				else if(currentInputDevice.getSuccessfulPollingCode() == 21 && currentInputDevice.getSuccessfulPollingValue() == 1){
-					Log.i("VCS-oSC", "Cover open");
+					Log.i("VCHS-oSC", "Cover open");
 					Functions.Actions.open_cover(this);
 				}
 			}
 		}
-		Log.d("VCS-oSC", "Stop read command");
+		Log.d("VCHS-oSC", "Stop read command");
 		events.Release();
 		events = null;
-		Log.d("VCS-oSC", "Memory cleaned");
+		Log.d("VCHS-oSC", "Memory cleaned");
 		System.gc();
 	}
 	
@@ -165,10 +165,12 @@ public class ViewCoverService extends Service implements Runnable {
 	
 	@Override
 	public void onDestroy() {
-		Log.d("VCS.onStartCommand", "View cover service stopped");
+		Log.d("VCHS.onStartCommand", "View cover Hall service stopped");
 		serviceStarted = false;
 		unregisterReceiver(mHeadset);
 		System.gc();
+		
+		super.onDestroy();
 	}
 
 }

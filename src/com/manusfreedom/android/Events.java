@@ -1,35 +1,28 @@
 /*
- * Android GetEvent
+ * Android get Event from drivers directly
  *
  * Copyright (c) 2014 by Manus Freedom , manus@manusfreedom.com
- *
  * Based on https://github.com/android/platform_system_core/blob/master/toolbox/getevent.c
  * Inspired by EventInjector
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * For more information on the GPL, please go to:
- * http://www.gnu.org/copyleft/gpl.html
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.manusfreedom.android;
 
 import java.util.ArrayList;
 import android.util.Log;
-import net.pocketmagic.android.eventinjector.Shell;;
+import eu.chainfire.libsuperuser.Shell;
 
 
 public class Events
@@ -98,9 +91,9 @@ public class Events
 	   		// if opening fails, we might not have the correct permissions, try changing 660 to 666
 	   		if (res != 0) {
 	   			// possible only if we have root
-	   			if(forceOpen && Shell.isSuAvailable()) { 
+	   			if(forceOpen && Shell.SU.available()) { 
 	   				// set new permissions
-	   				Shell.runCommand("chmod 666 "+ m_szPath);
+	   				Shell.SU.run("chmod 666 "+ m_szPath);
 	   				// reopen
 	   			    res = OpenDevice(m_szPath);
 	   			}
