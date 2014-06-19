@@ -2,35 +2,20 @@ package org.durka.hallmonitor;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.io.IOException;
-
-import org.durka.hallmonitor.Functions.Util;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.net.Uri;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources.NotFoundException;
-import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
-import android.provider.ContactsContract;
-import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -38,14 +23,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * This is the activity that is displayed by default - it is displayed for the configurable delay number of milliseconds when the case is closed,
@@ -79,7 +61,7 @@ public class DefaultActivity extends Activity {
     //all the views we need
     public ImageButton torchButton = null;
     private ImageButton cameraButton = null;
-    
+
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
@@ -191,9 +173,14 @@ public class DefaultActivity extends Activity {
 
 		//Remove notification bar
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		//Remove navigation bar
+		View decorView = getWindow().getDecorView();	
+		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+	              | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
 		//set default view
 		setContentView(R.layout.activity_default);
+
 		
 		//get the audio manager
 		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
@@ -211,38 +198,19 @@ public class DefaultActivity extends Activity {
 		//get the views we need
 	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
 	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
+	}
 
-	}  
-
-	@SuppressWarnings("deprecation")
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
 
-        // load debug setting
-        mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
+		if(hasFocus) {
+			//Remove navigation bar
+			View decorView = getWindow().getDecorView();	
+			decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+		              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+		}
 
-		Log.d("DA.onResume", "On resume called.");
-
-        refreshDisplay(); // TODO is this necessary to do here?`
-
-        /*
-        // check preview (extras are configured in xml)
-        if (getIntent().getExtras() != null && !getIntent().getExtras().getString("preview", "").equals("")) {
-            String preview = getIntent().getExtras().getString("preview");
-
-            if (preview.equals("phoneWidget")) {
-                new AlertDialog.Builder(this)
-                        .setMessage("search AlertDialog in DefaultActivity to place your code for preview of '" + preview + "' there!")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        })
-                        .show();
-            }
-        }
-        */
 	}
 
 	/**
@@ -252,9 +220,6 @@ public class DefaultActivity extends Activity {
 		
 		// we might have missed a phone-state revelation
 		phone_ringing = ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).getCallState() == TelephonyManager.CALL_STATE_RINGING;
-
-		//get the layout for the windowed view
-		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
 
 		//set the colours based on the picker values
 		Drawable rounded = getResources().getDrawable(R.drawable.rounded);
@@ -421,9 +386,44 @@ public class DefaultActivity extends Activity {
 	
 	@Override
 	protected void onPause() {
-	    super.onPause();
+		super.onPause();
 	}
 	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+        // load debug setting
+        mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
+
+		Log.d("DA.onResume", "On resume called.");
+
+		//Remove navigation bar
+		View decorView = getWindow().getDecorView();	
+		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+	              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+		refreshDisplay(); // TODO is this necessary to do here?`
+
+        /*
+        // check preview (extras are configured in xml)
+        if (getIntent().getExtras() != null && !getIntent().getExtras().getString("preview", "").equals("")) {
+            String preview = getIntent().getExtras().getString("preview");
+
+            if (preview.equals("phoneWidget")) {
+                new AlertDialog.Builder(this)
+                        .setMessage("search AlertDialog in DefaultActivity to place your code for preview of '" + preview + "' there!")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .show();
+            }
+        }
+        */
+	}
+
 	@Override
 	protected void onStop() {
 		super.onStop();

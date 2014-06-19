@@ -14,13 +14,8 @@
  */
 package org.durka.hallmonitor;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,28 +31,25 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources.NotFoundException;
+import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.service.notification.StatusBarNotification;
-import android.telephony.TelephonyManager;
+import android.os.SystemClock;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import eu.chainfire.libsuperuser.Shell;
 
 /**
  * Container Class for various inner Classes which service the capabilities of the HallMonitor app.
@@ -125,18 +117,20 @@ public class Functions {
 			//so we can use the screen through the window
 			 if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
                  Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
-
                  if (Build.DEVICE.equals(DEV_SERRANO_LTE_CM10) || Build.DEVICE.equals(DEV_SERRANO_LTE_CM11)) {
-                     run_commands_as_root(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
-                 } else // others devices
-                     run_commands_as_root(new String[]{"echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd"});
-
+                	 AsyncSuRunMulti localSuRunMulti = new AsyncSuRunMulti();
+                	 localSuRunMulti.execute(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
+                 }
+                 else { // others devices
+                	 AsyncSuRun localSuRun = new AsyncSuRun();
+                	 localSuRun.execute("echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd");
+                 }
+                 
 				 Log.d("F.Act.close_cover", "...Sensitivity boosted, hold onto your hats!");
 			 }
 			
 			//need this to let us lock the phone
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
-			//final PowerManager pm = (PowerManager)ctx.getSystemService(Context.POWER_SERVICE);
 			
 			ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 			if (!dpm.isAdminActive(me)) {
@@ -146,13 +140,19 @@ public class Functions {
 			}
 			
             //step 2: wait for the delay period and turn the screen off
-            setLockTimer(ctx);
+            setCloseTimer(ctx);
           
 		}
 
 		
-		public static void setLockTimer(Context ctx) {
-			setLockTimer(ctx, PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000));
+		public static void setCloseTimer(Context ctx) {
+			if(Is.SystemApp(ctx)) {
+				setSleepTimer(ctx, PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000));
+			}
+			else
+			{
+				setLockTimer(ctx, PreferenceManager.getDefaultSharedPreferences(ctx).getInt("pref_delay", 10000));
+			}
 		}
 		
 		public static void setLockTimer(Context ctx, int delay) {
@@ -176,16 +176,39 @@ public class Functions {
 				}
 			}, delay);
             
-            Log.d("F.Act.set_lock_timer", "Delay set to: " + delay);
+            Log.d("F.Act.setLockTimer", "Delay set to: " + delay);
 		}
 		
+		public static void setSleepTimer(Context ctx, int delay) {
+			timer.cancel();
+			
+			timer = new Timer();
+
+			final PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+			
+            timer.schedule(timerTask = new TimerTask() {
+				@Override
+				public void run() {	
+					if (pm.isScreenOn()){
+						Log.d("F.Act.close_cover", "Go to sleep now.");
+						pm.goToSleep(SystemClock.uptimeMillis() + 10);
+					}
+					else{
+						Log.d("F.Act.close_cover", "Screen already off.");
+					}
+				}
+			}, delay);
+            
+            Log.d("F.Act.setSleepTimer", "Delay set to: " + delay);
+		}
+
 		/**
-		 * Called from within the ViewCoverService.run method.
+		 * Called from within the ViewCoverHallService.run method
+		 * or called from within the Functions.Event.Proximity method.
          * If we are running root enabled reverts the screen sensitivity.
          * Wakes the screen up.
          * @param ctx Application context.
 		 */
-		@SuppressWarnings("deprecation")
 		public static void open_cover(Context ctx) {
 			
 			Log.d("F.Act.open_cover", "Open cover event receieved.");
@@ -215,7 +238,8 @@ public class Functions {
 			//so we can use the device as normal
 			 if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
 				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
-				 run_commands_as_root(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd && cat /sys/class/sec/tsp/cmd_result"});
+            	 AsyncSuRunMulti localSuRunMulti = new AsyncSuRunMulti();
+            	 localSuRunMulti.execute(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd && cat /sys/class/sec/tsp/cmd_result"});
 				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
 			 }
 		}
@@ -240,7 +264,12 @@ public class Functions {
 				act.startActivityForResult(coup, DEVICE_ADMIN_WAITING);
 			} else {
 				// we were already admin, just start the service
-				act.startService(new Intent(act, ViewCoverService.class));
+				if(PreferenceManager.getDefaultSharedPreferences(act).getBoolean("pref_realhall", false)) {
+					act.startService(new Intent(act, ViewCoverHallService.class));
+				}
+				else {
+					act.startService(new Intent(act, ViewCoverProximityService.class));
+				}
 			}
 		}
 		
@@ -252,7 +281,8 @@ public class Functions {
 			
 			Log.d("F.Act.stop_service", "Stop service called.");
 			
-			ctx.stopService(new Intent(ctx, ViewCoverService.class));
+			ctx.stopService(new Intent(ctx, ViewCoverHallService.class));
+			ctx.stopService(new Intent(ctx, ViewCoverProximityService.class));
 			ctx.stopService(new Intent(ctx, NotificationService.class));
 			
 			// Relinquish device admin (unless asked not to)
@@ -306,84 +336,27 @@ public class Functions {
 		}
 		
 		
-		public static String run_commands_as_root(String[] cmds) { return run_commands_as_root(cmds, true); }
-		
-		/**
-		 * Execute shell commands
-		 * @param cmds Commands to execute
-		 * @param want_output If true, attach to the 'su' binary's stdout and stderr streams, and return anything printed to stdout (if the exit status is nonzero, returns stderr instead)
-		 */
-		public static String run_commands_as_root(String[] cmds, boolean want_output) {
-	        try {
-	        	Process p = Runtime.getRuntime().exec("su");
-	        	
-	        	//create output stream for running commands
-	            DataOutputStream os = new DataOutputStream(p.getOutputStream());  
-	            
-	            //tap into the output
-	            InputStream is = p.getInputStream();
-	            BufferedReader isBr = new BufferedReader(new InputStreamReader(is));
-	            
-	            //tap into the error output
-	            InputStream es = p.getErrorStream();
-	            BufferedReader esBr = new BufferedReader(new InputStreamReader(es));
-	            
-	            //use this for collating the output
-	            String currentLine;
-	            
-	            //run commands
-	            for (String tmpCmd : cmds) {
-	            	Log.d("F.Act.run_comm_as_root", "Running command: " + tmpCmd);
-                    os.writeBytes(tmpCmd+"\n");
-	            }      
-	            os.writeBytes("exit\n");  
-	            os.flush();
-	            
-	            if (want_output) {
-		            //log out the output
-		            String output = "";
-		            while ((currentLine = isBr.readLine()) != null) {
-		              output += currentLine + "\n";
-		            } 
-		            Log.d("F.Act.run_comm_as_root", "Have output: " + output);
-	           
-		            //log out the error output
-		            String error = "";
-		            currentLine = "";
-		            while ((currentLine = esBr.readLine()) != null) {
-		              error += currentLine + "\n";
-		            }	           
-		            Log.d("F.Act.run_comm_as_root", "Have error: " + error);
-		            
-		            p.waitFor();
-		            if (p.exitValue() == 0) {
-		            	return output.trim();
-		            } else {
-		            	return error.trim();
-		            }
-	            }
-	            return "";
-
-	        } catch (IOException ioe) {
-	        	Log.e("F.Act.run_comm_as_root","Failed to run command!", ioe);
-	        	return "";
-	        } catch (InterruptedException iee) {
-				Log.e("F.Act.run_comm_as_root", "Command interrupt!", iee);
-				return "";
-			}
-		}
-
 
 		public static void hangup_call() {
 			Log.d("phone", "hanging up! goodbye");
-			run_commands_as_root(new String[]{"input keyevent 6"}, false);
+			//if(configurationActivity != null && configurationActivity.isSystemApp) {
+			//}
+			//else {
+			AsyncSuRun localSuRun = new AsyncSuRun();
+			localSuRun.execute("input keyevent 6");
+			//}
 			DefaultActivity.phone_ringing = false;
 			defaultActivity.refreshDisplay();
 		}
 		
 		public static void pickup_call() {
 			Log.d("phone", "picking up! hello");
-			run_commands_as_root(new String[]{"input keyevent 5"}, false);
+			//if(configurationActivity != null && configurationActivity.isSystemApp) {
+			//}
+			//else {
+			AsyncSuRun localSuRun = new AsyncSuRun();
+			localSuRun.execute("input keyevent 5");
+			//}
 			//DefaultActivity.phone_ringing = false;
 			//defaultActivity.refreshDisplay();
 		}
@@ -463,6 +436,22 @@ public class Functions {
 					mNotificationManager.cancel(42);
 			}
 		}
+
+	    private static class AsyncSuRun extends AsyncTask<String, Void, String> {
+			@Override
+			protected String doInBackground(String... params) {
+				Shell.SU.run(params[0]);
+				return "Executed";
+			}
+		}
+	    
+	    private static class AsyncSuRunMulti extends AsyncTask<String[], Void, String> {
+			@Override
+			protected String doInBackground(String[]... params) {
+				Shell.SU.run(params[0]);
+				return "Executed";
+			}
+		}
 	}
 
 	
@@ -486,8 +475,14 @@ public class Functions {
 			Log.d("F.Evt.boot", "Boot called.");
 			
 			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_enabled", false)) {
-	    		Intent startServiceIntent = new Intent(ctx, ViewCoverService.class);
-	    		ctx.startService(startServiceIntent);
+				if(PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_realhall", false)) {
+					Intent startServiceIntent = new Intent(ctx, ViewCoverHallService.class);
+					ctx.startService(startServiceIntent);
+				}
+				else {
+					Intent startServiceIntent = new Intent(ctx, ViewCoverProximityService.class);
+					ctx.startService(startServiceIntent);
+				}
 	    	}
 
         }
@@ -510,7 +505,12 @@ public class Functions {
 					// we asked to be an admin and the user clicked Activate
 					// (the intent receiver takes care of showing a toast)
 					// go ahead and start the service
-					ctx.startService(new Intent(ctx, ViewCoverService.class));
+					if(PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_realhall", false)) {
+						ctx.startService(new Intent(ctx, ViewCoverHallService.class));
+					}
+					else {
+						ctx.startService(new Intent(ctx, ViewCoverProximityService.class));
+					}
 				} else {
 					// we asked to be an admin and the user clicked Cancel (why?)
 					// complain, and un-check pref_enabled
@@ -629,6 +629,33 @@ public class Functions {
 		}
 		
 		
+		/**
+		 * Receives the value of the proximity sensor and reacts accordingly to update the cover state.
+		 * @param ctx Application context.
+		 * @param value Value of the proximity sensor.
+		 */
+		public static void proximity(Context ctx, float value) {
+			
+			Log.d("F.Evt.proximity", "Proximity method called with value: " + value + " ,whilst cover_closed is: " + cover_closed);
+			
+			if (value > 0) {
+				if (cover_closed) {
+					if (!Functions.Is.cover_closed(ctx)) {
+						//proximity false (>0) and cover open - take open_cover action
+						Actions.open_cover(ctx);
+					}
+				}
+			} else {
+				if (!cover_closed) {
+					if (Functions.Is.cover_closed(ctx)) {
+						//proximity true (<=0) and cover closed - take close_cover action
+						Actions.close_cover(ctx);
+					}
+				}
+			}
+			//Log.d(ctx.getString(R.string.app_name), String.format("cover_closed = %b", cover_closed));
+		}
+
 		public static void headset(final Context ctx, int state) {
 			if (state != 0) {
 				// headset was just inserted
@@ -778,10 +805,10 @@ public class Functions {
 			return widgetEnabled;
 		}
 		
-		
-		
-		
-		
+		public static boolean SystemApp(Context ctx) {
+		    return (ctx.getApplicationInfo().flags & (ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0;
+		}
+
 	}
 	
 	public static class Util {
@@ -819,10 +846,12 @@ public class Functions {
 			//FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK if possible
 			Log.d("F.Util.rs", "aww why can't I hit snooze");
 			PowerManager pm  = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+			@SuppressWarnings("deprecation")
 			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, ctx.getString(R.string.app_name));
 	        wl.acquire();
 	        wl.release();
 		}
+		
 	}
 
 }

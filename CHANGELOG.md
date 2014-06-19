@@ -1,3 +1,18 @@
+- 0.3.5
+	- Features
+		- Possibility to choose between real Hall or simule with Proximity sensor (under Root menu)
+		- Change licencing to Apache
+		- Use eu.chainfire.libsuperuser in place of net.pocketmagic.android.eventinjector
+		- All su access through eu.chainfire.libsuperuser.Shell
+		- Removed unused library import
+		- Suppress navigation bar (Softkey)
+		- Remove su call from main thread
+		- To test: gotosleep instead of lock if installed as SystemApp
+	- Remove
+		- Proximity sensor use
+	- Notes
+		- Next version add settings to choose between Proximity sensor or Hall Event?
+
 - 0.3.0
 	- Features
 		- Add real Hall Event
