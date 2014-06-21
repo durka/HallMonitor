@@ -191,7 +191,7 @@ public class Functions {
 				public void run() {	
 					if (pm.isScreenOn()){
 						Log.d("F.Act.close_cover", "Go to sleep now.");
-						pm.goToSleep(SystemClock.uptimeMillis() + 10);
+						pm.goToSleep(SystemClock.uptimeMillis());
 					}
 					else{
 						Log.d("F.Act.close_cover", "Screen already off.");
