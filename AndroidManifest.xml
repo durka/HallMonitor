@@ -75,6 +75,6 @@
               android:configChanges="orientation|keyboardHidden|screenSize"
               android:launchMode="singleTask"
               android:theme="@style/FullscreenTheme"
-              android:noHistory="true"></activity>
+              android:excludeFromRecents="true"></activity>
   </application>
 </manifest>
