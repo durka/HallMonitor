@@ -337,14 +337,14 @@ public class DefaultActivity extends Activity {
 	
 	//toggle the alternative torch
 	public void toggleTorch(View view) {
-		if (TorchActions.flashIsOn) {
-			 	TorchActions.turnOffFlash();
-		}
 		TorchActions.toggle_torch_alternative(this);
 	}
 	
 	//fire up the camera
 	public void camera_start(View view) {
+		if (TorchActions.flashIsOn) {
+		 	TorchActions.turnOffFlash();
+		}
 		Functions.Actions.start_camera(this);
 	}
 	
