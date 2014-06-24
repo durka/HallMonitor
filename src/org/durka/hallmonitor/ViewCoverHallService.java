@@ -91,10 +91,11 @@ public class ViewCoverHallService extends Service implements Runnable {
 	
 	@Override
 	public void run() {
-		String neededDevice = "gpio-keys";
-		Events events = new Events();
 		Log.d("VCHS-oSC", "Request root");
 		Shell.SU.available();
+
+		String neededDevice = "gpio-keys";
+		Events events = new Events();
 		
 		events.AddAllDevices();
 		String neededDevicePath = "";

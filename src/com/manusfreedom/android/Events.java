@@ -175,7 +175,16 @@ public class Events
 
 
     static {
-        System.loadLibrary("GetEvent");
+    	Shell.SU.available();
+    	try {
+            System.loadLibrary("GetEvent");
+        } catch (UnsatisfiedLinkError e) {
+        	try {
+                System.load("/data/app-lib/HallMonitor/libGetEvent.so");
+            } catch (UnsatisfiedLinkError e2) {
+                System.load("/system/lib/libGetEvent.so");
+            }
+        }
     }
 
 }
