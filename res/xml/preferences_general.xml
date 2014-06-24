@@ -29,6 +29,12 @@
         android:defaultValue="0xFF33B5E5" />
     
     <CheckBoxPreference
+        android:key="pref_datetime"
+        android:title="@string/pref_datetime"
+        android:summary="@string/pref_datetime_summary"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
         android:key="pref_keep_admin"
         android:title="@string/pref_keep_admin"
         android:summary="@string/pref_keep_admin_summary"

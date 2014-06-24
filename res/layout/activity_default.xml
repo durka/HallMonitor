@@ -143,6 +143,25 @@
                     android:textSize="50sp"
                     android:textStyle="bold" />
 
+                <TextClock
+                    android:id="@+id/default_text_clock_hour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:keepScreenOn="true"
+                    android:textColor="#33b5e5"
+                    android:textSize="35sp"
+                    android:textStyle="bold" />
+
+				<TextView
+                    android:id="@+id/default_text_clock_date"
+					android:layout_width="wrap_content"
+					android:layout_height="25dp"
+	                android:layout_below="@+id/default_text_clock_hour"
+                    android:keepScreenOn="true"
+                    android:textColor="#33b5e5"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
                 <TextView
                     android:id="@+id/default_battery_percent"
                     android:layout_width="wrap_content"

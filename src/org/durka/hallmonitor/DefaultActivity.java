@@ -1,5 +1,7 @@
 package org.durka.hallmonitor;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -136,9 +138,9 @@ public class DefaultActivity extends Activity {
 					} else {
 						if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 							Functions.Events.call_finished(context);
-							refreshDisplay();
 						}
 					}
+					refreshDisplay();
 				} else {
 					Log.d("phone", "phone controls are not enabled");
 				}
@@ -205,10 +207,7 @@ public class DefaultActivity extends Activity {
 		super.onWindowFocusChanged(hasFocus);
 
 		if(hasFocus) {
-			//Remove navigation bar
-			View decorView = getWindow().getDecorView();	
-			decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-		              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+			refreshDisplay();
 		}
 
 	}
@@ -218,6 +217,11 @@ public class DefaultActivity extends Activity {
 	 */
 	public void refreshDisplay() {
 		
+		//Remove navigation bar
+		View decorView = getWindow().getDecorView();	
+		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+	              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
 		// we might have missed a phone-state revelation
 		phone_ringing = ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).getCallState() == TelephonyManager.CALL_STATE_RINGING;
 
@@ -226,6 +230,9 @@ public class DefaultActivity extends Activity {
 		rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
 		((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
 		((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+		((TextClock)findViewById(R.id.default_text_clock_hour)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+		((TextView)findViewById(R.id.default_text_clock_date)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+		((TextView)findViewById(R.id.default_text_clock_date)).setText(DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date()));
 		
 		//hide or show the torch button as required
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false))
@@ -253,7 +260,17 @@ public class DefaultActivity extends Activity {
 			widgetType = "media";
 		}
 		// reset to showing the clock, but in a second we might hide it and attach a widget
-		findViewById(R.id.default_text_clock).setVisibility(View.VISIBLE);
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_datetime", false))
+		{
+			findViewById(R.id.default_text_clock).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_text_clock_hour).setVisibility(View.VISIBLE);
+			findViewById(R.id.default_text_clock_date).setVisibility(View.VISIBLE);
+		} else {
+			findViewById(R.id.default_text_clock).setVisibility(View.VISIBLE);
+			findViewById(R.id.default_text_clock_hour).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_text_clock_date).setVisibility(View.INVISIBLE);
+		}
+		
 		((RelativeLayout)findViewById(R.id.default_widget_area)).removeAllViews();
 
 		if (alarm_firing) {
@@ -302,6 +319,8 @@ public class DefaultActivity extends Activity {
 
 				//add the widget to the view
 				findViewById(R.id.default_text_clock).setVisibility(View.INVISIBLE);
+				findViewById(R.id.default_text_clock_hour).setVisibility(View.INVISIBLE);
+				findViewById(R.id.default_text_clock_date).setVisibility(View.INVISIBLE);
 				((RelativeLayout)findViewById(R.id.default_widget_area)).addView(hostView);
 			}
 		}
@@ -397,11 +416,6 @@ public class DefaultActivity extends Activity {
         mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
 
 		Log.d("DA.onResume", "On resume called.");
-
-		//Remove navigation bar
-		View decorView = getWindow().getDecorView();	
-		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-	              | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
 		refreshDisplay(); // TODO is this necessary to do here?`
 
