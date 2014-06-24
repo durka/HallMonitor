@@ -82,6 +82,8 @@
     
     <string name="pref_flash_controls">Controllo Torcia</string>
     <string name="pref_flash_controls_summary">Mostra un tasto nella finestra della cover per accendere e spegnere la torcia.</string>
+    <string name="pref_flash_controls_alternative">Controllo Torcia Alternativa</string>
+    <string name="pref_flash_controls_alternative_summary">Questa è un\' alternativa alla torcia inclusa nelle rom CM. Gli utenti che installano HallMonitor su rom non CM possono usare questa opzione per abilitare la torcia.</string>
     <string name="pref_camera_controls">Controllo Fotocamera</string>
     <string name="pref_camera_controls_summary">Mostra un tasto nella finestra della cover per attivare la fotocamera.</string>
     
@@ -94,7 +96,7 @@
     <string name="pref_security_settings_summary">Scorciatoia per le impostazioni dello schermo di blocco Android</string>
     
     <string name="pref_about">Su Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor versione 0.3.0.\nCopyright 2014 Alex Burka, rilasciato su Licenza Apache v2.\nTradotto in italiano da Zanin Marco\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor versione 0.3.7.\nCopyright 2014 Alex Burka, rilasciato su Licenza Apache v2.\nTradotto in italiano da Zanin Marco\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Impostazioni</string>
     <string name="pref_preview">Anteprima</string>
     <string name="pref_test">Test</string>
@@ -102,6 +104,10 @@
     <!-- version upgrade dialog -->
     <string name="firstrun_message">Vedo che hai aggiornato alla versione %s! Accertati di cliccare ovunque, ci sono tantissime novità.</string>
     <string name="firstrun_ok">OK</string>
+    
+    <!-- toast messages -->
+    <string name="no_torch_app">Applicazione torcia CM non installata - impossibile abilitare la torcia, prova il metodo alternativo!</string>
+    <string name="no_torch">Impossibile abilitare la torcia, il tuo telefono non supporta questa funzione!</string>
     
     <!-- random strings -->
     <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
