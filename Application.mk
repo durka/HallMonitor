@@ -1,4 +1,3 @@
-APP_ABI := armeabi armeabi-v7a x86 mips
+APP_ABI := all
 APP_PROJECT_PATH := $(call my-dir)
-APP_MODULES      := GetEvent
-
+APP_OPTIM := release

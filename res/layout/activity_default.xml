@@ -177,7 +177,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_marginRight="8dp"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="4dp"
                     android:layout_toLeftOf="@+id/default_battery_percent"
                     android:src="@drawable/stat_sys_battery" />
             </RelativeLayout>

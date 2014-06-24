@@ -102,6 +102,7 @@ public class Functions {
 			//save the cover state
 			Events.set_cover(true);
 			
+			enableCoverTouch(ctx, true);
 			
 		    // step 1: bring up the default activity window
 			//we are using the show when locked flag as we'll re-use this method to show the screen on power button press
@@ -112,23 +113,6 @@ public class Functions {
 												| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED));
 			}
             
-			
-			//if we are running in root enabled mode then lets up the sensitivity on the view screen
-			//so we can use the screen through the window
-			 if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
-                 Log.d("F.Act.close_cover", "We're root enabled so lets boost the sensitivity...");
-                 if (Build.DEVICE.equals(DEV_SERRANO_LTE_CM10) || Build.DEVICE.equals(DEV_SERRANO_LTE_CM11)) {
-                	 AsyncSuRunMulti localSuRunMulti = new AsyncSuRunMulti();
-                	 localSuRunMulti.execute(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
-                 }
-                 else { // others devices
-                	 AsyncSuRun localSuRun = new AsyncSuRun();
-                	 localSuRun.execute("echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd");
-                 }
-                 
-				 Log.d("F.Act.close_cover", "...Sensitivity boosted, hold onto your hats!");
-			 }
-			
 			//need this to let us lock the phone
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
 			
@@ -202,6 +186,31 @@ public class Functions {
             Log.d("F.Act.setSleepTimer", "Delay set to: " + delay);
 		}
 
+		public static void enableCoverTouch(Context ctx, Boolean value) {
+			//if we are running in root enabled mode then lets up the sensitivity on the view screen
+			//so we can use the screen through the window
+			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
+				if(value) {
+					Log.d("F.Act.enableCoverTouch", "We're root enabled so lets boost the sensitivity...");
+					if (Build.DEVICE.equals(DEV_SERRANO_LTE_CM10) || Build.DEVICE.equals(DEV_SERRANO_LTE_CM11)) {
+						AsyncSuRunMulti localSuRunMulti = new AsyncSuRunMulti();
+						localSuRunMulti.execute(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
+					}
+					else { // others devices
+						AsyncSuRun localSuRun = new AsyncSuRun();
+						localSuRun.execute("echo clear_cover_mode,1 > /sys/class/sec/tsp/cmd");
+					}         
+					Log.d("F.Act.enableCoverTouch", "...Sensitivity boosted, hold onto your hats!");
+				}
+				else {
+					 Log.d("F.Act.enableCoverTouch", "We're root enabled so lets revert the sensitivity...");
+	            	 AsyncSuRunMulti localSuRunMulti = new AsyncSuRunMulti();
+	            	 localSuRunMulti.execute(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd && cat /sys/class/sec/tsp/cmd_result"});
+					 Log.d("F.Act.enableCoverTouch", "...Sensitivity reverted, sanity is restored!");
+				}
+			}
+		}
+		
 		/**
 		 * Called from within the ViewCoverHallService.run method
 		 * or called from within the Functions.Event.Proximity method.
@@ -228,20 +237,13 @@ public class Functions {
 			// step 1: if we were going to turn the screen off, cancel that
 			if (timerTask != null) timerTask.cancel();
 			
+			enableCoverTouch(ctx, false);
+			
 			// step 2: wake the screen
 			Util.rise_and_shine(ctx);
 			
 			//save the cover state
 			Events.set_cover(false);
-			
-			//if we are running in root enabled mode then lets revert the sensitivity on the view screen
-			//so we can use the device as normal
-			 if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
-				 Log.d("F.Act.close_cover", "We're root enabled so lets revert the sensitivity...");
-            	 AsyncSuRunMulti localSuRunMulti = new AsyncSuRunMulti();
-            	 localSuRunMulti.execute(new String[]{"cd /sys/class/sec/tsp", "echo clear_cover_mode,0 > cmd && cat /sys/class/sec/tsp/cmd_result"});
-				 Log.d("F.Act.close_cover", "...Sensitivity reverted, sanity is restored!");
-			 }
 		}
 
 		
@@ -696,6 +698,7 @@ public class Functions {
 							          | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 						intent.setAction(Intent.ACTION_MAIN);
 						ctx.startActivity(intent);
+						Actions.enableCoverTouch(ctx, true);
 
 						Util.rise_and_shine(ctx); // make sure the screen is on
 					}

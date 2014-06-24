@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.durka.hallmonitor.Functions.Actions;
+
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
@@ -102,6 +104,7 @@ public class DefaultActivity extends Activity {
 					//to guarantee that we need to hold off until the alarm activity is running
 					//a 1 second delay seems to allow this
 					if (Functions.Is.cover_closed(context)) {
+						Functions.Actions.enableCoverTouch(context, true);
 						Timer timer = new Timer();
 						timer.schedule(new TimerTask() {
 							@Override
@@ -160,58 +163,6 @@ public class DefaultActivity extends Activity {
 	};
 
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		//pass a reference back to the Functions class so it can finish us when it wants to
-		//FIXME Presumably there is a better way to do this
-		Functions.defaultActivity = this;
-
-		Log.d("DA.onCreate", "onCreate of DefaultView.");
-
-		//Remove title bar
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-		//Remove notification bar
-		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		//Remove navigation bar
-		View decorView = getWindow().getDecorView();	
-		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-	              | View.SYSTEM_UI_FLAG_FULLSCREEN);
-
-		//set default view
-		setContentView(R.layout.activity_default);
-
-		
-		//get the audio manager
-		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-
-		//add screen on and alarm fired intent receiver
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_SCREEN_ON);
-		filter.addAction(ALARM_ALERT_ACTION);
-		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
-		filter.addAction("org.durka.hallmonitor.debug");
-		filter.addAction(ALARM_DONE_ACTION);
-		registerReceiver(receiver, filter);
-		
-		//get the views we need
-	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
-	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
-	}
-
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-
-		if(hasFocus) {
-			refreshDisplay();
-		}
-
-	}
-
 	/**
 	 * Refresh the display taking account of device and application state
 	 */
@@ -221,6 +172,19 @@ public class DefaultActivity extends Activity {
 		View decorView = getWindow().getDecorView();	
 		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 	              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+		if (findViewById(R.id.default_battery_picture) != null) {
+			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
+				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
+				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
+			} else {
+				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
+			}
+			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
+			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
+		}
 
 		// we might have missed a phone-state revelation
 		phone_ringing = ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).getCallState() == TelephonyManager.CALL_STATE_RINGING;
@@ -377,23 +341,63 @@ public class DefaultActivity extends Activity {
 	}
 	
 	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		//pass a reference back to the Functions class so it can finish us when it wants to
+		//FIXME Presumably there is a better way to do this
+		Functions.defaultActivity = this;
+
+		Log.d("DA.onCreate", "onCreate of DefaultView.");
+
+		//Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		//Remove notification bar
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		//Remove navigation bar
+		View decorView = getWindow().getDecorView();	
+		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+	              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+		//set default view
+		setContentView(R.layout.activity_default);
+
+		
+		//get the audio manager
+		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+
+		//add screen on and alarm fired intent receiver
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_SCREEN_ON);
+		filter.addAction(ALARM_ALERT_ACTION);
+		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		filter.addAction("org.durka.hallmonitor.debug");
+		filter.addAction(ALARM_DONE_ACTION);
+		registerReceiver(receiver, filter);
+		
+		//get the views we need
+	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
+	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+
+		if(hasFocus) {
+			Functions.Actions.enableCoverTouch(getBaseContext(), true);
+			refreshDisplay();
+		}
+
+	}
+
+	@Override
 	protected void onStart() {
 	    super.onStart();
 	    Log.d("DA-oS", "starting");
 	    on_screen = true;
-
-		if (findViewById(R.id.default_battery_picture) != null) {
-			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
-				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
-			} else {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
-			}
-			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
-			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
-		}
 
 		if (NotificationService.that != null) {
 			// notification listener service is running, show the current notifications

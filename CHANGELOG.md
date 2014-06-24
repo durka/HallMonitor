@@ -1,3 +1,11 @@
+- 0.3.6
+	- Features
+		- Data & Time feature
+		- Fix HallMonitor as System App on CM (gotosleep working): read special Readme
+		- Try better touch when cover is closed (nothing change but more often call but more often call to enble it)
+		- Build for more system
+		- Fix licenses
+
 - 0.3.5
 	- Features
 		- Possibility to choose between real Hall or simule with Proximity sensor (under Root menu)
@@ -8,10 +16,6 @@
 		- Suppress navigation bar (Softkey)
 		- Remove su call from main thread
 		- To test: gotosleep instead of lock if installed as SystemApp
-	- Remove
-		- Proximity sensor use
-	- Notes
-		- Next version add settings to choose between Proximity sensor or Hall Event?
 
 - 0.3.0
 	- Features

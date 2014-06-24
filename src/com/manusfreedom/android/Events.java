@@ -175,18 +175,21 @@ public class Events
 
 
     static {
-    	Shell.SU.available();
+    	//Shell.SU.available();
     	try {
             System.loadLibrary("GetEvent");
-        } catch (UnsatisfiedLinkError e) {
+        } catch (UnsatisfiedLinkError eGeneric) {
         	try {
-                System.load("/data/app-lib/HallMonitor/libGetEvent.so");
-            } catch (UnsatisfiedLinkError e2) {
-                System.load("/system/lib/libGetEvent.so");
+                System.load("/data/data/org.durka.hallmonitor/lib/libGetEvent.so");
+            } catch (UnsatisfiedLinkError eApkLib) {
+            	try {
+                    System.load("/data/app-lib/HallMonitor/libGetEvent.so");
+                } catch (UnsatisfiedLinkError eAppLib) {
+                    System.load("/system/lib/libGetEvent.so");
+                }
             }
         }
     }
 
 }
-
 
