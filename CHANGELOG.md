@@ -1,3 +1,9 @@
+- 0.3.7
+	- Features
+		- Real HallMonitor support for SERRANO device
+	- Fixes
+		- Remove submenu on Real HallMonitor on/off
+
 - 0.3.6
 	- Features
 		- Data & Time feature
