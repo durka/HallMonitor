@@ -64,6 +64,7 @@ public class DefaultActivity extends Activity {
     
     //all the views we need
     public ImageButton torchButton = null;
+    public ImageButton torchButton2 = null;
     private ImageButton cameraButton = null;
 
 	//we need to kill this activity when the screen opens
@@ -206,7 +207,15 @@ public class DefaultActivity extends Activity {
 			torchButton.setVisibility(View.INVISIBLE);
 		}
 		
-		//hide or show the torch button as required
+		//hide or show the alternate torch button as required
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls_alternative", false))
+		{
+			torchButton2.setVisibility(View.VISIBLE);
+		} else {
+			torchButton2.setVisibility(View.INVISIBLE);
+		}
+		
+		//hide or show the camera button as required
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_camera_controls", false))
 		{
 			cameraButton.setVisibility(View.VISIBLE);
@@ -326,6 +335,14 @@ public class DefaultActivity extends Activity {
 		Functions.Actions.toggle_torch(this);
 	}
 	
+	//toggle the alternative torch
+	public void toggleTorch(View view) {
+		if (TorchActions.flashIsOn) {
+			 	TorchActions.turnOffFlash();
+		}
+		TorchActions.toggle_torch_alternative(this);
+	}
+	
 	//fire up the camera
 	public void camera_start(View view) {
 		Functions.Actions.start_camera(this);
@@ -379,6 +396,7 @@ public class DefaultActivity extends Activity {
 		
 		//get the views we need
 	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
+	    torchButton2 = (ImageButton) findViewById(R.id.torchbutton2);
 	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
 	}
 
@@ -449,7 +467,9 @@ public class DefaultActivity extends Activity {
 		if (Functions.Actions.timerTask != null) {
 			Functions.Actions.timerTask.cancel();
 		}
-
+		if (TorchActions.flashIsOn) {
+				TorchActions.turnOffFlash();
+		}
 		if (camera_up) {
 			Functions.Actions.end_camera(this, false);
 		}

@@ -235,10 +235,22 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                         packageManager.getApplicationLogo("net.cactii.flash2");
                     } catch (PackageManager.NameNotFoundException nfne) {
                         // if the app isn't installed, just refuse to set the preference
-                        Toast.makeText(getActivity(), "Default torch application is not installed - cannot enable torch button!", Toast.LENGTH_SHORT).show();
+                    	Toast.makeText(getActivity(), getString(R.string.no_torch_app), Toast.LENGTH_SHORT).show();
                         prefs.edit().putBoolean(key, false).commit();
                     }
                 }
+             // if the flash controls are being enabled/disabled the key will be pref_widget     
+        } else if (key.equals("pref_flash_controls_alternative")) {
+        		if (prefs.getBoolean(key, false) ) {
+           			TorchActions.deviceHasFlash(getActivity());
+           			if (TorchActions.deviceHasFlash) {
+           				prefs.edit().putBoolean(key, true).commit();
+         			} else {
+        	          	// if the device does not have camera flash feature refuse to set the preference
+                      	Toast.makeText(getActivity(), getString(R.string.no_torch), Toast.LENGTH_SHORT).show();
+        	         	prefs.edit().putBoolean(key, false).commit();
+                  	}
+               	}
             // preferences_phone
         } else if (key.equals("pref_phone_controls_tts_delay")) {
             updatePhoneControlTtsDelay(prefs);
