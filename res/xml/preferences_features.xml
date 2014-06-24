@@ -15,12 +15,6 @@
 	        android:defaultValue="false" />
 	    
 	    <org.durka.hallmonitor.PreferenceSwitchable
-	    	android:key="pref_flash_controls_alternative"
-  	        android:title="@string/pref_flash_controls_alternative"
- 	        android:summary="@string/pref_flash_controls_alternative_summary"
- 	        android:defaultValue="false" />
-	    
-	    <org.durka.hallmonitor.PreferenceSwitchable
 	        android:key="pref_camera_controls"
 	        android:title="@string/pref_camera_controls"
 	        android:summary="@string/pref_camera_controls_summary"

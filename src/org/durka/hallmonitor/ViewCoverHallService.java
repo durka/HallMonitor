@@ -21,14 +21,12 @@ import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.manusfreedom.android.Events;
 import com.manusfreedom.android.Events.InputDevice;
-
 import eu.chainfire.libsuperuser.Shell;
 
 public class ViewCoverHallService extends Service implements Runnable {
@@ -36,9 +34,6 @@ public class ViewCoverHallService extends Service implements Runnable {
 	private HeadsetReceiver		mHeadset;
 	private Thread				getevent;
 	private Boolean				serviceStarted;
-	
-	private static final String DEV_SERRANO_LTE_CM10 = "serranolte"; 	// GT-I9195 CM10.x
-	private static final String DEV_SERRANO_LTE_CM11 = "serranoltexx"; 	// GT-I9195 CM11.x
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -100,9 +95,6 @@ public class ViewCoverHallService extends Service implements Runnable {
 		Shell.SU.available();
 
 		String neededDevice = "gpio-keys";
-		if(Build.DEVICE.equals(DEV_SERRANO_LTE_CM10) || Build.DEVICE.equals(DEV_SERRANO_LTE_CM11)){
-				neededDevice = "sec_keys";
-		}
 		Events events = new Events();
 		
 		events.AddAllDevices();

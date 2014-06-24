@@ -6,6 +6,7 @@
         android:key="pref_realhall"
         android:title="@string/pref_realhall"
         android:summary="@string/pref_realhall_summary"
+        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader"
         android:defaultValue="false"/>
 
 </PreferenceScreen>

@@ -17,8 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.durka.hallmonitor"
           android:installLocation="internalOnly"
-          android:versionCode="12"
-          android:versionName="0.3.7">
+          android:versionCode="11"
+          android:versionName="0.3.6">
   <uses-sdk android:minSdkVersion="19"
             android:targetSdkVersion="19" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -75,6 +75,6 @@
               android:configChanges="orientation|keyboardHidden|screenSize"
               android:launchMode="singleTask"
               android:theme="@style/FullscreenTheme"
-              android:excludeFromRecents="true"></activity>
+              android:noHistory="true"></activity>
   </application>
 </manifest>
