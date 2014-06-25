@@ -43,8 +43,16 @@
         android:key="pref_runasroot"
         android:title="@string/pref_runasroot"
         android:summary="@string/pref_runasroot_summary"
+        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader"
         android:defaultValue="false"
-        android:dependency="pref_enabled" />
+        android:dependency="pref_enabled">
+        <extra
+            android:name="resource"
+            android:value="preferences_root" />
+        <extra
+            android:name="title"
+            android:value="@string/pref_runasroot_title" />
+    </org.durka.hallmonitor.PreferenceSwitchable>
     
     <PreferenceScreen
         android:title="@string/pref_widgets"

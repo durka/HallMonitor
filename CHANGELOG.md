@@ -1,3 +1,41 @@
+- 0.3.8
+	- Fixes
+		- Fix System Bar appear under cover when we touch the screen (only for people using navigation bar instead of harware buttons)
+
+- 0.3.7
+	- Features
+		- Real HallMonitor support for SERRANO device
+	- Fixes
+		- Remove submenu on Real HallMonitor on/off
+
+- 0.3.6
+	- Features
+		- Data & Time feature
+		- Fix HallMonitor as System App on CM (gotosleep working): read special Readme
+		- Try better touch when cover is closed (nothing change but more often call but more often call to enble it)
+		- Build for more system
+		- Fix licenses
+
+- 0.3.5
+	- Features
+		- Possibility to choose between real Hall or simule with Proximity sensor (under Root menu)
+		- Change licencing to Apache
+		- Use eu.chainfire.libsuperuser in place of net.pocketmagic.android.eventinjector
+		- All su access through eu.chainfire.libsuperuser.Shell
+		- Removed unused library import
+		- Suppress navigation bar (Softkey)
+		- Remove su call from main thread
+		- To test: gotosleep instead of lock if installed as SystemApp
+
+- 0.3.0
+	- Features
+		- Add real Hall Event
+		- Root is now a requirement
+	- Remove
+		- Proximity sensor use
+	- Notes
+		- Next version add settings to choose between Proximity sensor or Hall Event?
+
 - 0.2.2
 	- Fixes
 		- (#37) Last used app no longer shows up randomly

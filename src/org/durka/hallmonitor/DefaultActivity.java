@@ -1,36 +1,25 @@
 package org.durka.hallmonitor;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.io.IOException;
 
-import org.durka.hallmonitor.Functions.Util;
+import org.durka.hallmonitor.Functions.Actions;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.net.Uri;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources.NotFoundException;
-import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
-import android.provider.ContactsContract;
-import android.service.notification.StatusBarNotification;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -38,14 +27,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * This is the activity that is displayed by default - it is displayed for the configurable delay number of milliseconds when the case is closed,
@@ -79,7 +65,7 @@ public class DefaultActivity extends Activity {
     //all the views we need
     public ImageButton torchButton = null;
     private ImageButton cameraButton = null;
-    
+
 	//we need to kill this activity when the screen opens
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
@@ -118,6 +104,7 @@ public class DefaultActivity extends Activity {
 					//to guarantee that we need to hold off until the alarm activity is running
 					//a 1 second delay seems to allow this
 					if (Functions.Is.cover_closed(context)) {
+						Functions.Actions.enableCoverTouch(context, true);
 						Timer timer = new Timer();
 						timer.schedule(new TimerTask() {
 							@Override
@@ -154,9 +141,9 @@ public class DefaultActivity extends Activity {
 					} else {
 						if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 							Functions.Events.call_finished(context);
-							refreshDisplay();
 						}
 					}
+					refreshDisplay();
 				} else {
 					Log.d("phone", "phone controls are not enabled");
 				}
@@ -176,91 +163,44 @@ public class DefaultActivity extends Activity {
 	};
 
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		//pass a reference back to the Functions class so it can finish us when it wants to
-		//FIXME Presumably there is a better way to do this
-		Functions.defaultActivity = this;
-
-		Log.d("DA.onCreate", "onCreate of DefaultView.");
-
-		//Remove title bar
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-		//Remove notification bar
-		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-		//set default view
-		setContentView(R.layout.activity_default);
-		
-		//get the audio manager
-		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-
-		//add screen on and alarm fired intent receiver
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_SCREEN_ON);
-		filter.addAction(ALARM_ALERT_ACTION);
-		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
-		filter.addAction("org.durka.hallmonitor.debug");
-		filter.addAction(ALARM_DONE_ACTION);
-		registerReceiver(receiver, filter);
-		
-		//get the views we need
-	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
-	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
-
-	}  
-
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-        // load debug setting
-        mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
-
-		Log.d("DA.onResume", "On resume called.");
-
-        refreshDisplay(); // TODO is this necessary to do here?`
-
-        /*
-        // check preview (extras are configured in xml)
-        if (getIntent().getExtras() != null && !getIntent().getExtras().getString("preview", "").equals("")) {
-            String preview = getIntent().getExtras().getString("preview");
-
-            if (preview.equals("phoneWidget")) {
-                new AlertDialog.Builder(this)
-                        .setMessage("search AlertDialog in DefaultActivity to place your code for preview of '" + preview + "' there!")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        })
-                        .show();
-            }
-        }
-        */
-	}
-
 	/**
 	 * Refresh the display taking account of device and application state
 	 */
 	public void refreshDisplay() {
 		
+		//Remove navigation bar
+		View decorView = getWindow().getDecorView();	
+		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+	            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+	            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+	            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+	            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+	            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+		if (findViewById(R.id.default_battery_picture) != null) {
+			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
+				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
+				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
+			} else {
+				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
+			}
+			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
+			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
+		}
+
 		// we might have missed a phone-state revelation
 		phone_ringing = ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).getCallState() == TelephonyManager.CALL_STATE_RINGING;
-
-		//get the layout for the windowed view
-		RelativeLayout contentView = (RelativeLayout)findViewById(R.id.default_widget);
 
 		//set the colours based on the picker values
 		Drawable rounded = getResources().getDrawable(R.drawable.rounded);
 		rounded.setColorFilter(new PorterDuffColorFilter(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_bgcolor", 0xFF000000), PorterDuff.Mode.MULTIPLY));
 		((RelativeLayout)findViewById(R.id.default_content)).setBackground(rounded);
 		((TextClock)findViewById(R.id.default_text_clock)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+		((TextClock)findViewById(R.id.default_text_clock_hour)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+		((TextView)findViewById(R.id.default_text_clock_date)).setTextColor(PreferenceManager.getDefaultSharedPreferences(this).getInt("pref_default_fgcolor", 0xFFFFFFFF));
+		((TextView)findViewById(R.id.default_text_clock_date)).setText(DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date()));
 		
 		//hide or show the torch button as required
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false))
@@ -288,7 +228,17 @@ public class DefaultActivity extends Activity {
 			widgetType = "media";
 		}
 		// reset to showing the clock, but in a second we might hide it and attach a widget
-		findViewById(R.id.default_text_clock).setVisibility(View.VISIBLE);
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_datetime", false))
+		{
+			findViewById(R.id.default_text_clock).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_text_clock_hour).setVisibility(View.VISIBLE);
+			findViewById(R.id.default_text_clock_date).setVisibility(View.VISIBLE);
+		} else {
+			findViewById(R.id.default_text_clock).setVisibility(View.VISIBLE);
+			findViewById(R.id.default_text_clock_hour).setVisibility(View.INVISIBLE);
+			findViewById(R.id.default_text_clock_date).setVisibility(View.INVISIBLE);
+		}
+		
 		((RelativeLayout)findViewById(R.id.default_widget_area)).removeAllViews();
 
 		if (alarm_firing) {
@@ -337,6 +287,8 @@ public class DefaultActivity extends Activity {
 
 				//add the widget to the view
 				findViewById(R.id.default_text_clock).setVisibility(View.INVISIBLE);
+				findViewById(R.id.default_text_clock_hour).setVisibility(View.INVISIBLE);
+				findViewById(R.id.default_text_clock_date).setVisibility(View.INVISIBLE);
 				((RelativeLayout)findViewById(R.id.default_widget_area)).addView(hostView);
 			}
 		}
@@ -393,23 +345,67 @@ public class DefaultActivity extends Activity {
 	}
 	
 	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		//pass a reference back to the Functions class so it can finish us when it wants to
+		//FIXME Presumably there is a better way to do this
+		Functions.defaultActivity = this;
+
+		Log.d("DA.onCreate", "onCreate of DefaultView.");
+
+		//Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		//Remove notification bar
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		//Remove navigation bar
+		View decorView = getWindow().getDecorView();	
+		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+	            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+	            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+	            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+	            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+	            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+		//set default view
+		setContentView(R.layout.activity_default);
+
+		
+		//get the audio manager
+		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+
+		//add screen on and alarm fired intent receiver
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_SCREEN_ON);
+		filter.addAction(ALARM_ALERT_ACTION);
+		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		filter.addAction("org.durka.hallmonitor.debug");
+		filter.addAction(ALARM_DONE_ACTION);
+		registerReceiver(receiver, filter);
+		
+		//get the views we need
+	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
+	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+
+		if(hasFocus) {
+			Functions.Actions.enableCoverTouch(getBaseContext(), true);
+			refreshDisplay();
+		}
+
+	}
+
+	@Override
 	protected void onStart() {
 	    super.onStart();
 	    Log.d("DA-oS", "starting");
 	    on_screen = true;
-
-		if (findViewById(R.id.default_battery_picture) != null) {
-			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
-				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
-			} else {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
-			}
-			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
-			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
-		}
 
 		if (NotificationService.that != null) {
 			// notification listener service is running, show the current notifications
@@ -421,9 +417,39 @@ public class DefaultActivity extends Activity {
 	
 	@Override
 	protected void onPause() {
-	    super.onPause();
+		super.onPause();
 	}
 	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+        // load debug setting
+        mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
+
+		Log.d("DA.onResume", "On resume called.");
+
+		refreshDisplay(); // TODO is this necessary to do here?`
+
+        /*
+        // check preview (extras are configured in xml)
+        if (getIntent().getExtras() != null && !getIntent().getExtras().getString("preview", "").equals("")) {
+            String preview = getIntent().getExtras().getString("preview");
+
+            if (preview.equals("phoneWidget")) {
+                new AlertDialog.Builder(this)
+                        .setMessage("search AlertDialog in DefaultActivity to place your code for preview of '" + preview + "' there!")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .show();
+            }
+        }
+        */
+	}
+
 	@Override
 	protected void onStop() {
 		super.onStop();

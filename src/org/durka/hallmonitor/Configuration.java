@@ -15,19 +15,15 @@
 package org.durka.hallmonitor;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 
 public class Configuration extends PreferenceActivity {
     private final String LOG_TAG = "Configuration";
