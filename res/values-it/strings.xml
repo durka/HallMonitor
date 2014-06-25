@@ -50,9 +50,14 @@
     <string name="pref_dim_summary">Quando la cover è chiusa e Hall Monitor è attivo (vedi sotto), la luminosità dello schermo si deve abbassare?</string>
     <string name="pref_keep_admin">Mantieni lo stato di amministratore del dispositivo</string>
     <string name="pref_keep_admin_summary">Quando Hall Monitor viene disabilitato, i permessi di amministratore del dispositivo non vengono revocati. Quando questa opzione viene selezionata, Hall Monitor non chiederà nuovamente di diventare amministratore del dispositivo quando viene abilitato. Utile quando si eseguono operazioni automatiche, es. Tasker.</string>
+    <string name="pref_datetime">Mostra Data e Ora</string>
+    <string name="pref_datetime_summary">Se selezionato mostra oltre all\' ora anche la data.</string>
     
     <string name="pref_runasroot">Impostazioni Root</string>
     <string name="pref_runasroot_summary">L\' applicazione dovrebbe venire eseguita con i permessi di superutente (richiesto per la maggior parte delle impostazioni) - per risultati migliori è meglio autorizzare permanentemente il root.</string>
+    <string name="pref_runasroot_title">Impostazioni Root</string>
+    <string name="pref_realhall">Usa Real Hall</string>
+    <string name="pref_realhall_summary">Seleziona per utilizzare il sensore real hall al posto del sensore di prossimità.</string>
     
     <string name="pref_optional">Impostazioni Opzionali</string>
     <string name="pref_optional_summary">Cliccate per abilitare/disabilitare le impostazioni</string>
@@ -96,7 +101,7 @@
     <string name="pref_security_settings_summary">Scorciatoia per le impostazioni dello schermo di blocco Android</string>
     
     <string name="pref_about">Su Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor versione 0.3.7.\nCopyright 2014 Alex Burka, rilasciato su Licenza Apache v2.\nTradotto in italiano da Zanin Marco\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor versione 0.3.9.\nCopyright 2014 Alex Burka, rilasciato su Licenza Apache v2.\nTradotto in italiano da Zanin Marco\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Impostazioni</string>
     <string name="pref_preview">Anteprima</string>
     <string name="pref_test">Test</string>
