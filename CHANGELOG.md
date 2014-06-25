@@ -1,3 +1,7 @@
+- 0.3.8
+	- Fixes
+		- Fix System Bar appear under cover when we touch the screen (only for people using navigation bar instead of harware buttons)
+
 - 0.3.7
 	- Features
 		- Real HallMonitor support for SERRANO device
