@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -222,7 +223,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         	localSuAvailable.execute();
         	
         } else if (key.equals("pref_realhall")) {
-            Functions.Actions.stop_service(getActivity());
+        	Context ctx = getActivity();
+        	ctx.stopService(new Intent(ctx, ViewCoverHallService.class));
+			ctx.stopService(new Intent(ctx, ViewCoverProximityService.class));
+			ctx.stopService(new Intent(ctx, NotificationService.class));
             SystemClock.sleep(1000);
             Functions.Actions.start_service(getActivity());
 
