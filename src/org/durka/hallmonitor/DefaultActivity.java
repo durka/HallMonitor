@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.durka.hallmonitor.Functions.Actions;
+import org.durka.hallmonitor.Functions.TorchActions;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
@@ -341,13 +342,14 @@ public class DefaultActivity extends Activity {
 	
 	//toggle the alternative torch
 	public void toggleTorch(View view) {
-		TorchActions.toggle_torch_alternative(this);
+		Functions.Actions.toggle_torch_alternative(this);
 	}
 	
 	//fire up the camera
 	public void camera_start(View view) {
-		if (TorchActions.flashIsOn) {
+		if (Functions.flashIsOn) {
 		 	TorchActions.turnOffFlash();
+		 	torchButton2.setImageResource(R.drawable.ic_appwidget_torch_off);
 		}
 		Functions.Actions.start_camera(this);
 	}
@@ -475,7 +477,7 @@ public class DefaultActivity extends Activity {
 		if (Functions.Actions.timerTask != null) {
 			Functions.Actions.timerTask.cancel();
 		}
-		if (TorchActions.flashIsOn) {
+		if (Functions.flashIsOn) {
 				TorchActions.turnOffFlash();
 		}
 		if (camera_up) {

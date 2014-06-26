@@ -14,6 +14,8 @@
  */
 package org.durka.hallmonitor;
 
+import org.durka.hallmonitor.Functions.TorchActions;
+
 import eu.chainfire.libsuperuser.Shell;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -243,7 +245,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         } else if (key.equals("pref_flash_controls_alternative")) {
         		if (prefs.getBoolean(key, false) ) {
            			TorchActions.deviceHasFlash(getActivity());
-           			if (TorchActions.deviceHasFlash) {
+           			if (Functions.deviceHasFlash) {
            				prefs.edit().putBoolean(key, true).commit();
          			} else {
         	          	// if the device does not have camera flash feature refuse to set the preference
