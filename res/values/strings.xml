@@ -52,6 +52,8 @@
     <string name="pref_keep_admin_summary">When Hall Monitor is disabled, don\'t relinquish Device Administrator permissions. If checked, Hall Monitor won\'t need to ask to become Device Administrator when you turn it on. May be useful with automation, e.g. Tasker.</string>
     <string name="pref_datetime">Display time and date</string>
     <string name="pref_datetime_summary">If checked, display time and date instead of only time.</string>
+    <string name="pref_keyguard">Enable/Dismiss Keyguard</string>
+    <string name="pref_keyguard_summary">If checked, dismiss the default lock screen when user open the cover. Not working with secure lock screen (Password, PIN, etc.).</string>
     
     <string name="pref_runasroot">Root Features</string>
     <string name="pref_runasroot_summary">Should the app run with root permissions (required for most features) - allow permanent root access for best results.</string>
@@ -87,6 +89,8 @@
     
     <string name="pref_flash_controls">Torch Controls</string>
     <string name="pref_flash_controls_summary">Whether to include a button to turn the torch on and off on the lock screen</string>
+    <string name="pref_flash_controls_alternative">Alternative Torch Controls</string>
+    <string name="pref_flash_controls_alternative_summary">This is an alternative to stock CM torch App for users that installs HallMonitor in non-CM roms.</string>
     <string name="pref_camera_controls">Camera Controls</string>
     <string name="pref_camera_controls_summary">Whether to include a button to activate the camera on the lock screen</string>
     
@@ -99,7 +103,7 @@
     <string name="pref_security_settings_summary">Shortcut to Android screen lock settings</string>
     
     <string name="pref_about">About Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor version 0.3.8.\nCopyright 2014 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor version 0.3.9.\nCopyright 2014 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Settings</string>
     <string name="pref_preview">Preview</string>
     <string name="pref_test">Test</string>
@@ -108,6 +112,10 @@
     <string name="firstrun_message">I see you\'ve upgraded to version %s! Be sure to click on everything, there are tons of new features.</string>
     <string name="firstrun_ok">OK</string>
     
+    <!-- toast messages -->
+    <string name="no_torch_app">Default CM torch application is not installed - cannot enable torch button, please try alternative method!</string>
+    <string name="no_torch">Cannot enable torch button, your phone does not support this function!</string>
+      
     <!-- random strings -->
     <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
     <string name="title_activity_window">WindowActivity</string>

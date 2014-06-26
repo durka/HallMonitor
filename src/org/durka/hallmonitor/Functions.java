@@ -32,8 +32,11 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.database.Cursor;
+import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -69,6 +72,11 @@ public class Functions {
     private static final String DEV_SERRANO_LTE_CM10 = "serranolte"; 	// GT-I9195 CM10.x
     private static final String DEV_SERRANO_LTE_CM11 = "serranoltexx"; 	// GT-I9195 CM11.x
 	
+    //All we need for alternative torch	 
+    private static Camera camera;
+    public static boolean flashIsOn = false;
+    public static boolean deviceHasFlash;
+    
 	//Class that handles interaction with 3rd party App Widgets
 	public static final HMAppWidgetManager hmAppWidgetManager = new HMAppWidgetManager();
 	
@@ -377,6 +385,18 @@ public class Functions {
 	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
 	        	close_cover(da);
 	        }
+		}
+		
+		public static void toggle_torch_alternative(DefaultActivity da) {
+	    	if (!flashIsOn) {
+	    		TorchActions.turnOnFlash();
+	    		da.torchButton2.setImageResource(R.drawable.ic_appwidget_torch_on);
+	    		if (Actions.timerTask != null) Actions.timerTask.cancel();
+	    } else {
+	    		TorchActions.turnOffFlash();
+	    		da.torchButton2.setImageResource(R.drawable.ic_appwidget_torch_off);
+	    		close_cover(da);
+	    	}
 		}
 		
 		public static void start_camera(DefaultActivity da) {
@@ -855,6 +875,45 @@ public class Functions {
 	        wl.release();
 		}
 		
+	}
+	
+	public static class TorchActions {
+		
+		/**
+		 * With this non-CM users can use torch button in HallMonitor.
+		 * Should (Hopefully) work on every device with SystemFeature FEATURE_CAMERA_FLASH
+		 * This code has been tested on I9505 jflte with ParanoidAndroid 4.4 rc2
+		 */
+
+	    // Turn On Flash
+	    public static void turnOnFlash() {
+	    	camera = Camera.open();
+	    	Parameters p = camera.getParameters();
+	    	p.setFlashMode(Parameters.FLASH_MODE_TORCH);
+	    	camera.setParameters(p);
+	    	camera.startPreview();
+	    	flashIsOn = true;
+	    	Log.d("torch", "turned on!");
+		}
+
+	    // Turn Off Flash
+	    public static void turnOffFlash() {
+	    	Parameters p = camera.getParameters();
+	    	p.setFlashMode(Parameters.FLASH_MODE_OFF);
+	    	camera.setParameters(p);
+	    	camera.stopPreview();
+	    	flashIsOn = false;
+	    	// Be sure to release the camera when the flash is turned off
+	    	if (camera != null) {
+	    		camera.release();
+	    		camera = null;
+	    		Log.d("torch", "turned off and camera released!");
+	    	}
+		}
+	    
+	    public static void deviceHasFlash(Context ctx) { 
+	    	deviceHasFlash = ctx.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);        
+	    }
 	}
 
 }

@@ -1,3 +1,12 @@
+- 0.3.9
+	- Features
+		- Added italian translation
+		- Added alternative torch button (tested on i9505, need test on other devices)
+	- Fixes
+		- Removed HallMonitor from "recent app list"
+		- Fix 5 seconds delay on start activity after home button pression (System App only)
+		- Minor changes
+
 - 0.3.8
 	- Fixes
 		- Fix System Bar appear under cover when we touch the screen (only for people using navigation bar instead of harware buttons)
