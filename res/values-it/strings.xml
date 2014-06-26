@@ -52,6 +52,8 @@
     <string name="pref_keep_admin_summary">Quando Hall Monitor viene disabilitato, i permessi di amministratore del dispositivo non vengono revocati. Quando questa opzione viene selezionata, Hall Monitor non chiederà nuovamente di diventare amministratore del dispositivo quando viene abilitato. Utile quando si eseguono operazioni automatiche, es. Tasker.</string>
     <string name="pref_datetime">Mostra Data e Ora</string>
     <string name="pref_datetime_summary">Se selezionato mostra oltre all\' ora anche la data.</string>
+    <string name="pref_keyguard">Abilita/Disabilita Keyguard</string>
+    <string name="pref_keyguard_summary">Se selezionata questa opzione rimuove il blocco schermo quando la cover viene aperta. Non funziona se si utilizza una schermata di blocco protetta (Password, PIN, ecc.).</string>
     
     <string name="pref_runasroot">Impostazioni Root</string>
     <string name="pref_runasroot_summary">L\' applicazione dovrebbe venire eseguita con i permessi di superutente (richiesto per la maggior parte delle impostazioni) - per risultati migliori è meglio autorizzare permanentemente il root.</string>

@@ -22,6 +22,7 @@
         android:title="@string/pref_default_bgcolor"
         android:summary="@string/pref_default_bgcolor_summary"
         android:defaultValue="0xFFA5C8F2" />
+    
     <afzkl.development.colorpickerview.preference.ColorPickerPreference
         android:key="pref_default_fgcolor"
         android:title="@string/pref_default_fgcolor"
@@ -32,6 +33,12 @@
         android:key="pref_datetime"
         android:title="@string/pref_datetime"
         android:summary="@string/pref_datetime_summary"
+        android:defaultValue="false" />
+    
+    <CheckBoxPreference
+        android:key="pref_keyguard"
+        android:title="@string/pref_keyguard"
+        android:summary="@string/pref_keyguard_summary"
         android:defaultValue="false" />
 
     <CheckBoxPreference

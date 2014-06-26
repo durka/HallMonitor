@@ -474,6 +474,9 @@ public class DefaultActivity extends Activity {
 	protected void onStop() {
 		super.onStop();
 		Log.d("DA-oS", "stopping");
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_keyguard", true)) {
+			this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+		}
 		if (Functions.Actions.timerTask != null) {
 			Functions.Actions.timerTask.cancel();
 		}
