@@ -14,18 +14,21 @@
  */
 package org.durka.hallmonitor;
 
+import org.durka.hallmonitor.Functions.TorchActions;
+
+import eu.chainfire.libsuperuser.Shell;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -35,8 +38,6 @@ import android.preference.PreferenceScreen;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
@@ -141,7 +142,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         prefs.edit()
-            .putBoolean("pref_enabled", Functions.Is.service_running(getActivity(), ViewCoverService.class))
+            .putBoolean("pref_enabled", Functions.Is.service_running(getActivity(), ViewCoverHallService .class) || Functions.Is.service_running(getActivity(), ViewCoverProximityService.class))
             .putBoolean("pref_do_notifications", Functions.Is.service_running(getActivity(), NotificationService.class))
             //.putBoolean("pref_default_widget", Functions.Is.widget_enabled(getActivity(), "default"))
             //.putBoolean("pref_media_widget", Functions.Is.widget_enabled(getActivity(), "media"))
@@ -188,6 +189,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         	Log.d(LOG_TAG, "pref_enabled is now " + prefs.getBoolean(key, false));
 
             if (prefs.getBoolean(key, false)) {
+            	if(prefs.getBoolean("pref_runasroot", false)) {
+                	AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
+                	localSuAvailable.execute();
+            	}
                 Functions.Actions.start_service(getActivity());
             } else {
                 Functions.Actions.stop_service(getActivity());
@@ -211,18 +216,15 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                 Functions.Actions.unregister_widget(getActivity(), "media");
             }
 
-            // if the default screen widget is being enabled/disabled the key will be pref_widget
         } else if (key.equals("pref_runasroot")) {
 
-            if (prefs.getBoolean(key, false)) {
-            	String output = Functions.Actions.run_commands_as_root(new String[]{"whoami"});
-            	// if we have root, "whoami" either returns "root" on stdout, or "whoami: unknown uid 0" on stderr
-                if (!output.equals("root") && !output.equals("whoami: unknown uid 0")) {
-                    // if "whoami" doesn't work, refuse to set preference
-                    Toast.makeText(getActivity(), "Root access not granted - cannot enable root features!", Toast.LENGTH_SHORT).show();
-                    prefs.edit().putBoolean(key, false).commit();
-                }
-            }
+        	AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
+        	localSuAvailable.execute();
+        	
+        } else if (key.equals("pref_realhall")) {
+            Functions.Actions.stop_service(getActivity());
+            SystemClock.sleep(1000);
+            Functions.Actions.start_service(getActivity());
 
         } else if (key.equals("pref_do_notifications")) {
             Functions.Actions.do_notifications(getActivity(), prefs.getBoolean(key, false));
@@ -235,10 +237,22 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                         packageManager.getApplicationLogo("net.cactii.flash2");
                     } catch (PackageManager.NameNotFoundException nfne) {
                         // if the app isn't installed, just refuse to set the preference
-                        Toast.makeText(getActivity(), "Default torch application is not installed - cannot enable torch button!", Toast.LENGTH_SHORT).show();
+                    	Toast.makeText(getActivity(), getString(R.string.no_torch_app), Toast.LENGTH_SHORT).show();
                         prefs.edit().putBoolean(key, false).commit();
                     }
                 }
+             // if the flash controls are being enabled/disabled the key will be pref_widget     
+        } else if (key.equals("pref_flash_controls_alternative")) {
+        		if (prefs.getBoolean(key, false) ) {
+           			TorchActions.deviceHasFlash(getActivity());
+           			if (Functions.deviceHasFlash) {
+           				prefs.edit().putBoolean(key, true).commit();
+         			} else {
+        	          	// if the device does not have camera flash feature refuse to set the preference
+                      	Toast.makeText(getActivity(), getString(R.string.no_torch), Toast.LENGTH_SHORT).show();
+        	         	prefs.edit().putBoolean(key, false).commit();
+                  	}
+               	}
             // preferences_phone
         } else if (key.equals("pref_phone_controls_tts_delay")) {
             updatePhoneControlTtsDelay(prefs);
@@ -324,4 +338,20 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
     	
     	return false;
     }
+
+    private class AsyncSuAvailable extends AsyncTask<Boolean, Boolean, Boolean> {
+		@Override
+		protected Boolean doInBackground(Boolean... params) {
+            return Shell.SU.available();
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if(!result)
+			{
+				Toast.makeText(getActivity(), "Root access not granted - cannot enable root features!", Toast.LENGTH_SHORT).show();
+				getPreferenceManager().getSharedPreferences().edit().putBoolean("pref_runasroot", false).commit();
+			}
+		}
+	}
 }

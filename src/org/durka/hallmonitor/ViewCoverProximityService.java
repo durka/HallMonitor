@@ -26,21 +26,18 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.hardware.input.InputManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.InputDevice;
 
-
-public class ViewCoverService extends Service implements SensorEventListener {
+public class ViewCoverProximityService extends Service implements SensorEventListener {
 	
 	private SensorManager       mSensorManager;
 	private HeadsetReceiver		mHeadset;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d("VCS.onStartCommand", "View cover service started");
+		Log.d("VCPS.onStartCommand", "View cover Proximity service started");
 
         //We don't want to do this - almost by defninition the cover can't be closed, and we don't actually want to do any open cover functionality
 		//until the cover is closed and then opened again
@@ -65,7 +62,7 @@ public class ViewCoverService extends Service implements SensorEventListener {
 			
 			int id = prefs.getInt("default_widget_id", -1);
 			if (id != -1) {
-				Log.d("VCS-oSC", "creating default widget with id=" + id);
+				Log.d("VCPS-oSC", "creating default widget with id=" + id);
 				
 				Intent data = new Intent();
 				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
@@ -79,7 +76,7 @@ public class ViewCoverService extends Service implements SensorEventListener {
 			
 			int id = prefs.getInt("media_widget_id", -1);
 			if (id != -1) {
-				Log.d("VCS-oSC", "creating media widget with id=" + id);
+				Log.d("VCPS-oSC", "creating media widget with id=" + id);
 				
 				Intent data = new Intent();
 				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
@@ -100,25 +97,26 @@ public class ViewCoverService extends Service implements SensorEventListener {
 	
 	@Override
 	public void onDestroy() {
-		Log.d("VCS.onStartCommand", "View cover service stopped");
+		Log.d("VCPS.onStartCommand", "View cover Proximity service stopped");
 		
 		//unregisterReceiver(receiver);
 		mSensorManager.unregisterListener(this);
 		
 		unregisterReceiver(mHeadset);
+		super.onDestroy();
 	}
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// I don't care
-		Log.d("VCS.onAccuracyChanged", "OnAccuracyChanged: Sensor=" + sensor.getName() + ", accuracy=" + accuracy);
+		Log.d("VCPS.onAccuracyChanged", "OnAccuracyChanged: Sensor=" + sensor.getName() + ", accuracy=" + accuracy);
 	}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		
 		if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {	
-			Log.d("VCS.onSensorChanged", "Proximity sensor changed, value=" + event.values[0]);
+			Log.d("VCPS.onSensorChanged", "Proximity sensor changed, value=" + event.values[0]);
 			Functions.Events.proximity(this, event.values[0]);
 			
 			//improve reliability by refiring the event 200ms afterwards

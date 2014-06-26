@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <org.durka.hallmonitor.PreferenceSwitchable
+        android:key="pref_realhall"
+        android:title="@string/pref_realhall"
+        android:summary="@string/pref_realhall_summary"
+        android:defaultValue="false"/>
+
+</PreferenceScreen>

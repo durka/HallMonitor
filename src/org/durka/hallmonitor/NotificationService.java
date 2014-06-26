@@ -15,16 +15,8 @@
 package org.durka.hallmonitor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import android.app.Service;
-import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.os.IBinder;
 import android.util.Log;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
@@ -34,6 +26,7 @@ public class NotificationService extends NotificationListenerService {
 	
 	public static NotificationService that = null;
 	
+	@SuppressWarnings("serial")
 	private final List<String> blacklist = new ArrayList<String>() {{
 			add("net.cactii.flash2"); // we have our own flashlight UI
 			add("android");           // this covers the keyboard selection notification, but does it clobber others too? TODO
