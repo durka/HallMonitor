@@ -234,7 +234,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
             Functions.Actions.do_notifications(getActivity(), prefs.getBoolean(key, false));
         // if the flash controls are being enabled/disabled the key will be pref_widget
         } else if (key.equals("pref_flash_controls")) {
-
+        	
+        	if (prefs.getBoolean("pref_flash_controls_alternative", true) ) {Toast.makeText(getActivity(), getString(R.string.alternative_torch_enabled), Toast.LENGTH_SHORT).show();
+            prefs.edit().putBoolean(key, false).commit();   		
+        	} else 
                 if (prefs.getBoolean(key, false) ) {
                     try {
                         PackageManager packageManager = getActivity().getPackageManager();
@@ -245,8 +248,12 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                         prefs.edit().putBoolean(key, false).commit();
                     }
                 }
-             // if the flash controls are being enabled/disabled the key will be pref_widget     
+        // if the flash controls are being enabled/disabled the key will be pref_widget     
         } else if (key.equals("pref_flash_controls_alternative")) {
+        	
+        	if (prefs.getBoolean("pref_flash_controls", true) ) {Toast.makeText(getActivity(), getString(R.string.default_torch_enabled), Toast.LENGTH_SHORT).show();
+            prefs.edit().putBoolean(key, false).commit();   		
+        	} else 
         		if (prefs.getBoolean(key, false) ) {
            			TorchActions.deviceHasFlash(getActivity());
            			if (Functions.deviceHasFlash) {

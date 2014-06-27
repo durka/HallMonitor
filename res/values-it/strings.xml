@@ -115,6 +115,8 @@
     <!-- toast messages -->
     <string name="no_torch_app">Applicazione torcia CM non installata - impossibile abilitare la torcia, prova il metodo alternativo!</string>
     <string name="no_torch">Impossibile abilitare la torcia, il tuo telefono non supporta questa funzione!</string>
+    <string name="default_torch_enabled">Hai già abilitato la torcia di default, non ti serve un altro tasto per accendere la torcia!</string>
+    <string name="alternative_torch_enabled">Hai già abilitato la torcia alternativa, non ti serve un altro tasto per accendere la torcia!</string> 
     
     <!-- random strings -->
     <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>

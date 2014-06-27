@@ -199,15 +199,17 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int admin_granted=0x7f090004;
         public static final int admin_refused=0x7f090006;
         public static final int admin_revoked=0x7f090005;
+        public static final int alternative_torch_enabled=0x7f09004e;
         /**  titles and such 
  titles and such 
          */
         public static final int app_name=0x7f090000;
-        public static final int caller_name=0x7f090055;
-        public static final int caller_number=0x7f090056;
-        public static final int dismiss=0x7f090054;
-        public static final int dummy_button=0x7f090051;
-        public static final int dummy_content=0x7f090052;
+        public static final int caller_name=0x7f090057;
+        public static final int caller_number=0x7f090058;
+        public static final int default_torch_enabled=0x7f09004d;
+        public static final int dismiss=0x7f090056;
+        public static final int dummy_button=0x7f090053;
+        public static final int dummy_content=0x7f090054;
         /**  version upgrade dialog 
  version upgrade dialog 
          */
@@ -216,8 +218,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         /**  random strings 
  random strings 
          */
-        public static final int hall_file=0x7f09004d;
-        public static final int hello_world=0x7f09004f;
+        public static final int hall_file=0x7f09004f;
+        public static final int hello_world=0x7f090051;
         public static final int no_torch=0x7f09004c;
         /**  toast messages 
  toast messages 
@@ -295,11 +297,11 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int pref_test=0x7f090048;
         public static final int pref_widgets=0x7f090023;
         public static final int pref_widgets_summary=0x7f090024;
-        public static final int snooze=0x7f090053;
+        public static final int snooze=0x7f090055;
         public static final int title_activity_configuration=0x7f090001;
-        public static final int title_activity_fullscreen=0x7f090050;
-        public static final int title_activity_window=0x7f09004e;
-        public static final int unknown_caller=0x7f090057;
+        public static final int title_activity_fullscreen=0x7f090052;
+        public static final int title_activity_window=0x7f090050;
+        public static final int unknown_caller=0x7f090059;
     }
     public static final class style {
         /** 
