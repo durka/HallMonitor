@@ -8,8 +8,12 @@ SET MODE=release
 REM ant clean
 del bin\%APPNAME%-%MODE%-unaligned.apk
 del bin\%APPNAME%.apk
-%ANDROID_NDK%\ndk-build.cmd clean
-%ANDROID_NDK%\ndk-build.cmd NDK_APPLICATION_MK=Application.mk
-ant %MODE%
-IF %MODE%==release java -jar cm_certs\signapk.jar cm_certs\platform.x509.pem cm_certs\platform.pk8 bin\%APPNAME%-%MODE%-unsigned.apk bin\%APPNAME%-%MODE%-unaligned.apk
-"%ANDROID_SDK_TOOLS%\zipalign.exe" -v 4 bin\%APPNAME%-%MODE%-unaligned.apk bin\%APPNAME%.apk
+del libs\armeabi\libGetEvent.so
+del libs\armeabi-v7a\libGetEvent.so
+del libs\mips\libGetEvent.so
+del libs\x86\libGetEvent.so
+%ANDROID_NDK%\ndk-build.cmd clean > build_ndkclean.log
+%ANDROID_NDK%\ndk-build.cmd NDK_APPLICATION_MK=Application.mk > build_ndk.log
+ant %MODE% > build_ant.log
+IF %MODE%==release java -jar cm_certs\signapk.jar cm_certs\platform.x509.pem cm_certs\platform.pk8 bin\%APPNAME%-%MODE%-unsigned.apk bin\%APPNAME%-%MODE%-unaligned.apk > build_sign.log
+"%ANDROID_SDK_TOOLS%\zipalign.exe" -v 4 bin\%APPNAME%-%MODE%-unaligned.apk bin\%APPNAME%.apk > build_align.log
