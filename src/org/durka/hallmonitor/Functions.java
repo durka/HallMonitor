@@ -288,6 +288,9 @@ public class Functions {
 		 * @param ctx Application context.
 		 */
 		public static void stop_service(Context ctx) {
+			stop_service(ctx, false);
+		}
+		public static void stop_service(Context ctx, boolean override_keep_admin) {
 			
 			Log.d("F.Act.stop_service", "Stop service called.");
 			
@@ -296,7 +299,7 @@ public class Functions {
 			ctx.stopService(new Intent(ctx, NotificationService.class));
 			
 			// Relinquish device admin (unless asked not to)
-			if (!PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_keep_admin", false)) {
+			if (!override_keep_admin && !PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_keep_admin", false)) {
 				DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
 				ComponentName me = new ComponentName(ctx, AdminReceiver.class);
 				if (dpm.isAdminActive(me)) dpm.removeActiveAdmin(me);

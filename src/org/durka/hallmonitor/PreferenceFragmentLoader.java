@@ -222,7 +222,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         	localSuAvailable.execute();
         	
         } else if (key.equals("pref_realhall")) {
-            Functions.Actions.stop_service(getActivity());
+            Functions.Actions.stop_service(getActivity(), true);
             SystemClock.sleep(1000);
             Functions.Actions.start_service(getActivity());
 

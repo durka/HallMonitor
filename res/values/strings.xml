@@ -103,7 +103,7 @@
     <string name="pref_security_settings_summary">Shortcut to Android screen lock settings</string>
     
     <string name="pref_about">About Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor version 0.3.9.\nCopyright 2014 Alex Burka, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor version 0.4.0.\nProduced by Alex Burka (@durka), @manusfreedom, @B--B, @Wallace0, @habeIchVergessen, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Settings</string>
     <string name="pref_preview">Preview</string>
     <string name="pref_test">Test</string>

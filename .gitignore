@@ -1,0 +1,10 @@
+bin/
+gen/
+local.properties
+libs/
+obj/
+*.log
+*.swp
+*.orig
+*.keystore
+
