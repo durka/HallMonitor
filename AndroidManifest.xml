@@ -17,8 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.durka.hallmonitor"
           android:installLocation="internalOnly"
-          android:versionCode="14"
-          android:versionName="0.3.9">
+          android:versionCode="15"
+          android:versionName="0.4.0">
   <uses-sdk android:minSdkVersion="19"
             android:targetSdkVersion="19" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />

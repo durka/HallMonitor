@@ -1,6 +1,19 @@
+- 0.4.0
+	- 0.3.x were internal, unreleased versions
+	- Features (summary)
+		- New contributors
+		- Option to use the real Hall effect sensor for everything!
+		  Proximity sensor no longer required.
+		- Option to install as system app
+		- Italian translation
+		- See 0.3.x changelogs for details
+	- Fixes
+		- Many
+		- See 0.3.x changelogs for details
+
 - 0.3.9
 	- Features
-		- Added italian translation
+		- Added Italian translation
 		- Added alternative torch button (tested on i9505, need test on other devices)
 	- Fixes
 		- Removed HallMonitor from "recent app list"

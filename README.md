@@ -33,10 +33,10 @@ If you test this on something other than the above (including another carrier's 
 
 Installation / Usage
 --------------------
-The current release is: [0.2.2](https://github.com/durka/HallMonitor/tree/0.2.2) (see [changelog](https://github.com/durka/HallMonitor/blob/0.2.2/CHANGELOG.md))
+The current release is: [0.4.0](https://github.com/durka/HallMonitor/tree/0.4.0) (see [changelog](https://github.com/durka/HallMonitor/blob/0.4.0/CHANGELOG.md))
 
 - The easiest way to install the latest stable version is through [F-Droid](https://f-droid.org/), an "app store" for open source. Here is [Hall Monitor's entry](https://f-droid.org/repository/browse/?fdid=org.durka.hallmonitor).
-- You can download [`bin/HallMonitor.apk`](https://github.com/durka/HallMonitor/blob/0.2.2/bin/HallMonitor.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
+- You can download [`bin/HallMonitor.apk`](https://github.com/durka/HallMonitor/blob/0.4.0/bin/HallMonitor.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
 - You can clone the repository at a tagged version and build from source. It's configured as an Eclipse project, but I haven't even used any external libraries yet, so it "should" be "simple" to build with another system such as Android Studio or ant.
 
 Limitations / Known Issues
@@ -44,8 +44,6 @@ Limitations / Known Issues
 - Little Things
     - The feature that receives phone calls doesn't work all the time. It uses a timer to jump on top of the regular call answering screen, which is a huge hack. I'd like to find a better way.
     - You can accidentally escape from Hall Monitor while the cover is closed by long-pressing the menu button. I managed to disable the back button, but if you have an action set up for long-press-menu (e.g. for me it opens Google Now) then an app cannot override this through normal means. I'd be happy to find some abnormal means, though.
-- Bigger Things
-    - I have figured out how to _read_ the state of the hall effect sensor, i.e. whether the cover is opened or closed. But I have not yet figured out how to receive _events_ from the sensor. Constantly polling its state is not an option, due to battery life concerns. So I am using the proximity sensor events, and the hall effect sensor for confirmation (so if you put your hand over the screen, the proximity sensor will fire, but the hall effect sensor will report that the cover is still open, so the phone will not lock). This is kind of a hack, and also it is possible to fool the system by closing or opening the cover while holding your finger over the proximity sensor (it's near the top edge of the screen). In my testing this has never happened accidentally, but it would still be nice not to need the proximity sensor hack.
 
 Future Plans
 ------------
