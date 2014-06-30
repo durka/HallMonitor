@@ -2,6 +2,7 @@ REM keytool-importkeypair -k cm_platform.keystore -p android -pk8 platform.pk8 -
 SET JAVA_HOME=c:\Progra~1\Java\jdk1.8
 SET PATH=%PATH%;c:\Progra~1\Java\jdk1.8\Bin;C:\Dev\android-sdk-windows\tools;C:\Dev\android-sdk-windows\platform-tools;C:\Dev\apache-ant\bin
 SET ANDROID_SDK_TOOLS=C:\Dev\android-sdk-windows\build-tools\19.1.0
+SET ANDROID_HOME=C:\\Dev\\android-sdk-windows
 SET ANDROID_NDK=C:\Dev\android-ndk
 SET APPNAME=HallMonitor
 SET MODE=release
