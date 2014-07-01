@@ -1,3 +1,8 @@
+- 0.4.1
+	- Fixes
+		- Touch screen sensitivity now works on S4 Mini Dual Sim
+		- JNI build issues resolved
+
 - 0.4.0
 	- 0.3.x were internal, unreleased versions
 	- Features (summary)
