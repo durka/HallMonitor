@@ -5,7 +5,7 @@ APPNAME=HallMonitor
 MODE=debug
 ant clean
 ndk-build clean
-ndk-build NDK_APPLICATION_MK=Application.mk
+ndk-build
 ant $MODE
 if [ $MODE == release ]; then
     java -jar cm_certs/{signapk.jar,platform.{x509.pem,pk8}} bin/$APPNAME-$MODE-un{s,al}igned.apk

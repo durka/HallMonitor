@@ -71,6 +71,8 @@ public class Functions {
 
     private static final String DEV_SERRANO_LTE_CM10 = "serranolte"; 	// GT-I9195 CM10.x
     private static final String DEV_SERRANO_LTE_CM11 = "serranoltexx"; 	// GT-I9195 CM11.x
+    private static final String DEV_SERRANO_DS_CM10 = "serranods"; 	    // GT-I9192 CM10.x
+    private static final String DEV_SERRANO_DS_CM11 = "serranodsxx"; 	// GT-I9192 CM11.x
 	
     //All we need for alternative torch	 
     private static Camera camera;
@@ -200,7 +202,7 @@ public class Functions {
 			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_runasroot", false)) {
 				if(value) {
 					Log.d("F.Act.enableCoverTouch", "We're root enabled so lets boost the sensitivity...");
-					if (Build.DEVICE.equals(DEV_SERRANO_LTE_CM10) || Build.DEVICE.equals(DEV_SERRANO_LTE_CM11)) {
+					if (Build.DEVICE.equals(DEV_SERRANO_LTE_CM10) || Build.DEVICE.equals(DEV_SERRANO_LTE_CM11) || Build.DEVICE.equals(DEV_SERRANO_DS_CM10) || Build.DEVICE.equals(DEV_SERRANO_DS_CM11)) {
 						AsyncSuRunMulti localSuRunMulti = new AsyncSuRunMulti();
 						localSuRunMulti.execute(new String[]{"echo module_on_master > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result", "echo clear_cover_mode,3 > /sys/class/sec/tsp/cmd && cat /sys/class/sec/tsp/cmd_result"});
 					}
