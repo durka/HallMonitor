@@ -1,6 +1,5 @@
 package org.durka.hallmonitor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -64,13 +63,6 @@ public class HMAppWidgetManager {
 	    Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
 	    pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 	    
-	    //have to add the next 4 lines to avoid an android bug according to this guy: http://coderender.blogspot.co.uk/2012/01/hosting-android-widgets-my.html
-	    //FIXME check if this is till required and remove if not
-	    ArrayList<AppWidgetProviderInfo> customInfo = new ArrayList<AppWidgetProviderInfo>();
-	    pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_INFO, customInfo);
-	    ArrayList<Bundle> customExtras = new ArrayList<Bundle>();
-	    pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_EXTRAS, customExtras);
-
 	    //store our widgetType so we know what we are doing when the call back comes back
 	    currentWidgetType = widgetType;
 	    

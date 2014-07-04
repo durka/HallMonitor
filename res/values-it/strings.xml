@@ -103,7 +103,7 @@
     <string name="pref_security_settings_summary">Scorciatoia per le impostazioni dello schermo di blocco Android</string>
     
     <string name="pref_about">Su Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor versione 0.3.9.\nCopyright 2014 Alex Burka, rilasciato su Licenza Apache v2.\nTradotto in italiano da Zanin Marco\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor versione 0.4.1.\Prodotto da Alex Burka (@durka), @manusfreedom, @B--B, @Wallace0, @habeIchVergessen, rilasciato su Licenza Apache v2.\nTradotto in italiano da Zanin Marco\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Impostazioni</string>
     <string name="pref_preview">Anteprima</string>
     <string name="pref_test">Test</string>
@@ -115,6 +115,8 @@
     <!-- toast messages -->
     <string name="no_torch_app">Applicazione torcia CM non installata - impossibile abilitare la torcia, prova il metodo alternativo!</string>
     <string name="no_torch">Impossibile abilitare la torcia, il tuo telefono non supporta questa funzione!</string>
+    <string name="default_torch_enabled">Hai già abilitato la torcia di default, non ti serve un altro tasto per accendere la torcia!</string>
+    <string name="alternative_torch_enabled">Hai già abilitato la torcia alternativa, non ti serve un altro tasto per accendere la torcia!</string>
     
     <!-- random strings -->
     <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
