@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
+	    
+    <org.durka.hallmonitor.PreferenceSwitchable
+	    android:key="pref_layout"
+	    android:title="@string/pref_layout"
+	    android:summary="@string/pref_layout_summary"
+	    android:defaultValue="false" />
+    
     <com.hlidskialf.android.preference.SeekBarPreference
         android:key="pref_delay"
         android:title="@string/pref_delay"

@@ -170,15 +170,6 @@ public class DefaultActivity extends Activity {
 	 */
 	public void refreshDisplay() {
 		
-		//Remove navigation bar
-		View decorView = getWindow().getDecorView();	
-		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-	            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-	            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-	            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-	            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-	            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
 		if (findViewById(R.id.default_battery_picture) != null) {
 			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
@@ -373,24 +364,10 @@ public class DefaultActivity extends Activity {
 
 		Log.d("DA.onCreate", "onCreate of DefaultView.");
 
-		//Remove title bar
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-		//Remove notification bar
-		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		//Remove navigation bar
-		View decorView = getWindow().getDecorView();	
-		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-	            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-	            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-	            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-	            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-	            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
 		//set default view
-		setContentView(R.layout.activity_default);
-
 		
+		Functions.Actions.choose_layout(this);
+
 		//get the audio manager
 		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
@@ -474,9 +451,7 @@ public class DefaultActivity extends Activity {
 	protected void onStop() {
 		super.onStop();
 		Log.d("DA-oS", "stopping");
-		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_keyguard", true)) {
-			this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-		}
+		Functions.Actions.dismiss_keyguard(this);
 		if (Functions.Actions.timerTask != null) {
 			Functions.Actions.timerTask.cancel();
 		}

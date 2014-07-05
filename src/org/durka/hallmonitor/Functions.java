@@ -464,7 +464,21 @@ public class Functions {
 			}
 		}
 
-	    private static class AsyncSuRun extends AsyncTask<String, Void, String> {
+		public static void dismiss_keyguard (Context ctx) {
+			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_keyguard", true)) {
+				defaultActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);	
+			}
+		}
+		
+		public static void choose_layout (Context ctx) {
+			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_layout", true)) {
+				((DefaultActivity) ctx).setContentView(R.layout.activity_alternative);
+			} else {
+				((DefaultActivity) ctx).setContentView(R.layout.activity_default);
+			}
+		}
+
+		private static class AsyncSuRun extends AsyncTask<String, Void, String> {
 			@Override
 			protected String doInBackground(String... params) {
 				Shell.SU.run(params[0]);
@@ -879,7 +893,6 @@ public class Functions {
 	        wl.acquire();
 	        wl.release();
 		}
-		
 	}
 	
 	public static class TorchActions {
