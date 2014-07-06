@@ -741,7 +741,7 @@ public class Functions {
 
 						Util.rise_and_shine(ctx); // make sure the screen is on
 					}
-				}, 500);
+				}, 900);
 				
 				/*
 				new Handler().postDelayed(new Runnable() {
