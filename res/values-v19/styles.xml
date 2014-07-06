@@ -11,11 +11,11 @@
         <!-- API 19 theme customizations can go here. -->
     </style>
 
-    <style name="FullscreenTheme" parent="android:Theme.Holo.Light">
+    <style name="FullscreenTheme" parent="android:Theme.Holo.Light.NoActionBar.Fullscreen">
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowBackground">@null</item>
         <item name="android:windowAnimationStyle">@null</item>
-		<item name="android:windowNoTitle">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
     
 </resources>

@@ -54,6 +54,8 @@
     <string name="pref_datetime_summary">If checked, display time and date instead of only time.</string>
     <string name="pref_keyguard">Enable/Dismiss Keyguard</string>
     <string name="pref_keyguard_summary">If checked, dismiss the default lock screen when user open the cover. Not working with secure lock screen (Password, PIN, etc.).</string>
+    <string name="pref_layout">Layouts</string>
+    <string name="pref_layout_summary">Switch between default layout and an alternative layout.</string>
     
     <string name="pref_runasroot">Root Features</string>
     <string name="pref_runasroot_summary">Should the app run with root permissions (required for most features) - allow permanent root access for best results.</string>
