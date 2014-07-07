@@ -744,12 +744,12 @@ public class Functions {
 						intent.setAction(Intent.ACTION_MAIN);
 						ctx.startActivity(intent);
 						Actions.enableCoverTouch(ctx, true);
-
-						Util.rise_and_shine(ctx); // make sure the screen is on
+						
+						//Util.rise_and_shine(ctx); // make sure the screen is on (Removed for Testing)
 						if (Functions.Actions.timerTask != null) {
 							Functions.Actions.timerTask.cancel();}
 					}
-				}, 500);
+				}, 800);
 				
 				/*
 				new Handler().postDelayed(new Runnable() {

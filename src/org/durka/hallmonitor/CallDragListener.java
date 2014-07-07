@@ -16,7 +16,7 @@ public class CallDragListener implements OnDragListener {
     	  Log.d("DragnDrop", "Event received");
         break;
       case DragEvent.ACTION_DRAG_ENTERED:
-    	  Log.d("DragnDrop", "Icon not now is in target area");        
+    	  Log.d("DragnDrop", "Icon now is in target area");        
     	  break;
       case DragEvent.ACTION_DRAG_EXITED:
     	  Log.d("DragnDrop", "Icon now is out of the target area");
