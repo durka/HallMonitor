@@ -27,6 +27,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
 import android.appwidget.AppWidgetManager;
+import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -47,8 +48,11 @@ import android.provider.ContactsContract;
 import android.service.notification.StatusBarNotification;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.View.DragShadowBuilder;
+import android.view.View.OnTouchListener;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -362,6 +366,7 @@ public class Functions {
 			//}
 			DefaultActivity.phone_ringing = false;
 			defaultActivity.refreshDisplay();
+			setCloseTimer(defaultActivity);
 		}
 		
 		public static void pickup_call() {
@@ -371,6 +376,7 @@ public class Functions {
 			//else {
 			AsyncSuRun localSuRun = new AsyncSuRun();
 			localSuRun.execute("input keyevent 5");
+			setCloseTimer(defaultActivity);
 			//}
 			//DefaultActivity.phone_ringing = false;
 			//defaultActivity.refreshDisplay();
@@ -726,7 +732,7 @@ public class Functions {
 				//a 1 second delay seems to allow this
 				DefaultActivity.phone_ringing = true;
 				DefaultActivity.call_from = number;
-
+				
 				Timer timer = new Timer();
 				timer.schedule(new TimerTask() {
 					@Override
@@ -740,8 +746,10 @@ public class Functions {
 						Actions.enableCoverTouch(ctx, true);
 
 						Util.rise_and_shine(ctx); // make sure the screen is on
+						if (Functions.Actions.timerTask != null) {
+							Functions.Actions.timerTask.cancel();}
 					}
-				}, 900);
+				}, 500);
 				
 				/*
 				new Handler().postDelayed(new Runnable() {
@@ -933,5 +941,4 @@ public class Functions {
 	    	deviceHasFlash = ctx.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);        
 	    }
 	}
-
 }

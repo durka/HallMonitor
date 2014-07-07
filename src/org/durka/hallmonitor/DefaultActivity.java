@@ -11,6 +11,7 @@ import org.durka.hallmonitor.Functions.TorchActions;
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -23,11 +24,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.View.DragShadowBuilder;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
@@ -140,6 +144,35 @@ public class DefaultActivity extends Activity {
 					Log.d("phone", "phone state changed to " + state);
 					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 						Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
+						findViewById(R.id.pickup_button1).setOnTouchListener(new CallTouchListener() {
+							@Override
+							public boolean onTouch(View view, MotionEvent motionEvent) {
+							      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+							        ClipData data = ClipData.newPlainText("Pickup", "Call");
+							        DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+							        view.startDrag(data, shadowBuilder, view, 0);
+							        view.setVisibility(View.VISIBLE);
+							        return true;
+							      } else {
+							        return false;
+							      }
+							}
+						});
+					    findViewById(R.id.hangup_button1).setOnTouchListener(new CallTouchListener() {
+					    	@Override
+							public boolean onTouch(View view, MotionEvent motionEvent) {
+							      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+							        ClipData data = ClipData.newPlainText("Hang", "Call");
+							        DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+							        view.startDrag(data, shadowBuilder, view, 0);
+							        view.setVisibility(View.VISIBLE);
+							        return true;
+							      } else {
+							        return false;
+							      }
+							}
+					    });
+					    findViewById(R.id.callchoice).setOnDragListener(new CallDragListener());
 					} else {
 						if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 							Functions.Events.call_finished(context);
@@ -512,8 +545,8 @@ public class DefaultActivity extends Activity {
 		default:
 			return super.onKeyUp(code, evt);
 		}
-	}
-
+	} 
+	
     public static boolean isDebug() {
         return mDebug;
     }
