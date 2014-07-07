@@ -85,13 +85,12 @@
             android:visibility="visible" >
 
             <ImageView
-                android:id="@+id/hangup_button1"
+                android:id="@+id/hangup_button"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/pickup_button1"
-                android:layout_alignBottom="@+id/pickup_button1"
                 android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:src="@drawable/ic_jog_dial_decline" />
 
             <TextView
@@ -104,7 +103,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <ImageView
-                android:id="@+id/pickup_button1"
+                android:id="@+id/pickup_button"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -121,7 +120,7 @@
                 android:visibility="visible" />
 
             <ImageView
-                android:id="@+id/imageView1"
+                android:id="@+id/accept_slide"
                 android:layout_width="80dp"
                 android:layout_height="25dp"
                 android:layout_centerVertical="true"
@@ -129,7 +128,7 @@
                 android:src="@drawable/ic_call_accept_slide" />
 
             <ImageView
-                android:id="@+id/imageView2"
+                android:id="@+id/reject_slide"
                 android:layout_width="80dp"
                 android:layout_height="25dp"
                 android:layout_alignParentRight="true"
