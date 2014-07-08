@@ -11,10 +11,19 @@ public class CallTouchListener implements OnTouchListener {
 	@Override
 	public boolean onTouch(View view, MotionEvent motionEvent) {
 	      if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-	        ClipData data = ClipData.newPlainText("", "");
-	        DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-	        view.startDrag(data, shadowBuilder, view, 0);
-	        view.setVisibility(View.VISIBLE);
+	    	  switch(view.getId()){
+	    	  case R.id.pickup_button:
+	    		  ClipData data = ClipData.newPlainText("Pickup", "Call");
+	    		  DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+	  	          view.startDrag(data, shadowBuilder, view, 0);
+	  	          view.setVisibility(View.VISIBLE);
+	    	  break;
+	    	  case R.id.hangup_button:
+	    		  ClipData data2 = ClipData.newPlainText("Hang", "Call");
+	    		  DragShadowBuilder shadowBuilder2 = new View.DragShadowBuilder(view);
+	  	          view.startDrag(data2, shadowBuilder2, view, 0);
+	  	          view.setVisibility(View.VISIBLE);
+	    	  }
 	        return true;
 	      } else {
 	        return false;
