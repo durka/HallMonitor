@@ -1,3 +1,14 @@
+- 0.4.2
+	Features
+		- Added a new alternative layout
+		- Answer/Reject call with "swipe"
+	Fixes
+		- If a torch button is enabled, refuse to enable the second button at the same time
+		- Stopped TimerTask when receiving a call
+	Partial Fixes
+		- Incoming call screen now works 99% times in both layouts when the screen is off and the cover closed. Does not work if the screen is on and the cover closed (need to open and close the cover manually)
+		- Alternative and media widgets works for 4x1 widgets and for some 4x2 widget, but
+only on alternative layout
 - 0.4.1
 	- Fixes
 		- Touch screen sensitivity now works on S4 Mini Dual Sim
