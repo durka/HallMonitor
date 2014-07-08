@@ -746,10 +746,20 @@ public class Functions {
 						Actions.enableCoverTouch(ctx, true);
 						
 						//Util.rise_and_shine(ctx); // make sure the screen is on (Removed for Testing)
-						if (Functions.Actions.timerTask != null) {
-							Functions.Actions.timerTask.cancel();}
 					}
 				}, 800);
+				
+				// We must stop TimerTask during an incoming call, and we must be sure that
+				// timerTask.cancel will be executed only when the screen is on
+				Timer timer2 = new Timer();
+				timer2.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						if (Functions.Actions.timerTask != null) {
+							Functions.Actions.timerTask.cancel();}	
+					}
+					
+				}, 1500);
 				
 				/*
 				new Handler().postDelayed(new Runnable() {
