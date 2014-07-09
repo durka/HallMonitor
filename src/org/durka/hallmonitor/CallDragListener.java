@@ -4,14 +4,11 @@ import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
 import android.view.View.OnDragListener;
-import android.widget.ImageView;
 
 public class CallDragListener implements OnDragListener {
 	
     @Override
     public boolean onDrag(View v, DragEvent dragevent) {
-      int dragAction = dragevent.getAction();
-      View dragView = (View) dragevent.getLocalState();
 
       switch (dragevent.getAction()) {
       case DragEvent.ACTION_DRAG_STARTED:
@@ -35,8 +32,7 @@ public class CallDragListener implements OnDragListener {
     	  Log.d("DragnDrop", "Icon dropped in target area");
         break;
       case DragEvent.ACTION_DRAG_ENDED:
-    	  if (dropEventNotHandled(dragevent)) {
-              dragView.setVisibility(View.VISIBLE);
+    	  if (dropEventNotHandled(dragevent)) {      
               Log.d("DragnDrop", "Not dropped in target area, restoring default");
           }
       default:
