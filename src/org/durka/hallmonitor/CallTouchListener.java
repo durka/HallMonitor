@@ -16,13 +16,13 @@ public class CallTouchListener implements OnTouchListener {
 	    		  ClipData data = ClipData.newPlainText("Pickup", "Call");
 	    		  DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
 	  	          view.startDrag(data, shadowBuilder, view, 0);
-	  	          view.setVisibility(View.VISIBLE);
+	  	          view.setVisibility(View.INVISIBLE);
 	    	  break;
 	    	  case R.id.hangup_button:
 	    		  ClipData data2 = ClipData.newPlainText("Hang", "Call");
 	    		  DragShadowBuilder shadowBuilder2 = new View.DragShadowBuilder(view);
 	  	          view.startDrag(data2, shadowBuilder2, view, 0);
-	  	          view.setVisibility(View.VISIBLE);
+	  	          view.setVisibility(View.INVISIBLE);
 	    	  }
 	        return true;
 	      } else {
