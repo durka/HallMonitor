@@ -759,7 +759,7 @@ public class Functions {
 							Functions.Actions.timerTask.cancel();}	
 					}
 					
-				}, 1500);
+				}, 2000);
 				
 				/*
 				new Handler().postDelayed(new Runnable() {

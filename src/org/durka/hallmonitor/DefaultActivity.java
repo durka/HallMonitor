@@ -189,6 +189,19 @@ public class DefaultActivity extends Activity {
 			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
 			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
 		}
+		
+		else if (findViewById(R.id.default_battery_picture_horizontal) != null) {
+			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
+				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
+				((ImageView)findViewById(R.id.default_battery_picture_horizontal)).setImageResource(R.drawable.stat_sys_battery_charge_horizontal);
+			} else {
+				((ImageView)findViewById(R.id.default_battery_picture_horizontal)).setImageResource(R.drawable.stat_sys_battery_horizontal);
+			}
+			((ImageView)findViewById(R.id.default_battery_picture_horizontal)).getDrawable().setLevel(level);
+			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
+		}
 
 		// we might have missed a phone-state revelation
 		phone_ringing = ((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).getCallState() == TelephonyManager.CALL_STATE_RINGING;
