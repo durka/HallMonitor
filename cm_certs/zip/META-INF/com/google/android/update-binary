@@ -1,0 +1,75 @@
+#!/sbin/sh
+
+OUTFD=$2
+ZIP=$3
+
+ui_print() {
+	echo -n -e "ui_print $1\n" > /proc/self/fd/$OUTFD
+	echo -n -e "ui_print\n" > /proc/self/fd/$OUTFD
+}
+
+set_perm() {
+	chown $1.$2 $4
+	chown $1:$2 $4
+	chmod $3 $4
+}
+
+ch_con() {
+	/system/bin/toolbox chcon u:object_r:system_file:s0 $1
+	chcon u:object_r:system_file:s0 $1
+}
+
+ui_print "***********************"
+ui_print "HallMonitor install ZIP"
+ui_print "***********************"
+
+ui_print "- Mounting /system"
+mount /system
+mount /data
+mount -o rw,remount /system
+mount -o rw,remount /system /system
+mount -o rw,remount /
+mount -o rw,remount / /
+
+ABI=$(cat /system/build.prop | grep ro.product.cpu.abi= | dd bs=1 skip=19)
+ABI2=$(cat /system/build.prop | grep ro.product.cpu.abi2= | dd bs=1 skip=20)
+
+ui_print "- Extracting files"
+cd /tmp
+mkdir hallmonitor
+cd hallmonitor
+unzip -o "$ZIP"
+
+LIB=/tmp/hallmonitor/lib/$ABI
+COM=/tmp/hallmonitor/common
+
+ui_print "- Removing old files"
+rm -f /cache/dalvik-cache/*org.durka.hallmonitor*
+rm -f /data/anr/*org.durka.hallmonitor*
+rm -f /data/app/org.durka.hallmonitor*
+rm -f /data/app-lib/HallMonitor/libGetEvent.so
+rm -f /data/dalvik-cache/*HallMonitor.apk*
+rm -f /data/dalvik-cache/*org.durka.hallmonitor*
+rm -f /system/app/HallMonitor.apk
+rm -f /system/app/HallMonitor.odex
+rm -f /system/lib/libGetEvent.so
+
+
+ui_print "- Placing files"
+cp $LIB/libGetEvent.so /data/app-lib/HallMonitor/libGetEvent.so
+cp $COM/HallMonitor.apk /system/app/HallMonitor.apk
+cp $LIB/libGetEvent.so /system/lib/libGetEvent.so
+
+ui_print "- Setting permissions"
+set_perm 1000 1000 0755 /data/app-lib/HallMonitor/libGetEvent.so
+ch_con /data/app-lib/HallMonitor/libGetEvent.so
+set_perm 0 0 0644 /system/app/HallMonitor.apk
+ch_con /system/app/HallMonitor.apk
+set_perm 0 0 0644 /system/lib/libGetEvent.so
+ch_con /system/lib/libGetEvent.so
+
+ui_print "- Unmounting /system"
+umount /system
+
+ui_print "- Done !"
+exit 0
