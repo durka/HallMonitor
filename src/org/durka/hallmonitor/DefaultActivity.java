@@ -11,6 +11,7 @@ import org.durka.hallmonitor.Functions.TorchActions;
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -23,11 +24,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.View.DragShadowBuilder;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
@@ -140,6 +144,9 @@ public class DefaultActivity extends Activity {
 					Log.d("phone", "phone state changed to " + state);
 					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 						Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
+						findViewById(R.id.pickup_button).setOnTouchListener(new CallTouchListener());
+					    findViewById(R.id.hangup_button).setOnTouchListener(new CallTouchListener());
+					    findViewById(R.id.callchoice).setOnDragListener(new CallDragListener());
 					} else {
 						if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 							Functions.Events.call_finished(context);
@@ -180,6 +187,19 @@ public class DefaultActivity extends Activity {
 				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
 			}
 			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
+			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
+		}
+		
+		else if (findViewById(R.id.default_battery_picture_horizontal) != null) {
+			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
+				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
+				((ImageView)findViewById(R.id.default_battery_picture_horizontal)).setImageResource(R.drawable.stat_sys_battery_charge_horizontal);
+			} else {
+				((ImageView)findViewById(R.id.default_battery_picture_horizontal)).setImageResource(R.drawable.stat_sys_battery_horizontal);
+			}
+			((ImageView)findViewById(R.id.default_battery_picture_horizontal)).getDrawable().setLevel(level);
 			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
 		}
 
@@ -512,8 +532,8 @@ public class DefaultActivity extends Activity {
 		default:
 			return super.onKeyUp(code, evt);
 		}
-	}
-
+	} 
+	
     public static boolean isDebug() {
         return mDebug;
     }

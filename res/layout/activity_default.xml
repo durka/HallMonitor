@@ -9,9 +9,9 @@
     <RelativeLayout
         android:id="@+id/default_content"
         android:layout_width="310dp"
-        android:layout_height="125dp"
+        android:layout_height="145dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/rounded"
         android:gravity="center"
         android:keepScreenOn="true" >
@@ -84,35 +84,58 @@
             android:layout_height="match_parent"
             android:visibility="visible" >
 
-            <ImageButton
-                android:id="@+id/hangup_button"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/pickup_button"
-                android:layout_alignBottom="@+id/pickup_button"
-                android:layout_alignParentLeft="true"
-                android:onClick="sendHangUp"
-                android:src="@drawable/ic_jog_dial_decline" />
-
             <TextView
                 android:id="@+id/call_from"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:text="@string/unknown_caller"
-                android:textColor="#ffffff"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <ImageButton
-                android:id="@+id/pickup_button"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#ffffff" />
+            
+            <ImageView
+                android:id="@+id/hangup_button"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:onClick="sendPickUp"
+                android:src="@drawable/ic_jog_dial_decline" />
+
+            <ImageView
+                android:id="@+id/pickup_button"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
                 android:src="@drawable/ic_jog_dial_answer" />
+            
+            <LinearLayout
+                android:id="@+id/callchoice"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_centerInParent="true"
+                android:orientation="vertical"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/accept_slide"
+                android:layout_width="80dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="60dp"
+                android:src="@drawable/ic_call_accept_slide" />
+
+            <ImageView
+                android:id="@+id/reject_slide"
+                android:layout_width="80dp"
+                android:layout_height="25dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="60dp"
+                android:src="@drawable/ic_call_reject_slide" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -124,73 +147,75 @@
             <RelativeLayout
                 android:id="@+id/default_widget"
                 android:layout_width="match_parent"
-                android:layout_height="75dp"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/default_icon_container"
+                android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:gravity="center" >
 
                 <RelativeLayout
                     android:id="@+id/default_widget_area"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="80dp"
+                    android:layout_height="130dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="30dp"
                     android:keepScreenOn="true" />
 
                 <TextClock
                     android:id="@+id/default_text_clock"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="10dp"
                     android:keepScreenOn="true"
                     android:textColor="#33b5e5"
-                    android:textSize="50sp"
+                    android:textSize="55sp"
                     android:textStyle="bold" />
 
                 <TextClock
                     android:id="@+id/default_text_clock_hour"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="65dp"
+                    android:layout_marginLeft="35dp"
+                    android:layout_marginTop="5dp"
                     android:keepScreenOn="true"
                     android:textColor="#33b5e5"
-                    android:textSize="35sp"
-                    android:textStyle="bold" />
-
-				<TextView
-                    android:id="@+id/default_text_clock_date"
-					android:layout_width="wrap_content"
-					android:layout_height="25dp"
-	                android:layout_below="@+id/default_text_clock_hour"
-                    android:keepScreenOn="true"
-                    android:textColor="#33b5e5"
-                    android:textSize="15sp"
+                    android:textSize="50sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/default_battery_percent"
+                    android:id="@+id/default_text_clock_date"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:text="100%"
-                    android:textColor="#ffffff"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:layout_height="30dp"
+                    android:layout_below="@+id/default_text_clock_hour"
+                    android:layout_marginLeft="35dp"
+                    android:keepScreenOn="true"
+                    android:textColor="#33b5e5"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/default_battery_picture"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_toLeftOf="@+id/default_battery_percent"
-                    android:src="@drawable/stat_sys_battery" />
             </RelativeLayout>
+
+ 	        <ImageView
+ 	            android:id="@+id/default_battery_picture_horizontal"
+ 	            android:layout_width="wrap_content"
+ 	            android:layout_height="wrap_content"
+ 	            android:layout_alignParentRight="true"
+ 	            android:layout_alignParentTop="true"
+ 	            android:layout_marginRight="7dp"
+ 	            android:layout_toLeftOf="@id/default_battery_percent"
+ 	            android:src="@drawable/stat_sys_battery_horizontal" />
 
             <GridView
                 android:id="@+id/default_icon_container"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_below="@id/default_widget"
+                android:layout_width="230dp"
+                android:layout_height="20dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
                 android:layout_margin="0dp"
-                android:columnWidth="24dp"
+                android:columnWidth="20dp"
                 android:horizontalSpacing="4dp"
                 android:numColumns="0"
                 android:padding="0dp" />
@@ -200,18 +225,20 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/default_icon_container"
+                android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
                 android:onClick="sendToggleTorch"
                 android:src="@drawable/ic_appwidget_torch_off" />
-            
+
             <ImageButton
                 android:id="@+id/torchbutton2"
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/default_icon_container"
+                android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
                 android:onClick="toggleTorch"
                 android:src="@drawable/ic_appwidget_torch_off" />
 
@@ -220,11 +247,24 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/default_icon_container"
-                android:layout_toLeftOf="@+id/torchbutton"
+                android:layout_above="@id/torchbutton"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
                 android:onClick="camera_start"
                 android:src="@drawable/ic_notification" />
+
+            <TextView
+                android:id="@+id/default_battery_percent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="12dp"
+                android:text="100%"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#ffffff" />
+
         </RelativeLayout>
+
     </RelativeLayout>
 
 </RelativeLayout>

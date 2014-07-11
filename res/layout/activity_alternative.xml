@@ -11,7 +11,7 @@
         android:layout_width="310dp"
         android:layout_height="145dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/rounded"
         android:gravity="center"
         android:keepScreenOn="true" >
@@ -84,15 +84,13 @@
             android:layout_height="match_parent"
             android:visibility="visible" >
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/hangup_button"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/pickup_button"
-                android:layout_alignBottom="@+id/pickup_button"
-                android:layout_alignParentLeft="true"
-                android:onClick="sendHangUp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:src="@drawable/ic_jog_dial_decline" />
 
             <TextView
@@ -104,15 +102,40 @@
                 android:textColor="#ffffff"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/pickup_button"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_jog_dial_answer" />
+            
+            <LinearLayout
+                android:id="@+id/callchoice"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_centerInParent="true"
+                android:orientation="vertical"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/accept_slide"
+                android:layout_width="80dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="60dp"
+                android:src="@drawable/ic_call_accept_slide" />
+
+            <ImageView
+                android:id="@+id/reject_slide"
+                android:layout_width="80dp"
+                android:layout_height="25dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:onClick="sendPickUp"
-                android:src="@drawable/ic_jog_dial_answer" />
+                android:layout_marginRight="60dp"
+                android:src="@drawable/ic_call_reject_slide" />
+
         </RelativeLayout>
 
         <RelativeLayout
@@ -204,14 +227,13 @@
 
         <GridView
             android:id="@+id/default_icon_container"
-            android:layout_width="wrap_content"
-            android:layout_height="25dp"
+            android:layout_width="230dp"
+            android:layout_height="20dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_margin="0dp"
-            android:layout_toLeftOf="@+id/default_battery_picture"
-            android:columnWidth="9dp"
-            android:horizontalSpacing="2dp"
+            android:columnWidth="20dp"
+            android:horizontalSpacing="4dp"
             android:numColumns="0"
             android:padding="0dp" >
 

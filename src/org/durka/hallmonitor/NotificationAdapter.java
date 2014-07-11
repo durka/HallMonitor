@@ -48,8 +48,8 @@ public class NotificationAdapter extends BaseAdapter {
 			view = (ImageView)convert;
 		} else {
 			view = new ImageView(that);
-			view.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT));
-			view.setScaleType(ImageView.ScaleType.FIT_CENTER);
+			int size = (int) that.getResources().getDimension(R.dimen.icon_dimension);
+			view.setLayoutParams(new GridView.LayoutParams(size, size));
 			view.setPadding(0, 0, 0, 0);
 			try {
 				view.setImageDrawable(that.createPackageContext(notifs[position].getPackageName(), 0).getResources().getDrawable(notifs[position].getNotification().icon));

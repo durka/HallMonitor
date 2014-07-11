@@ -105,7 +105,7 @@
     <string name="pref_security_settings_summary">Scorciatoia per le impostazioni dello schermo di blocco Android</string>
     
     <string name="pref_about">Su Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor versione 0.4.1.\nProdotto da Alex Burka (@durka), @manusfreedom, @B--B, @Wallace0, @habeIchVergessen, rilasciato su Licenza Apache v2.\nTradotto in italiano da Zanin Marco\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor versione 0.4.2.\nProdotto da Alex Burka (@durka), @manusfreedom, @B--B, @Wallace0, @habeIchVergessen, rilasciato su Licenza Apache v2.\nTradotto in italiano da Zanin Marco\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Impostazioni</string>
     <string name="pref_preview">Anteprima</string>
     <string name="pref_test">Test</string>
