@@ -6,7 +6,7 @@ SET ANDROID_HOME=C:\\Dev\\android-sdk-windows
 SET ANDROID_NDK=C:\Dev\android-ndk
 SET APPNAME=HallMonitor
 SET MODE=release
-REM ant clean
+ant clean
 del bin\%APPNAME%-%MODE%-unaligned.apk
 del bin\%APPNAME%.apk
 del libs\armeabi\libGetEvent.so
@@ -18,3 +18,7 @@ del libs\x86\libGetEvent.so
 ant %MODE% > build_ant.log
 IF %MODE%==release java -jar cm_certs\signapk.jar cm_certs\platform.x509.pem cm_certs\platform.pk8 bin\%APPNAME%-%MODE%-unsigned.apk bin\%APPNAME%-%MODE%-unaligned.apk > build_sign.log
 "%ANDROID_SDK_TOOLS%\zipalign.exe" -v 4 bin\%APPNAME%-%MODE%-unaligned.apk bin\%APPNAME%.apk > build_align.log
+xcopy /y bin\%APPNAME%.apk cm_certs\zip\common
+xcopy /s /y libs\* cm_certs\zip\lib
+del cm_certs\zip\lib\android-support-v4.jar
+echo Please create zip with cm_certs\zip contents

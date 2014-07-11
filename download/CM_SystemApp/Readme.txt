@@ -8,5 +8,6 @@ Before install HallMonitor to System App for the first time:
 - Reboot to Recovery
 - Install HallMonitor using zip file
 - Reboot to CM, wait full start
-- Past HallMonitor.apk (file in CM_SystemApp on GitHub) in /system/app using an file explorer for routed device
 - Launch and configure HallMonitor
+
+If HallMonitor does not start/crash at boot/launch, try to copy apk from zip to your /system/app directory.
