@@ -200,11 +200,11 @@
 
  	        <ImageView
  	            android:id="@+id/default_battery_picture_horizontal"
- 	            android:layout_width="wrap_content"
- 	            android:layout_height="wrap_content"
+ 	            android:layout_width="35dp"
+ 	            android:layout_height="18dp"
  	            android:layout_alignParentRight="true"
  	            android:layout_alignParentTop="true"
- 	            android:layout_marginRight="7dp"
+ 	            android:layout_marginTop="7dp"
  	            android:layout_toLeftOf="@id/default_battery_percent"
  	            android:src="@drawable/stat_sys_battery_horizontal" />
 
@@ -255,10 +255,12 @@
 
             <TextView
                 android:id="@+id/default_battery_percent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="19dp"
                 android:layout_alignParentRight="true"
-                android:layout_marginTop="12dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="7dp"
+                android:gravity="left"
                 android:text="100%"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#ffffff" />

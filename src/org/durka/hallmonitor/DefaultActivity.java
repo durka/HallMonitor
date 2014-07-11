@@ -196,11 +196,12 @@ public class DefaultActivity extends Activity {
 				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
 			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
 				((ImageView)findViewById(R.id.default_battery_picture_horizontal)).setImageResource(R.drawable.stat_sys_battery_charge_horizontal);
+				((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level));
 			} else {
 				((ImageView)findViewById(R.id.default_battery_picture_horizontal)).setImageResource(R.drawable.stat_sys_battery_horizontal);
+				((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
 			}
 			((ImageView)findViewById(R.id.default_battery_picture_horizontal)).getDrawable().setLevel(level);
-			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
 		}
 
 		// we might have missed a phone-state revelation
