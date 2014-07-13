@@ -144,9 +144,7 @@ public class DefaultActivity extends Activity {
 					Log.d("phone", "phone state changed to " + state);
 					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 						Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
-						findViewById(R.id.pickup_button).setOnTouchListener(new CallTouchListener());
-					    findViewById(R.id.hangup_button).setOnTouchListener(new CallTouchListener());
-					    findViewById(R.id.callchoice).setOnDragListener(new CallDragListener());
+						Functions.Actions.choose_call_layout(getApplicationContext());
 					} else {
 						if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 							Functions.Events.call_finished(context);

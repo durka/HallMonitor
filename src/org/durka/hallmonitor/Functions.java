@@ -483,6 +483,17 @@ public class Functions {
 				((DefaultActivity) ctx).setContentView(R.layout.activity_default);
 			}
 		}
+		
+		public static void choose_call_layout (Context ctx) {
+			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_incoming_call_layout", false)) {
+				defaultActivity.findViewById(R.id.hangup_button).setOnTouchListener(new SwipeTouchListener(ctx));
+				defaultActivity.findViewById(R.id.pickup_button).setOnTouchListener(new SwipeTouchListener(ctx));
+			} else {
+				defaultActivity.findViewById(R.id.pickup_button).setOnTouchListener(new CallTouchListener());
+				defaultActivity.findViewById(R.id.hangup_button).setOnTouchListener(new CallTouchListener());
+				defaultActivity.findViewById(R.id.callchoice).setOnDragListener(new CallDragListener());
+			}
+		}
 
 		private static class AsyncSuRun extends AsyncTask<String, Void, String> {
 			@Override

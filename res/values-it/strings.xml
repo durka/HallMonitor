@@ -56,6 +56,8 @@
     <string name="pref_keyguard_summary">Se selezionata questa opzione rimuove il blocco schermo quando la cover viene aperta. Non funziona se si utilizza una schermata di blocco protetta (Password, PIN, ecc.).</string>
     <string name="pref_layout">Layout</string>
     <string name="pref_layout_summary">Passa dal layout di default ad un layout alternativo.</string>
+    <string name="pref_incoming_call_layout">Controlli sperimentali per le chiamate in arrivo</string>
+    <string name="pref_incoming_call_layout_summary">!SPERIMENTALE! Passa dai controlli per le chiamate in arrivo di default "drag and drop" al controllo sperimentale con swipe. I controlli potrebbero non funzionare correttamente, usateli a vostro rischio.</string>
     
     <string name="pref_runasroot">Impostazioni Root</string>
     <string name="pref_runasroot_summary">L\' applicazione dovrebbe venire eseguita con i permessi di superutente (richiesto per la maggior parte delle impostazioni) - per risultati migliori è meglio autorizzare permanentemente il root.</string>
