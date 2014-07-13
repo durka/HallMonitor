@@ -3,14 +3,14 @@ package org.durka.hallmonitor;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
-import android.view.View.OnDragListener;
-import android.widget.ImageView;
 
-public class CallDragListener implements OnDragListener {
+public class CallDragListener implements View.OnDragListener {
 	
-    @Override
     public boolean onDrag(View v, DragEvent dragevent) {
 
+    	int dragAction = dragevent.getAction();
+    	View dragView = (View) dragevent.getLocalState();
+    	
       switch (dragevent.getAction()) {
       case DragEvent.ACTION_DRAG_STARTED:
     	  Log.d("DragnDrop", "Event received");
@@ -24,17 +24,20 @@ public class CallDragListener implements OnDragListener {
       case DragEvent.ACTION_DROP: {
     	  if (dragevent.getClipDescription().getLabel().equals("Pickup")) {
     		  Functions.Actions.pickup_call();
+    		  dragView.setVisibility(View.VISIBLE);
     		  Log.d("DragnDrop", "PickUp Call");
     	  } if (dragevent.getClipDescription().getLabel().equals("Hang")) {
     		  Functions.Actions.hangup_call();
+    		  dragView.setVisibility(View.VISIBLE);
     		  Log.d("DragnDrop", "Hangup Call");
     	  }
       }
     	  Log.d("DragnDrop", "Icon dropped in target area");
         break;
       case DragEvent.ACTION_DRAG_ENDED:
-    	  if (dropEventNotHandled(dragevent)) {  
-              Log.d("DragnDrop", "Not dropped in target area, restoring default");
+    	  if (dropEventNotHandled(dragevent)) {
+    			  dragView.setVisibility(View.VISIBLE);
+    			  Log.d("DragnDrop", "Not dropped in target area, restoring default");
           }
         break;
       }

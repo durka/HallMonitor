@@ -84,15 +84,6 @@
             android:layout_height="match_parent"
             android:visibility="visible" >
 
-            <ImageView
-                android:id="@+id/hangup_button"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_jog_dial_decline" />
-
             <TextView
                 android:id="@+id/call_from"
                 android:layout_width="wrap_content"
@@ -102,19 +93,46 @@
                 android:textColor="#ffffff"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <ImageView
-                android:id="@+id/pickup_button"
-                style="?android:attr/buttonStyleSmall"
+            <LinearLayout
+                android:id="@+id/hangup_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:orientation="horizontal"
+                android:visibility="visible" >
+
+                <ImageView
+                    android:id="@+id/hangup_button"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_jog_dial_decline" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/pickup_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_jog_dial_answer" />
+                android:orientation="horizontal"
+                android:visibility="visible" >
+
+            	<ImageView
+            	    android:id="@+id/pickup_button"
+            	    style="?android:attr/buttonBarButtonStyle"
+            	    android:layout_width="wrap_content"
+            	    android:layout_height="wrap_content"
+            	    android:src="@drawable/ic_jog_dial_answer" />
+
+            </LinearLayout>
             
             <LinearLayout
                 android:id="@+id/callchoice"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_centerInParent="true"
                 android:orientation="vertical"
                 android:visibility="visible" />
