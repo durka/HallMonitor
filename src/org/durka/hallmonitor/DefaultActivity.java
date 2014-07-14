@@ -5,13 +5,11 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.durka.hallmonitor.Functions.Actions;
 import org.durka.hallmonitor.Functions.TorchActions;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -24,14 +22,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.DragShadowBuilder;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
@@ -175,20 +169,7 @@ public class DefaultActivity extends Activity {
 	 */
 	public void refreshDisplay() {
 		
-		if (findViewById(R.id.default_battery_picture) != null) {
-			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
-				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
-			} else {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
-			}
-			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
-			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
-		}
-		
-		else if (findViewById(R.id.default_battery_picture_horizontal) != null) {
+		if (findViewById(R.id.default_battery_picture_horizontal) != null) {
 			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
 				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);

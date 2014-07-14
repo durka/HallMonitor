@@ -27,7 +27,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
 import android.appwidget.AppWidgetManager;
-import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -48,11 +47,8 @@ import android.provider.ContactsContract;
 import android.service.notification.StatusBarNotification;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.View.DragShadowBuilder;
-import android.view.View.OnTouchListener;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -479,6 +475,12 @@ public class Functions {
 		public static void choose_layout (Context ctx) {
 			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_layout", true)) {
 				((DefaultActivity) ctx).setContentView(R.layout.activity_alternative);
+				if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_do_notifications", true)) {
+					defaultActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+					defaultActivity.findViewById(R.id.default_battery_percent).setVisibility(View.INVISIBLE);
+					defaultActivity.findViewById(R.id.default_battery_picture_horizontal).setVisibility(View.INVISIBLE);
+					
+				}
 			} else {
 				((DefaultActivity) ctx).setContentView(R.layout.activity_default);
 			}
@@ -770,7 +772,7 @@ public class Functions {
 							Functions.Actions.timerTask.cancel();}	
 					}
 					
-				}, 2000);
+				}, 2500);
 				
 				/*
 				new Handler().postDelayed(new Runnable() {

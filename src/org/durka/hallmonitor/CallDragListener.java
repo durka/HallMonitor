@@ -8,7 +8,6 @@ public class CallDragListener implements View.OnDragListener {
 	
     public boolean onDrag(View v, DragEvent dragevent) {
 
-    	int dragAction = dragevent.getAction();
     	View dragView = (View) dragevent.getLocalState();
     	
       switch (dragevent.getAction()) {
