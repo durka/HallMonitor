@@ -9,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/default_content"
         android:layout_width="310dp"
-        android:layout_height="145dp"
+        android:layout_height="135dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded"
