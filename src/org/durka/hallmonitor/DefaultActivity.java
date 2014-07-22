@@ -454,7 +454,9 @@ public class DefaultActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 
-        homeKeyLocker.lock(this);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_disable_home", true)) {
+            homeKeyLocker.lock(this);
+        }
 		
         // load debug setting
         mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
