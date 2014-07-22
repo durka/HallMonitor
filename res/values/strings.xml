@@ -52,6 +52,8 @@
     <string name="pref_keep_admin_summary">When Hall Monitor is disabled, don\'t relinquish Device Administrator permissions. If checked, Hall Monitor won\'t need to ask to become Device Administrator when you turn it on. May be useful with automation, e.g. Tasker.</string>
     <string name="pref_datetime">Display time and date</string>
     <string name="pref_datetime_summary">If checked, display time and date instead of only time.</string>
+    <string name="pref_disable_home">Disable buttons</string>
+    <string name="pref_disable_home_summary">If checked, the back/menu/home buttons are disabled while the cover is closed.</string>
     <string name="pref_keyguard">Enable/Dismiss Keyguard</string>
     <string name="pref_keyguard_summary">If checked, dismiss the default lock screen when user open the cover. Not working with secure lock screen (Password, PIN, etc.).</string>
     <string name="pref_layout">Layouts</string>

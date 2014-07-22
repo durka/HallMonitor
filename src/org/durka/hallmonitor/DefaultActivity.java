@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.durka.hallmonitor.Functions.Actions;
 import org.durka.hallmonitor.Functions.TorchActions;
 
 import android.app.Activity;
@@ -25,12 +26,15 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import io.github.homelocker.lib.HomeKeyLocker;
 
 /**
  * This is the activity that is displayed by default - it is displayed for the configurable delay number of milliseconds when the case is closed,
@@ -51,6 +55,9 @@ public class DefaultActivity extends Activity {
 
 	//audio manager to detect media state
 	private AudioManager audioManager;
+
+    //manager for home key hack
+    private HomeKeyLocker homeKeyLocker;
 
 	//Action fired when alarm goes off
     public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
@@ -385,6 +392,9 @@ public class DefaultActivity extends Activity {
 	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
 	    torchButton2 = (ImageButton) findViewById(R.id.torchbutton2);
 	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
+
+        //home key hack
+        homeKeyLocker = new HomeKeyLocker();
 	}
 
 	@Override
@@ -415,11 +425,17 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+
+        homeKeyLocker.unlock();
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_disable_home", true)) {
+            homeKeyLocker.lock(this);
+        }
 		
         // load debug setting
         mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
@@ -470,49 +486,6 @@ public class DefaultActivity extends Activity {
 		//tidy up our receiver when we are destroyed
 		unregisterReceiver(receiver);
 	}
-	
-	@Override
-	public boolean onKeyDown(int code, KeyEvent evt) {
-		// disable back and menu buttons
-		Log.d("DA-oKD", "key down " + code);
-		switch (code)
-		{
-		case KeyEvent.KEYCODE_BACK:
-		case KeyEvent.KEYCODE_MENU:
-			evt.startTracking(); // catch long presses as well
-			return true;
-		default:
-			return super.onKeyDown(code, evt);
-		}
-	}
-	
-	@Override
-	public boolean onKeyLongPress(int code, KeyEvent evt) {
-		// disable back and menu buttons
-		Log.d("DA-oKLP", "key long press " + code);
-		switch (code)
-		{
-		case KeyEvent.KEYCODE_BACK:
-		case KeyEvent.KEYCODE_MENU:
-			return true;
-		default:
-			return super.onKeyLongPress(code, evt);
-		}
-	}
-	
-	@Override
-	public boolean onKeyUp(int code, KeyEvent evt) {
-		// disable back and menu buttons
-		Log.d("DA-oKU", "key up " + code);
-		switch (code)
-		{
-		case KeyEvent.KEYCODE_BACK:
-		case KeyEvent.KEYCODE_MENU:
-			return true;
-		default:
-			return super.onKeyUp(code, evt);
-		}
-	} 
 	
     public static boolean isDebug() {
         return mDebug;
