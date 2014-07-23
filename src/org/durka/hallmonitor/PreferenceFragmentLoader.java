@@ -63,18 +63,19 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
 
             // debug
             mDebug = getPreferenceManager().getSharedPreferences().getBoolean("pref_dev_opts_debug", mDebug);
-            if (mDebug)
-                Toast.makeText(getActivity(), "debug is enabled!", Toast.LENGTH_LONG).show();
-
             final int resourceId = context.getResources().getIdentifier(resourceName, "xml", context.getPackageName());
 
             PreferenceManager.setDefaultValues(getActivity(), resourceId, false);
             addPreferencesFromResource(resourceId);
+
+            if (mDebug && findPreference("pref_about") != null)
+                Toast.makeText(getActivity(), "debug is enabled!", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Log_d(LOG_TAG, "onCreate: exception occurred! " + e.getMessage());
         }
 
         // setup about preference for debug
+        SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
         Preference about = findPreference("pref_about");
         if (about != null) {
             // init onClick listener
@@ -100,6 +101,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
             about.setTitle(getTextDisabledFormatted(about.getTitle()));
             about.setSummary(getTextDisabledFormatted(about.getSummary()));
         }
+
+        // phone control
+        enablePhoneScreen(prefs);
+        updatePhoneControlTtsDelay(prefs);
     }
 
     @Override
@@ -280,7 +285,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         boolean phoneControlConfig = prefs.getBoolean("pref_phone_controls", false);
         Preference phoneControl = findPreference("pref_phone_controls_user");
 
-        if (phoneControlConfig != phoneControlState && phoneControl != null)
+        if (phoneControl != null && (phoneControlConfig != phoneControlState || phoneControl.isEnabled() != phoneControlState))
             phoneControl.setEnabled(phoneControlState);
         if (phoneControlConfig != (phoneControlState && prefs.getBoolean("pref_phone_controls_user", false)))
             prefs.edit().putBoolean("pref_phone_controls", !phoneControlConfig).commit();
