@@ -496,7 +496,7 @@ public class Functions {
 				defaultActivity.findViewById(R.id.callchoice).setOnDragListener(new CallDragListener());
 			}
 		}
-
+		
 		private static class AsyncSuRun extends AsyncTask<String, Void, String> {
 			@Override
 			protected String doInBackground(String... params) {

@@ -8,4 +8,10 @@
         android:summary="@string/pref_realhall_summary"
         android:defaultValue="false"/>
 
+    <org.durka.hallmonitor.PreferenceSwitchable
+        android:key="pref_realfullscreen"
+        android:title="@string/pref_realfullscreen"
+        android:summary="@string/pref_realfullscreen_summary"
+        android:defaultValue="false"/>
+
 </PreferenceScreen>

@@ -176,6 +176,8 @@ public class DefaultActivity extends Activity {
 	 */
 	public void refreshDisplay() {
 		
+		//set_real_fullscreen();
+		
 		if (findViewById(R.id.default_battery_picture_horizontal) != null) {
 			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
@@ -302,7 +304,6 @@ public class DefaultActivity extends Activity {
 		}
 	}
 
-
 	/** Called when the user touches the snooze button */
 	public void sendSnooze(View view) {
 		// Broadcast alarm snooze event
@@ -361,6 +362,19 @@ public class DefaultActivity extends Activity {
 		Functions.Actions.end_camera(this);
 	}
 	
+	public void set_real_fullscreen () {
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_realfullscreen", false) && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_runasroot", false)) {
+			//Remove navigation bar
+	 		View decorView = getWindow().getDecorView();
+	 		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+		            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+		            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+		            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+		            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+		            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+		}
+ 	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -373,6 +387,7 @@ public class DefaultActivity extends Activity {
 
 		//set default view
 		
+		set_real_fullscreen();
 		Functions.Actions.choose_layout(this);
 
 		//get the audio manager

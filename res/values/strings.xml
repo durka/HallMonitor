@@ -66,6 +66,8 @@
     <string name="pref_runasroot_title">Root settings</string>
     <string name="pref_realhall">Use Real Hall</string>
     <string name="pref_realhall_summary">Use real hall sensor or use proximity sensor.</string>
+    <string name="pref_realfullscreen">Use Real FullScreen</string>
+    <string name="pref_realfullscreen_summary">Hide all system bar: navigation bar,... (Require HallMonitor restart)</string>
     
     <string name="pref_optional">Optional Features</string>
     <string name="pref_optional_summary">Click through to enable/disable features</string>
