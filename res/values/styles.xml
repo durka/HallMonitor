@@ -39,4 +39,14 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <!-- from Android-HomeKey-Locker -->
+    <style name="OverlayDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
 </resources>

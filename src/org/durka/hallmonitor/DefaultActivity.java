@@ -11,7 +11,6 @@ import org.durka.hallmonitor.Functions.TorchActions;
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.content.BroadcastReceiver;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -24,19 +23,18 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.DragShadowBuilder;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import io.github.homelocker.lib.HomeKeyLocker;
 
 /**
  * This is the activity that is displayed by default - it is displayed for the configurable delay number of milliseconds when the case is closed,
@@ -57,6 +55,9 @@ public class DefaultActivity extends Activity {
 
 	//audio manager to detect media state
 	private AudioManager audioManager;
+
+    //manager for home key hack
+    private HomeKeyLocker homeKeyLocker;
 
 	//Action fired when alarm goes off
     public static final String ALARM_ALERT_ACTION = "com.android.deskclock.ALARM_ALERT";
@@ -144,9 +145,7 @@ public class DefaultActivity extends Activity {
 					Log.d("phone", "phone state changed to " + state);
 					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 						Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
-						findViewById(R.id.pickup_button).setOnTouchListener(new CallTouchListener());
-					    findViewById(R.id.hangup_button).setOnTouchListener(new CallTouchListener());
-					    findViewById(R.id.callchoice).setOnDragListener(new CallDragListener());
+						Functions.Actions.choose_call_layout(getApplicationContext());
 					} else {
 						if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 							Functions.Events.call_finished(context);
@@ -177,30 +176,18 @@ public class DefaultActivity extends Activity {
 	 */
 	public void refreshDisplay() {
 		
-		if (findViewById(R.id.default_battery_picture) != null) {
-			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
-				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery_charge);
-			} else {
-				((ImageView)findViewById(R.id.default_battery_picture)).setImageResource(R.drawable.stat_sys_battery);
-			}
-			((ImageView)findViewById(R.id.default_battery_picture)).getDrawable().setLevel(level);
-			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
-		}
-		
-		else if (findViewById(R.id.default_battery_picture_horizontal) != null) {
+		if (findViewById(R.id.default_battery_picture_horizontal) != null) {
 			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 			int level = (int) (battery_status.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) / (float)battery_status.getIntExtra(BatteryManager.EXTRA_SCALE, -1) * 100),
 				status = battery_status.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
 			if (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL) {
 				((ImageView)findViewById(R.id.default_battery_picture_horizontal)).setImageResource(R.drawable.stat_sys_battery_charge_horizontal);
+				((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level));
 			} else {
 				((ImageView)findViewById(R.id.default_battery_picture_horizontal)).setImageResource(R.drawable.stat_sys_battery_horizontal);
+				((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
 			}
 			((ImageView)findViewById(R.id.default_battery_picture_horizontal)).getDrawable().setLevel(level);
-			((TextView)findViewById(R.id.default_battery_percent)).setText(Integer.toString(level) + "%");
 		}
 
 		// we might have missed a phone-state revelation
@@ -405,6 +392,9 @@ public class DefaultActivity extends Activity {
 	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
 	    torchButton2 = (ImageButton) findViewById(R.id.torchbutton2);
 	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
+
+        //home key hack
+        homeKeyLocker = new HomeKeyLocker();
 	}
 
 	@Override
@@ -435,11 +425,17 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+
+        homeKeyLocker.unlock();
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_disable_home", true)) {
+            homeKeyLocker.lock(this);
+        }
 		
         // load debug setting
         mDebug = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("pref_dev_opts_debug", false);
@@ -490,49 +486,6 @@ public class DefaultActivity extends Activity {
 		//tidy up our receiver when we are destroyed
 		unregisterReceiver(receiver);
 	}
-	
-	@Override
-	public boolean onKeyDown(int code, KeyEvent evt) {
-		// disable back and menu buttons
-		Log.d("DA-oKD", "key down " + code);
-		switch (code)
-		{
-		case KeyEvent.KEYCODE_BACK:
-		case KeyEvent.KEYCODE_MENU:
-			evt.startTracking(); // catch long presses as well
-			return true;
-		default:
-			return super.onKeyDown(code, evt);
-		}
-	}
-	
-	@Override
-	public boolean onKeyLongPress(int code, KeyEvent evt) {
-		// disable back and menu buttons
-		Log.d("DA-oKLP", "key long press " + code);
-		switch (code)
-		{
-		case KeyEvent.KEYCODE_BACK:
-		case KeyEvent.KEYCODE_MENU:
-			return true;
-		default:
-			return super.onKeyLongPress(code, evt);
-		}
-	}
-	
-	@Override
-	public boolean onKeyUp(int code, KeyEvent evt) {
-		// disable back and menu buttons
-		Log.d("DA-oKU", "key up " + code);
-		switch (code)
-		{
-		case KeyEvent.KEYCODE_BACK:
-		case KeyEvent.KEYCODE_MENU:
-			return true;
-		default:
-			return super.onKeyUp(code, evt);
-		}
-	} 
 	
     public static boolean isDebug() {
         return mDebug;
