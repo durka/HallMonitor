@@ -66,9 +66,6 @@ public class Functions {
 	public static final int NOTIFICATION_LISTENER_ON = 0xDEAD;
 	public static final int NOTIFICATION_LISTENER_OFF = 0xBEEF;
 	
-    //this action will let us toggle the flashlight
-    public static final String TOGGLE_FLASHLIGHT = "net.cactii.flash2.TOGGLE_FLASHLIGHT";
-
     private static final String DEV_SERRANO_LTE_CM10 = "serranolte"; 	// GT-I9195 CM10.x
     private static final String DEV_SERRANO_LTE_CM11 = "serranoltexx"; 	// GT-I9195 CM11.x
     private static final String DEV_SERRANO_DS_CM10 = "serranods"; 	    // GT-I9192 CM10.x
@@ -112,8 +109,6 @@ public class Functions {
 			//save the cover state
 			Events.set_cover(true);
 			
-			enableCoverTouch(ctx, true);
-			
 		    // step 1: bring up the default activity window
 			//we are using the show when locked flag as we'll re-use this method to show the screen on power button press
 			if (!DefaultActivity.on_screen) {
@@ -122,7 +117,12 @@ public class Functions {
 												| Intent.FLAG_ACTIVITY_NO_ANIMATION
 												| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED));
 			}
-            
+			else {
+				defaultActivity.refreshDisplay();
+			}
+
+			enableCoverTouch(ctx, true);
+				
 			//need this to let us lock the phone
 			final DevicePolicyManager dpm = (DevicePolicyManager) ctx.getSystemService(Context.DEVICE_POLICY_SERVICE);
 			
@@ -351,59 +351,75 @@ public class Functions {
 		}
 		
 		
+		public static void snooze_alarm() {
+			Log.d("F.Act.alarm", "snooze... I sleep");
 
+			// Broadcast alarm snooze event
+			Intent alarmSnooze = new Intent(DefaultActivity.ALARM_SNOOZE_ACTION);
+			defaultActivity.sendBroadcast(alarmSnooze);
+			
+			//unset alarm firing flag
+			DefaultActivity.alarm_firing = false;
+			
+			defaultActivity.refreshDisplay();
+			setCloseTimer(defaultActivity);
+		}
+
+		public static void dismiss_alarm() {
+			Log.d("F.Act.alarm", "dismiss... I am wake");
+
+			// Broadcast alarm dismiss event
+			Intent alarmDismiss = new Intent(DefaultActivity.ALARM_DISMISS_ACTION);
+			defaultActivity.sendBroadcast(alarmDismiss);
+			
+			//unset alarm firing flag
+			DefaultActivity.alarm_firing = false;
+			
+			defaultActivity.refreshDisplay();
+			setCloseTimer(defaultActivity);
+		}
+		
 		public static void hangup_call() {
-			Log.d("phone", "hanging up! goodbye");
-			//if(configurationActivity != null && configurationActivity.isSystemApp) {
-			//}
-			//else {
+			Log.d("F.Act.phone", "hanging up! goodbye");
+
 			AsyncSuRun localSuRun = new AsyncSuRun();
 			localSuRun.execute("input keyevent 6");
-			//}
+
 			DefaultActivity.phone_ringing = false;
+			
 			defaultActivity.refreshDisplay();
 			setCloseTimer(defaultActivity);
 		}
 		
 		public static void pickup_call() {
-			Log.d("phone", "picking up! hello");
-			//if(configurationActivity != null && configurationActivity.isSystemApp) {
-			//}
-			//else {
+			Log.d("F.Act.phone", "picking up! hello");
+
 			AsyncSuRun localSuRun = new AsyncSuRun();
 			localSuRun.execute("input keyevent 5");
+			
 			setCloseTimer(defaultActivity);
-			//}
-			//DefaultActivity.phone_ringing = false;
-			//defaultActivity.refreshDisplay();
 		}
 		
 		public static void toggle_torch(DefaultActivity da) {
-			Intent intent = new Intent(TOGGLE_FLASHLIGHT);
-	        intent.putExtra("strobe", false);
-	        intent.putExtra("period", 100);
-	        intent.putExtra("bright", false);
-	        da.sendBroadcast(intent);
-	        Is.torchIsOn = !Is.torchIsOn;
-	        if (Is.torchIsOn) {
-	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
-	        	if (timerTask != null) timerTask.cancel();
-	        } else {
-	        	da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
-	        	close_cover(da);
-	        }
-		}
-		
-		public static void toggle_torch_alternative(DefaultActivity da) {
-	    	if (!flashIsOn) {
-	    		TorchActions.turnOnFlash();
-	    		da.torchButton2.setImageResource(R.drawable.ic_appwidget_torch_on);
-	    		if (Actions.timerTask != null) Actions.timerTask.cancel();
-	    } else {
-	    		TorchActions.turnOffFlash();
-	    		da.torchButton2.setImageResource(R.drawable.ic_appwidget_torch_off);
-	    		close_cover(da);
-	    	}
+			if(PreferenceManager.getDefaultSharedPreferences(da).getBoolean("pref_flash_controls", false)) {
+				Intent intent = new Intent(DefaultActivity.TOGGLE_FLASHLIGHT);
+		        intent.putExtra("strobe", false);
+		        intent.putExtra("period", 100);
+		        intent.putExtra("bright", false);
+		        da.sendBroadcast(intent);
+		        da.toggleTorchIcon();
+			}
+			else if(PreferenceManager.getDefaultSharedPreferences(da).getBoolean("pref_flash_controls_alternative", false)) {
+		    	if (!flashIsOn) {
+		    		TorchActions.turnOnFlash();
+		    		da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_on);
+		    		if (timerTask != null) timerTask.cancel();
+		    	} else {
+		    		TorchActions.turnOffFlash();
+		    		da.torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
+		    		close_cover(da);
+		    	}
+			}
 		}
 		
 		public static void start_camera(DefaultActivity da) {
@@ -478,8 +494,7 @@ public class Functions {
 				if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_do_notifications", true)) {
 					defaultActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 					defaultActivity.findViewById(R.id.default_battery_percent).setVisibility(View.INVISIBLE);
-					defaultActivity.findViewById(R.id.default_battery_picture_horizontal).setVisibility(View.INVISIBLE);
-					
+					defaultActivity.findViewById(R.id.default_battery_picture_horizontal).setVisibility(View.INVISIBLE);					
 				}
 			} else {
 				((DefaultActivity) ctx).setContentView(R.layout.activity_default);
@@ -488,15 +503,110 @@ public class Functions {
 		
 		public static void choose_call_layout (Context ctx) {
 			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_incoming_call_layout", false)) {
-				defaultActivity.findViewById(R.id.hangup_button).setOnTouchListener(new SwipeTouchListener(ctx));
-				defaultActivity.findViewById(R.id.pickup_button).setOnTouchListener(new SwipeTouchListener(ctx));
+				defaultActivity.findViewById(R.id.default_content_phone).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_content_phone).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_CALL));
+				defaultActivity.findViewById(R.id.accept_slide).setLongClickable(true);
+				defaultActivity.findViewById(R.id.accept_slide).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_CALL));
+				defaultActivity.findViewById(R.id.reject_slide).setLongClickable(true);
+				defaultActivity.findViewById(R.id.reject_slide).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_CALL));
+				defaultActivity.findViewById(R.id.call_from).setLongClickable(true);
+				defaultActivity.findViewById(R.id.call_from).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_CALL));
+				defaultActivity.findViewById(R.id.incoming_call_layout).setLongClickable(true);
+				defaultActivity.findViewById(R.id.incoming_call_layout).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_CALL));
+				defaultActivity.findViewById(R.id.pickup_button).setLongClickable(true);
+				defaultActivity.findViewById(R.id.pickup_button).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_CALL));
+				defaultActivity.findViewById(R.id.hangup_button).setLongClickable(true);
+				defaultActivity.findViewById(R.id.hangup_button).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_CALL));
+				defaultActivity.findViewById(R.id.callchoice).setOnDragListener(null);
+				defaultActivity.findViewById(R.id.callchoice).setLongClickable(true);
+				defaultActivity.findViewById(R.id.callchoice).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_CALL));
 			} else {
+				defaultActivity.findViewById(R.id.default_content_phone).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_content_phone).setLongClickable(false);
+				defaultActivity.findViewById(R.id.accept_slide).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.accept_slide).setLongClickable(false);
+				defaultActivity.findViewById(R.id.reject_slide).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.reject_slide).setLongClickable(false);
+				defaultActivity.findViewById(R.id.call_from).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.call_from).setLongClickable(false);
+				defaultActivity.findViewById(R.id.incoming_call_layout).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.incoming_call_layout).setLongClickable(false);
 				defaultActivity.findViewById(R.id.pickup_button).setOnTouchListener(new CallTouchListener());
+				defaultActivity.findViewById(R.id.pickup_button).setLongClickable(false);
 				defaultActivity.findViewById(R.id.hangup_button).setOnTouchListener(new CallTouchListener());
+				defaultActivity.findViewById(R.id.hangup_button).setLongClickable(false);
+				defaultActivity.findViewById(R.id.callchoice).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.callchoice).setLongClickable(false);
 				defaultActivity.findViewById(R.id.callchoice).setOnDragListener(new CallDragListener());
 			}
 		}
 		
+		public static void choose_alarm_layout (Context ctx) {
+			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_alarm_layout", false)) {
+				defaultActivity.findViewById(R.id.default_content_alarm).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_content_alarm).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_ALARM));
+				defaultActivity.findViewById(R.id.snoozebutton).setClickable(false);
+				defaultActivity.findViewById(R.id.snoozebutton).setLongClickable(true);
+				defaultActivity.findViewById(R.id.snoozebutton).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_ALARM));
+				defaultActivity.findViewById(R.id.dismissbutton).setClickable(false);
+				defaultActivity.findViewById(R.id.dismissbutton).setLongClickable(true);
+				defaultActivity.findViewById(R.id.dismissbutton).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_ALARM));
+			} else {
+				defaultActivity.findViewById(R.id.default_content_alarm).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_content_alarm).setLongClickable(false);
+				defaultActivity.findViewById(R.id.snoozebutton).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.snoozebutton).setLongClickable(false);
+				defaultActivity.findViewById(R.id.snoozebutton).setClickable(true);
+				defaultActivity.findViewById(R.id.dismissbutton).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.dismissbutton).setLongClickable(false);
+				defaultActivity.findViewById(R.id.dismissbutton).setClickable(true);
+			}
+		}
+		
+		public static void choose_torch_layout (Context ctx) {
+			if (PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("pref_torch_layout", false)) {
+				defaultActivity.findViewById(R.id.default_content_normal).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_content_normal).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+				defaultActivity.findViewById(R.id.default_widget).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_widget).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+				defaultActivity.findViewById(R.id.default_text_clock).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_text_clock).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+				defaultActivity.findViewById(R.id.default_text_clock_hour).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_text_clock_hour).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+				defaultActivity.findViewById(R.id.default_text_clock_date).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_text_clock_date).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+				defaultActivity.findViewById(R.id.default_battery_picture_horizontal).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_battery_picture_horizontal).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+				defaultActivity.findViewById(R.id.default_battery_percent).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_battery_percent).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+				defaultActivity.findViewById(R.id.default_icon_container).setLongClickable(true);
+				defaultActivity.findViewById(R.id.default_icon_container).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+				defaultActivity.findViewById(R.id.torchbutton).setClickable(false);
+				defaultActivity.findViewById(R.id.torchbutton).setLongClickable(true);
+				defaultActivity.findViewById(R.id.torchbutton).setOnTouchListener(new SwipeTouchListener(ctx, SwipeTouchListener.ActionMode.MODE_TORCH));
+			} else {
+				defaultActivity.findViewById(R.id.default_content_normal).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_content_normal).setLongClickable(false);
+				defaultActivity.findViewById(R.id.default_widget).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_widget).setLongClickable(false);
+				defaultActivity.findViewById(R.id.default_text_clock).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_text_clock).setLongClickable(false);
+				defaultActivity.findViewById(R.id.default_text_clock_hour).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_text_clock_hour).setLongClickable(false);
+				defaultActivity.findViewById(R.id.default_text_clock_date).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_text_clock_date).setLongClickable(false);
+				defaultActivity.findViewById(R.id.default_battery_picture_horizontal).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_battery_picture_horizontal).setLongClickable(false);
+				defaultActivity.findViewById(R.id.default_battery_percent).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_battery_percent).setLongClickable(false);
+				defaultActivity.findViewById(R.id.default_icon_container).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.default_icon_container).setLongClickable(false);
+				defaultActivity.findViewById(R.id.torchbutton).setOnTouchListener(null);
+				defaultActivity.findViewById(R.id.torchbutton).setLongClickable(false);
+				defaultActivity.findViewById(R.id.torchbutton).setClickable(true);
+			}
+		}
+
 		private static class AsyncSuRun extends AsyncTask<String, Void, String> {
 			@Override
 			protected String doInBackground(String... params) {
@@ -735,9 +845,9 @@ public class Functions {
 		}
 
 		public static void incoming_call(final Context ctx, String number) {
-			Log.d("phone", "call from " + number);
+			Log.d("F.Evt.phone", "call from " + number);
 			if (Functions.Is.cover_closed(ctx)) {
-				Log.d("phone", "but the screen is closed. screen my calls");
+				Log.d("F.Evt.phone", "but the screen is closed. screen my calls");
 				
 				//if the cover is closed then
 				//we want to pop this activity up over the top of the dialer activity
@@ -773,34 +883,60 @@ public class Functions {
 					}
 					
 				}, 2500);
-				
-				/*
-				new Handler().postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						Process process;
-						try {
-							process = Runtime.getRuntime().exec(new String[]{ "su","-c","input keyevent 6"});
-							process.waitFor();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					    
-					}
-				}, 500);
-				*/
-				
 			}
 		}
 		
 		public static void call_finished(Context ctx) {
-			Log.d("phone", "call is over, cleaning up");
+			Log.d("F.Evt.phone", "call is over, cleaning up");
 			DefaultActivity.phone_ringing = false;
 			((TextView)defaultActivity.findViewById(R.id.call_from)).setText(ctx.getString(R.string.unknown_caller));
+			Actions.close_cover(ctx);
+		}
+
+		public static void incoming_alarm(final Context ctx) {
+			Log.d("F.Evt.alarm", "alarm ringing" );
+			if (Functions.Is.cover_closed(ctx)) {
+				Log.d("F.Evt.alarm", "but the screen is closed. screen alarm");
+				
+				//if the cover is closed then
+				//we want to pop this activity up over the top of the alarm activity
+				//to guarantee that we need to hold off until the alarm activity is running
+				//a 1 second delay seems to allow this
+				DefaultActivity.alarm_firing = true;
+				
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						Intent intent = new Intent(ctx, DefaultActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+							          | Intent.FLAG_ACTIVITY_CLEAR_TOP
+							          | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+						intent.setAction(Intent.ACTION_MAIN);
+						ctx.startActivity(intent);
+						Actions.enableCoverTouch(ctx, true);
+						
+						//Util.rise_and_shine(ctx); // make sure the screen is on (Removed for Testing)
+					}
+				}, 800);
+				
+				// We must stop TimerTask during an alarm, and we must be sure that
+				// timerTask.cancel will be executed only when the screen is on
+				Timer timer2 = new Timer();
+				timer2.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						if (Functions.Actions.timerTask != null) {
+							Functions.Actions.timerTask.cancel();}	
+					}
+					
+				}, 2500);
+			}
+		}
+		
+		public static void alarm_finished(Context ctx) {
+			Log.d("F.Evt.alarm", "alarm is over, cleaning up");
+			DefaultActivity.alarm_firing = false;
 			Actions.close_cover(ctx);
 		}
 	}
@@ -809,9 +945,7 @@ public class Functions {
 	 * Contains methods to check the state
 	 */
 	public static class Is {
-		
-		public static boolean torchIsOn = false;
-		
+			
 		/**
 		 * Is the cover closed.
 		 * @param ctx Application context.
@@ -890,7 +1024,7 @@ public class Functions {
 			
 			if (number.equals("")) return "";
 			
-			Log.d("phone", "looking up " + number + "...");
+			Log.d("F.Util.phone", "looking up " + number + "...");
 			
 		    Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
 		    String name = number;
@@ -911,7 +1045,7 @@ public class Functions {
 		        }
 		    }
 
-		    Log.d("phone", "...result is " + name);
+		    Log.d("F.Util.phone", "...result is " + name);
 		    return name;
 		}
 

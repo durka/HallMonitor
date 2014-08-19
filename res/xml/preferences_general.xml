@@ -59,10 +59,4 @@
         android:summary="@string/pref_keep_admin_summary"
         android:defaultValue="false" />
     
-    <CheckBoxPreference
-        android:key="pref_incoming_call_layout"
-        android:title="@string/pref_incoming_call_layout"
-        android:summary="@string/pref_incoming_call_layout_summary"
-        android:defaultValue="false" />
-
 </PreferenceScreen>

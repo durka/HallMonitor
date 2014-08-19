@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/pref_settings">
+        <org.durka.hallmonitor.PreferenceSwitchable
+            android:key="pref_alarm_layout"
+            android:title="@string/pref_alarm_layout"
+            android:summary="@string/pref_alarm_layout_summary"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -241,17 +241,6 @@
                 android:src="@drawable/ic_appwidget_torch_off" />
 
             <ImageButton
-                android:id="@+id/torchbutton2"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="30dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
-                android:onClick="toggleTorch"
-                android:src="@drawable/ic_appwidget_torch_off" />
-
-            <ImageButton
                 android:id="@+id/camerabutton"
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="30dp"

@@ -2,10 +2,7 @@ package org.durka.hallmonitor;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import org.durka.hallmonitor.Functions.Actions;
 import org.durka.hallmonitor.Functions.TorchActions;
 
 import android.app.Activity;
@@ -23,7 +20,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -67,10 +63,13 @@ public class DefaultActivity extends Activity {
     public static final String ALARM_DISMISS_ACTION = "com.android.deskclock.ALARM_DISMISS";
     //This action should let us know if the alarm has been killed by another app
     public static final String ALARM_DONE_ACTION = "com.android.deskclock.ALARM_DONE";
+
+    public static final String TORCH_STATE = "torch_state";
+    public static final String TOGGLE_FLASHLIGHT = "net.cactii.flash2.TOGGLE_FLASHLIGHT";
+    public static final String TORCH_STATE_CHANGED = "net.cactii.flash2.TORCH_STATE_CHANGED";
     
     //all the views we need
     public ImageButton torchButton = null;
-    public ImageButton torchButton2 = null;
     private ImageButton cameraButton = null;
 
 	//we need to kill this activity when the screen opens
@@ -79,14 +78,14 @@ public class DefaultActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
 
-				Log.d("DA.onReceive", "Screen on event received.");
+				Log.d("DA.onReceive.screen", "Screen on event received.");
 
 				if (Functions.Is.cover_closed(context)) {
-					Log.d("DA.onReceive", "Cover is closed, display Default Activity.");
+					Log.d("DA.onReceive.screen", "Cover is closed, display Default Activity.");
 					//easiest way to do this is actually just to invoke the close_cover action as it does what we want
 					Functions.Actions.close_cover(getApplicationContext());
 				} else {
-					Log.d("DA.onReceive", "Cover is open, stopping Default Activity.");
+					Log.d("DA.onReceive.screen", "Cover is open, stopping Default Activity.");
 
 					// when the cover opens, the fullscreen activity goes poof				
 					//Log.d("DA.onReceive", "Current task: " + ((ActivityManager)getSystemService(ACTIVITY_SERVICE)).getRunningTasks(1).get(0).topActivity.getPackageName());
@@ -96,56 +95,33 @@ public class DefaultActivity extends Activity {
 
 			} else if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
 
-				Log.d("DA.onReceive", "Alarm on event received.");
+				Log.d("DA.onReceive.alarm", "Alarm on event received.");
 
 				//only take action if alarm controls are enabled
 				if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_alarm_controls", false)) {
 
-					Log.d("DA.onReceive", "Alarm controls are enabled, taking action.");
+					Log.d("DA.onReceive.alarm", "Alarm controls are enabled, taking action.");
 
-					//set the alarm firing state
-					alarm_firing=true;
-
-					//if the cover is closed then
-					//we want to pop this activity up over the top of the alarm activity
-					//to guarantee that we need to hold off until the alarm activity is running
-					//a 1 second delay seems to allow this
-					if (Functions.Is.cover_closed(context)) {
-						Functions.Actions.enableCoverTouch(context, true);
-						Timer timer = new Timer();
-						timer.schedule(new TimerTask() {
-							@Override
-							public void run() {	
-								Intent myIntent = new Intent(getApplicationContext(),DefaultActivity.class);
-								myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK 
-										| Intent.FLAG_ACTIVITY_CLEAR_TOP
-										| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-								myIntent.setAction(Intent.ACTION_MAIN);
-								startActivity(myIntent);
-
-							}
-						}, 1000);	
-					}
+					Functions.Actions.choose_alarm_layout(context);
+					Functions.Events.incoming_alarm(context);
+					refreshDisplay();
 				} else {
-					Log.d("DA.onReceive", "Alarm controls are not enabled.");
+					Log.d("DA.onReceive.alarm", "Alarm controls are not enabled.");
 				}
-
 			} else if (intent.getAction().equals(ALARM_DONE_ACTION) ) {
 					
-					Log.d("DA.onReceive", "Alarm done event received.");
+					Log.d("DA.onReceive.alarm", "Alarm done event received.");
 					
-					//if the alarm is turned off using the normal alarm screen this will
-					//ensure that we will hide the alarm controls
-					alarm_firing=false;
-				
+					Functions.Events.alarm_finished(context);
+					refreshDisplay();
 			} else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
 				
 				if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_phone_controls", false)) {
 					String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-					Log.d("phone", "phone state changed to " + state);
+					Log.d("DA.onReceive.phone", "phone state changed to " + state);
 					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+						Functions.Actions.choose_call_layout(context);
 						Functions.Events.incoming_call(context, intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
-						Functions.Actions.choose_call_layout(getApplicationContext());
 					} else {
 						if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 							Functions.Events.call_finished(context);
@@ -153,8 +129,16 @@ public class DefaultActivity extends Activity {
 					}
 					refreshDisplay();
 				} else {
-					Log.d("phone", "phone controls are not enabled");
+					Log.d("DA.onReceive.phone", "phone controls are not enabled");
 				}
+	        } else if (intent.getAction().equals(TORCH_STATE_CHANGED) || intent.getAction().equals(TOGGLE_FLASHLIGHT)) {
+	        	if(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_flash_controls", false)) {
+					Log.d("DA.onReceive.torch", "torch state changed");
+	        		refreshDisplay();
+	        	}
+	        	else {
+					Log.d("DA.onReceive.torch", "torch controls are not enabled.");
+	        	}
 			} else if (intent.getAction().equals("org.durka.hallmonitor.debug")) {
 				Log.d("DA.onReceive", "received debug intent");
 				// test intent to show/hide a notification
@@ -166,7 +150,7 @@ public class DefaultActivity extends Activity {
 					Functions.Actions.debug_notification(context, false);
 					break;
 				}
-			}
+	        }			
 		}
 	};
 
@@ -176,7 +160,7 @@ public class DefaultActivity extends Activity {
 	 */
 	public void refreshDisplay() {
 		
-		//set_real_fullscreen();
+		set_real_fullscreen();
 		
 		if (findViewById(R.id.default_battery_picture_horizontal) != null) {
 			Intent battery_status = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -205,19 +189,16 @@ public class DefaultActivity extends Activity {
 		((TextView)findViewById(R.id.default_text_clock_date)).setText(DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date()));
 		
 		//hide or show the torch button as required
-		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false))
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false)
+				|| PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls_alternative", false))
 		{
+			Functions.Actions.choose_torch_layout(this);
+			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls", false)) {
+				toggleTorchIcon();				
+			}
 			torchButton.setVisibility(View.VISIBLE);
 		} else {
 			torchButton.setVisibility(View.INVISIBLE);
-		}
-		
-		//hide or show the alternate torch button as required
-		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_flash_controls_alternative", false))
-		{
-			torchButton2.setVisibility(View.VISIBLE);
-		} else {
-			torchButton2.setVisibility(View.INVISIBLE);
 		}
 		
 		//hide or show the camera button as required
@@ -252,6 +233,7 @@ public class DefaultActivity extends Activity {
 		((RelativeLayout)findViewById(R.id.default_widget_area)).removeAllViews();
 
 		if (alarm_firing) {
+			Functions.Actions.choose_alarm_layout(this);
 			// show the alarm controls
 			findViewById(R.id.default_content_alarm).setVisibility(View.VISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
@@ -259,7 +241,8 @@ public class DefaultActivity extends Activity {
 			findViewById(R.id.default_content_camera).setVisibility(View.INVISIBLE);
 			
 		} else if (phone_ringing) {
-			
+			Functions.Actions.choose_call_layout(this);
+
 			// show the phone controls
 			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.VISIBLE);
@@ -269,7 +252,6 @@ public class DefaultActivity extends Activity {
 			((TextView)findViewById(R.id.call_from)).setText(Functions.Util.getContactName(this, call_from));
 			
 		} else if (camera_up) {
-			
 			findViewById(R.id.default_content_alarm).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_phone).setVisibility(View.INVISIBLE);
 			findViewById(R.id.default_content_normal).setVisibility(View.INVISIBLE);
@@ -306,24 +288,12 @@ public class DefaultActivity extends Activity {
 
 	/** Called when the user touches the snooze button */
 	public void sendSnooze(View view) {
-		// Broadcast alarm snooze event
-		Intent alarmSnooze = new Intent(ALARM_SNOOZE_ACTION);
-		sendBroadcast(alarmSnooze);
-		//unset alarm firing flag
-		alarm_firing = false;
-		//refresh the display
-		refreshDisplay();
+		Functions.Actions.snooze_alarm();
 	}
-
+	
 	/** Called when the user touches the dismiss button */
 	public void sendDismiss(View view) {
-		// Broadcast alarm dismiss event
-		Intent alarmDismiss = new Intent(ALARM_DISMISS_ACTION);
-		sendBroadcast(alarmDismiss);
-		//unset alarm firing flag
-		alarm_firing = false;
-		//refresh the display
-		refreshDisplay();
+		Functions.Actions.dismiss_alarm();
 	}
 	
 	public void sendHangUp(View view) {
@@ -339,16 +309,30 @@ public class DefaultActivity extends Activity {
 		Functions.Actions.toggle_torch(this);
 	}
 	
-	//toggle the alternative torch
-	public void toggleTorch(View view) {
-		Functions.Actions.toggle_torch_alternative(this);
+	public void toggleTorchIcon()
+	{
+		Intent stateIntent = Functions.defaultActivity.registerReceiver(null, new IntentFilter(DefaultActivity.TORCH_STATE_CHANGED));
+        boolean torchIsOn = stateIntent != null && stateIntent.getIntExtra("state", 0) != 0;
+        
+		if (torchIsOn) {
+    		Log.d("torch", "Icon On");
+        	((ImageButton)Functions.defaultActivity.findViewById(R.id.torchbutton)).setImageResource(R.drawable.ic_appwidget_torch_on);
+        	if (Functions.Actions.timerTask != null) Functions.Actions.timerTask.cancel();
+        } else {
+    		Log.d("torch", "Icon Off");
+        	((ImageButton)Functions.defaultActivity.findViewById(R.id.torchbutton)).setImageResource(R.drawable.ic_appwidget_torch_off);
+        	if(Functions.Is.cover_closed(this))
+        	{
+        		Functions.Actions.setCloseTimer(this);
+        	}
+        }
 	}
-	
+		
 	//fire up the camera
 	public void camera_start(View view) {
 		if (Functions.flashIsOn) {
 		 	TorchActions.turnOffFlash();
-		 	torchButton2.setImageResource(R.drawable.ic_appwidget_torch_off);
+		 	torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
 		}
 		Functions.Actions.start_camera(this);
 	}
@@ -364,8 +348,10 @@ public class DefaultActivity extends Activity {
 	
 	public void set_real_fullscreen () {
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_realfullscreen", false) && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_runasroot", false)) {
+			//Remove notification bar
+			this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			//Remove navigation bar
-	 		View decorView = getWindow().getDecorView();
+	 		View decorView = this.getWindow().getDecorView();
 	 		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 		            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 		            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -385,27 +371,31 @@ public class DefaultActivity extends Activity {
 
 		Log.d("DA.onCreate", "onCreate of DefaultView.");
 
-		//set default view
+		//Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		set_real_fullscreen();
+
+		//set default view
 		Functions.Actions.choose_layout(this);
 
 		//get the audio manager
 		audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
-		//add screen on and alarm fired intent receiver
+	    //add screen on and alarm fired intent receiver
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_ON);
 		filter.addAction(ALARM_ALERT_ACTION);
-		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
-		filter.addAction("org.durka.hallmonitor.debug");
 		filter.addAction(ALARM_DONE_ACTION);
+		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		filter.addAction(TORCH_STATE_CHANGED);
+		filter.addAction(TOGGLE_FLASHLIGHT);
+		filter.addAction("org.durka.hallmonitor.debug");
 		registerReceiver(receiver, filter);
 		
 		//get the views we need
 	    torchButton = (ImageButton) findViewById(R.id.torchbutton);
-	    torchButton2 = (ImageButton) findViewById(R.id.torchbutton2);
 	    cameraButton = (ImageButton) findViewById(R.id.camerabutton);
 
         //home key hack
@@ -440,13 +430,14 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-
+		on_screen = false;
         homeKeyLocker.unlock();
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
+		on_screen = true;
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_disable_home", true)) {
             homeKeyLocker.lock(this);

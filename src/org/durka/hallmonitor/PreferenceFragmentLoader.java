@@ -231,8 +231,9 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         // if the flash controls are being enabled/disabled the key will be pref_widget
         } else if (key.equals("pref_flash_controls")) {
  
-        	if (prefs.getBoolean("pref_flash_controls_alternative", true) ) {Toast.makeText(getActivity(), getString(R.string.alternative_torch_enabled), Toast.LENGTH_SHORT).show();
-        	prefs.edit().putBoolean(key, false).commit();   		
+        	if (prefs.getBoolean("pref_flash_controls_alternative", false) ) {
+        		Toast.makeText(getActivity(), getString(R.string.alternative_torch_enabled), Toast.LENGTH_SHORT).show();
+        		prefs.edit().putBoolean(key, false).commit();   		
         	} else if (prefs.getBoolean(key, false) ) {
                     try {
                         PackageManager packageManager = getActivity().getPackageManager();
@@ -243,11 +244,13 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
                         prefs.edit().putBoolean(key, false).commit();
                     }
                 }
+
         // if the flash controls are being enabled/disabled the key will be pref_widget     
         } else if (key.equals("pref_flash_controls_alternative")) {
         	
-        	if (prefs.getBoolean("pref_flash_controls", true) ) {Toast.makeText(getActivity(), getString(R.string.default_torch_enabled), Toast.LENGTH_SHORT).show();
-        	prefs.edit().putBoolean(key, false).commit();   		
+        	if (prefs.getBoolean("pref_flash_controls", false) ) {
+        		Toast.makeText(getActivity(), getString(R.string.default_torch_enabled), Toast.LENGTH_SHORT).show();
+        		prefs.edit().putBoolean(key, false).commit();   		
         	} else if (prefs.getBoolean(key, false) ) {
            			TorchActions.deviceHasFlash(getActivity());
            			if (Functions.deviceHasFlash) {
@@ -258,7 +261,20 @@ public class PreferenceFragmentLoader extends PreferenceFragment  implements Sha
         	         	prefs.edit().putBoolean(key, false).commit();
                   	}
                	}
-            // preferences_phone
+
+        } else if (key.equals("pref_realfullscreen")) {
+       	 
+        	if (prefs.getBoolean("pref_disable_home", false) ) {
+        		Toast.makeText(getActivity(), getString(R.string.pref_disable_enabled), Toast.LENGTH_SHORT).show();
+        		prefs.edit().putBoolean(key, false).commit();   		
+        	}
+        } else if (key.equals("pref_disable_home")) {        	 
+        	if (prefs.getBoolean("pref_realfullscreen", false) ) {
+        		Toast.makeText(getActivity(), getString(R.string.pref_realhall_enabled), Toast.LENGTH_SHORT).show();
+        		prefs.edit().putBoolean(key, false).commit();   		
+        	}
+
+        // preferences_phone
         } else if (key.equals("pref_phone_controls_tts_delay")) {
             updatePhoneControlTtsDelay(prefs);
         }

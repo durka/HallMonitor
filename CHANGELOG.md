@@ -1,3 +1,19 @@
+- 0.5.0
+	Features
+		- Add Swipe for Torch
+		- Add Swipe for Alarm
+		- Add Swipe for Phone (fix)
+		- Re-add Real Fullscreen (only for software navigation bar)
+
+	Fixes
+		- Try re-fix (#37) Last used app shows up randomly
+		- Remove duplicate torch button
+		- At init unable to turn on directly Torch Control
+		- Torch icon on CM display correctly (is on/off too when activated outside HallMonitor)
+		- Clean Alarm code
+		- Cover mode sensitivity after displaying not before
+		- Better debug tag
+
 - 0.4.2
 	Features
 		- Added a new alternative layout
@@ -7,8 +23,7 @@
 		- Stopped TimerTask when receiving a call
 	Partial Fixes
 		- Incoming call screen now works 99% times in both layouts when the screen is off and the cover closed. Does not work if the screen is on and the cover closed (need to open and close the cover manually)
-		- Alternative and media widgets works for 4x1 widgets and for some 4x2 widget, but
-only on alternative layout
+		- Alternative and media widgets works for 4x1 widgets and for some 4x2 widget, but only on alternative layout
 - 0.4.1
 	- Fixes
 		- Touch screen sensitivity now works on S4 Mini Dual Sim
