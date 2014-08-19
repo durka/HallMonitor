@@ -1,3 +1,7 @@
+- 0.5.1
+	Features
+		- Add serrano3gxx support (thank habeIchVergessen)
+
 - 0.5.0
 	Features
 		- Add Swipe for Torch

@@ -18,7 +18,7 @@
           package="org.durka.hallmonitor"
           android:installLocation="internalOnly"
           android:versionCode="17"
-          android:versionName="0.5.0">
+          android:versionName="0.5.1">
   <uses-sdk android:minSdkVersion="19"
             android:targetSdkVersion="19" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
