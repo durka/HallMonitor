@@ -649,6 +649,11 @@ public class ColorPickerView extends View{
 	}
 		
 	@Override
+	public boolean performClick() {
+		return super.performClick();
+	}
+	
+	@Override
 	public boolean onTouchEvent(MotionEvent event) {		
 		boolean update = false;
 				
@@ -664,7 +669,10 @@ public class ColorPickerView extends View{
 			break;			
 		case MotionEvent.ACTION_UP:			
 			mStartTouchPoint = null;
-			update = moveTrackersIfNeeded(event);			
+			update = moveTrackersIfNeeded(event);
+			if(mStartTouchPoint != null){
+				performClick();
+			}
 			break;	
 		}
 		
@@ -820,6 +828,7 @@ public class ColorPickerView extends View{
 		setMeasuredDimension(finalWidth, finalHeight);
 	}
 
+	@SuppressWarnings("unused")
 	private String modeToString(int mode) {
 		switch(mode) {
 		case MeasureSpec.AT_MOST:
@@ -833,6 +842,7 @@ public class ColorPickerView extends View{
 		return "ERROR";
 	}
 	
+	@SuppressWarnings("unused")
 	private int getPreferredWidth(){		
 		//Our preferred width and height is 200dp for the square sat / val rectangle.
 		int width = (int)(200 * mDensity);
@@ -840,6 +850,7 @@ public class ColorPickerView extends View{
 		return (int) (width + HUE_PANEL_WIDTH + PANEL_SPACING);	
 	}
 	
+	@SuppressWarnings("unused")
 	private int getPreferredHeight(){	
 		int height = (int)(200 * mDensity);
 		

@@ -4,7 +4,16 @@
     android:layout_height="match_parent"
     android:background="#000000"
     android:id="@+id/default_main"
-    tools:context=".DefaultActivity" >
+    tools:context=".DefaultActivity"
+    android:splitMotionEvents="true" >
+
+    <RelativeLayout
+        android:id="@+id/default_undercover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+	    android:background="#000000"
+        android:splitMotionEvents="true" >
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/default_content"
@@ -14,7 +23,8 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded"
         android:gravity="center"
-        android:keepScreenOn="true" >
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
 
         <RelativeLayout
             android:id="@+id/default_content_camera"
@@ -37,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_gravity="left"
-                android:onClick="camera_capture"
+                android:onClick="captureCamera"
                 android:src="@drawable/ic_notification" />
 
             <ImageButton
@@ -46,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="right"
-                android:onClick="camera_back"
+                android:onClick="stopCamera"
                 android:src="@drawable/ic_menu_trash_holo_light" />
         </RelativeLayout>
 
@@ -54,7 +64,7 @@
             android:id="@+id/default_content_alarm"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" >
+            android:visibility="invisible" >
 
             <ImageButton
                 android:id="@+id/snoozebutton"
@@ -76,13 +86,21 @@
                 android:layout_centerVertical="true"
                 android:onClick="sendDismiss"
                 android:src="@drawable/dismiss_button" />
+
+            <RelativeLayout
+                android:id="@+id/swipe_alarm"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+	            android:visibility="gone"
+                android:splitMotionEvents="true" />
+            
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/default_content_phone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" >
+            android:visibility="invisible" >
 
             <ImageView
                 android:id="@+id/accept_slide"
@@ -145,13 +163,20 @@
                 android:orientation="vertical"
                 android:visibility="visible" />
             
+            <RelativeLayout
+                android:id="@+id/swipe_call"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+	            android:visibility="gone"
+                android:splitMotionEvents="true" />
+            	            
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/default_content_normal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visible="true" >
+            android:visibility="invisible" >
 
             <RelativeLayout
                 android:id="@+id/default_widget"
@@ -171,8 +196,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_centerInParent="false"
                     android:layout_marginRight="32dp"
-                    android:layout_marginTop="10dp"
-                    android:keepScreenOn="true" >
+                    android:layout_marginTop="10dp" >
 
                 </RelativeLayout>
 
@@ -184,7 +208,6 @@
                     android:layout_centerInParent="true"
                     android:layout_marginLeft="35dp"
                     android:layout_marginTop="25dp"
-                    android:keepScreenOn="true"
                     android:textColor="#33b5e5"
                     android:textSize="55sp"
                     android:textStyle="bold" />
@@ -196,7 +219,6 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="45dp"
                     android:layout_marginTop="20dp"
-                    android:keepScreenOn="true"
                     android:textColor="#33b5e5"
                     android:textSize="45sp"
                     android:textStyle="bold" />
@@ -207,70 +229,88 @@
                     android:layout_height="25dp"
                     android:layout_alignLeft="@id/default_text_clock_hour"
                     android:layout_below="@+id/default_text_clock_hour"
-                    android:keepScreenOn="true"
                     android:textColor="#33b5e5"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
-        </RelativeLayout>
+			</RelativeLayout>
 
-        <ImageView
- 	            android:id="@+id/default_battery_picture_horizontal"
- 	            android:layout_width="35dp"
- 	            android:layout_height="18dp"
- 	            android:layout_alignParentRight="true"
- 	            android:layout_alignParentTop="true"
- 	            android:layout_marginTop="7dp"
- 	            android:src="@drawable/stat_sys_battery_horizontal" />
+	        <ImageView
+	 	            android:id="@+id/default_battery_picture_horizontal"
+	 	            android:layout_width="35dp"
+	 	            android:layout_height="18dp"
+	 	            android:layout_alignParentRight="true"
+	 	            android:layout_alignParentTop="true"
+	 	            android:layout_marginTop="7dp"
+	 	            android:src="@drawable/stat_sys_battery_horizontal" />
+	
+	        <TextView
+	                android:id="@+id/default_battery_percent"
+	                android:layout_width="30dp"
+	                android:layout_height="19dp"
+	                android:layout_alignParentRight="true"
+	                android:layout_marginRight="1dp"
+	                android:layout_marginTop="7dp"
+	                android:gravity="left"
+	                android:text="100%"
+	                android:textAppearance="?android:attr/textAppearanceSmall"
+	                android:textColor="#ffffff" />
+	
+	        <GridView
+	            android:id="@+id/default_icon_container"
+	            android:layout_width="230dp"
+	            android:layout_height="0dp"
+	            android:layout_alignParentLeft="true"
+	            android:layout_alignParentTop="true"
+	            android:layout_margin="0dp"
+	            android:columnWidth="20dp"
+	            android:horizontalSpacing="4dp"
+	            android:numColumns="0"
+	            android:padding="0dp" >
+	        </GridView>
 
-        <TextView
-                android:id="@+id/default_battery_percent"
-                android:layout_width="30dp"
-                android:layout_height="19dp"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="1dp"
-                android:layout_marginTop="7dp"
-                android:gravity="left"
-                android:text="100%"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#ffffff" />
+	        <ImageButton
+	            android:id="@+id/torchbutton"
+	            style="?android:attr/buttonBarButtonStyle"
+	            android:layout_width="30dp"
+	            android:layout_height="wrap_content"
+	            android:layout_alignParentBottom="true"
+	            android:layout_alignParentRight="true"
+	            android:layout_marginLeft="10dp"
+	            android:onClick="sendToggleTorch"
+	            android:background="#1F000000"
+	            android:src="@drawable/ic_appwidget_torch_off" />
+	
+	        <ImageButton
+	            android:id="@+id/camerabutton"
+	            style="?android:attr/buttonBarButtonStyle"
+	            android:layout_width="30dp"
+	            android:layout_height="wrap_content"
+	            android:layout_above="@id/torchbutton"
+	            android:layout_alignParentRight="true"
+	            android:layout_marginLeft="10dp"
+	            android:onClick="startCamera"
+	            android:background="#1F000000"
+	            android:src="@drawable/ic_notification" />
 
-        <GridView
-            android:id="@+id/default_icon_container"
-            android:layout_width="230dp"
-            android:layout_height="0dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_margin="0dp"
-            android:columnWidth="20dp"
-            android:horizontalSpacing="4dp"
-            android:numColumns="0"
-            android:padding="0dp" >
-        </GridView>
-
-        <ImageButton
-            android:id="@+id/torchbutton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="10dp"
-            android:onClick="sendToggleTorch"
-            android:src="@drawable/ic_appwidget_torch_off" />
-
-        <ImageButton
-            android:id="@+id/camerabutton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/torchbutton"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="10dp"
-            android:onClick="camera_start"
-            android:src="@drawable/ic_notification" />
-
-		</RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/swipe_torch"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+   	            android:layout_alignParentBottom="true"
+                android:layout_marginBottom="0dp"
+			    android:background="#55000088"
+	            android:visibility="gone" >
+			</RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/swipe_camera"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_alignParentBottom="true"
+   	            android:layout_marginBottom="30dp"
+			    android:background="#55008800"
+	            android:visibility="gone" >
+			</RelativeLayout>
+       	</RelativeLayout>
     </RelativeLayout>
-
 </RelativeLayout>

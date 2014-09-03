@@ -17,56 +17,62 @@ package org.durka.hallmonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
+import android.content.Intent;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 public class NotificationService extends NotificationListenerService {
-	
+
+	private final String LOG_TAG = "Hall.NS";
 	public static NotificationService that = null;
-	
+	private LocalBroadcastManager mLocalBroadcastManager;
+
 	@SuppressWarnings("serial")
-	private final List<String> blacklist = new ArrayList<String>() {{
+	private final List<String> blacklist = new ArrayList<String>() {
+		{
 			add("net.cactii.flash2"); // we have our own flashlight UI
-			add("android");           // this covers the keyboard selection notification, but does it clobber others too? TODO
-	}};
-	
+			add("android"); // this covers the keyboard selection notification,
+							// but does it clobber others too? TODO
+		}
+	};
+
 	@Override
 	public void onCreate() {
-		Log.d("NS-oC", "ohai");
+		Log.d(LOG_TAG + ".oC", "ohai");
 		that = this;
+		mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
 	}
-	
+
 	@Override
 	public void onDestroy() {
-		Log.d("NS-oD", "kthxbai");
+		Log.d(LOG_TAG + ".oD", "kthxbai");
 		that = null;
 	}
-	
+
 	@Override
 	public void onNotificationPosted(StatusBarNotification sbn) {
-		Log.d("NS-oNP", "notification posted: " + sbn.toString());
-		if (DefaultActivity.on_screen) {
-			Functions.Actions.refresh_notifications();
-		}
+		Log.d(LOG_TAG + ".oNP", "notification posted: " + sbn.toString());
+		Intent mIntent = new Intent(CoreApp.DA_ACTION_NOTIFICATION_REFRESH);
+		mLocalBroadcastManager.sendBroadcast(mIntent);
 	}
 
 	@Override
 	public void onNotificationRemoved(StatusBarNotification sbn) {
-		Log.d("NS-oNR", "notification removed: " + sbn.toString());
-		if (DefaultActivity.on_screen) {
-			Functions.Actions.refresh_notifications();
-		}
+		Log.d(LOG_TAG + ".oNR", "notification removed: " + sbn.toString());
+		Intent mIntent = new Intent(CoreApp.DA_ACTION_NOTIFICATION_REFRESH);
+		mLocalBroadcastManager.sendBroadcast(mIntent);
 	}
-	
+
 	@Override
 	public StatusBarNotification[] getActiveNotifications() {
 		StatusBarNotification[] notifs = super.getActiveNotifications();
-		
-		List<StatusBarNotification> acc = new ArrayList<StatusBarNotification>(notifs.length);
+
+		List<StatusBarNotification> acc = new ArrayList<StatusBarNotification>(
+				notifs.length);
 		for (StatusBarNotification sbn : notifs) {
-			Log.d("NS-gAN", sbn.getPackageName());
+			Log.d(LOG_TAG + ".gAN", sbn.getPackageName());
 			if (!blacklist.contains(sbn.getPackageName())) {
 				acc.add(sbn);
 			}

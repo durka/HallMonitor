@@ -14,110 +14,79 @@
  */
 package org.durka.hallmonitor;
 
-import java.lang.Thread;
-
 import android.app.Service;
-import android.appwidget.AppWidgetManager;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.manusfreedom.android.Events;
 import com.manusfreedom.android.Events.InputDevice;
 
-import eu.chainfire.libsuperuser.Shell;
-
 public class ViewCoverHallService extends Service implements Runnable {
-	
-	private HeadsetReceiver		mHeadset;
-	private Thread				getevent;
-	private Boolean				serviceStarted;
+	private final String LOG_TAG = "Hall.VCHS";
 
-    private static final String DEV_SERRANO_LTE_CM10 = "serranolte"; 	// GT-I9195 CM10.x
-    private static final String DEV_SERRANO_LTE_CM11 = "serranoltexx"; 	// GT-I9195 CM11.x
+	private Thread getevent;
+	private Boolean serviceStarted;
+
+	private static final String DEV_SERRANO_LTE_CM10 = "serranolte"; // GT-I9195
+																		// CM10.x
+	private static final String DEV_SERRANO_LTE_CM11 = "serranoltexx"; // GT-I9195
+																		// CM11.x
+
+	private CoreStateManager mStateManager;
+
+	@Override
+	public void onCreate() {
+		Log.d(LOG_TAG + ".oC", "Core service creating");
+
+		mStateManager = ((CoreApp) getApplicationContext()).getStateManager();
+	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d("VCHS.onStartCommand", "View cover Hall service started");
+		Log.d(LOG_TAG + ".oSC", "View cover Hall service started");
 
-        //We don't want to do this - almost by definition the cover can't be closed, and we don't actually want to do any open cover functionality
-		//until the cover is closed and then opened again
-		/*if (Functions.Is.cover_closed(this)) {
-			Functions.Actions.close_cover(this);
-		} else {
-			Functions.Actions.open_cover(this);
-		} */
-		
-		mHeadset = new HeadsetReceiver();
-		IntentFilter intfil = new IntentFilter();
-		intfil.addAction("android.intent.action.HEADSET_PLUG");
-		registerReceiver(mHeadset, intfil);
-		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if (prefs.getBoolean("pref_default_widget", false)
-				&& !Functions.hmAppWidgetManager.doesWidgetExist("default")) {
-			
-			int id = prefs.getInt("default_widget_id", -1);
-			if (id != -1) {
-				Log.d("VCHS-oSC", "creating default widget with id=" + id);
-				
-				Intent data = new Intent();
-				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
-				
-				Functions.hmAppWidgetManager.currentWidgetType = "default";
-				Functions.hmAppWidgetManager.createWidget(data, this);
-			}
-		}
-		if (prefs.getBoolean("pref_default_widget", false)
-				&& !Functions.hmAppWidgetManager.doesWidgetExist("media")) {
-			
-			int id = prefs.getInt("media_widget_id", -1);
-			if (id != -1) {
-				Log.d("VCHS-oSC", "creating media widget with id=" + id);
-				
-				Intent data = new Intent();
-				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
-				
-				Functions.hmAppWidgetManager.currentWidgetType = "media";
-				Functions.hmAppWidgetManager.createWidget(data, this);
-			}
-		}
 		serviceStarted = true;
-		
+
 		getevent = new Thread(this);
 		getevent.start();
 
 		return START_STICKY;
 	}
-	
+
 	@Override
 	public void run() {
-		Log.d("VCHS-oSC", "Request root");
-		Shell.SU.available();
+		if (!mStateManager.getRootApp()) {
+			Log.e(LOG_TAG + ".r", "Required root to use Real Hall service");
+
+			return;
+		}
 
 		String neededDevice = "gpio-keys";
-		if(Build.DEVICE.equals(DEV_SERRANO_LTE_CM10) || Build.DEVICE.equals(DEV_SERRANO_LTE_CM11)){
+		if (Build.DEVICE.equals(DEV_SERRANO_LTE_CM10)
+				|| Build.DEVICE.equals(DEV_SERRANO_LTE_CM11)) {
 			neededDevice = "sec_keys";
 		}
 		Events events = new Events();
-		
+
 		events.AddAllDevices();
 		String neededDevicePath = "";
 
-		Log.e("VCHS-oSC", "Number of device found:" + events.m_Devs.size());
+		Log.e(LOG_TAG + ".r", "Number of device found:" + events.m_Devs.size());
 
-		Log.d("VCHS-oSC", "Scan device");
-		for (InputDevice idev:events.m_Devs) {
-			if(!idev.getOpen())
-				idev.Open(true);
-			if(idev.getOpen()) {
-				Log.d("VCHS-oSC", " Open: " + idev.getPath() + " / Name: " + idev.getName() + " / Version: " + idev.getVersion() + " / Location: " + idev.getLocation() + " / IdStr: " + idev.getIdStr() + " / Result: " + idev.getOpen());
-				if(idev.getName().equals(neededDevice)){
-					Log.d("VCHS-oSC", "Device " + neededDevice + " found");
+		Log.d(LOG_TAG + ".r", "Scan device");
+		for (InputDevice idev : events.m_Devs) {
+			if (!idev.getOpen()) {
+				idev.Open(true, mStateManager.getRootApp());
+			}
+			if (idev.getOpen()) {
+				Log.d(LOG_TAG + ".r", " Open: " + idev.getPath() + " / Name: "
+						+ idev.getName() + " / Version: " + idev.getVersion()
+						+ " / Location: " + idev.getLocation() + " / IdStr: "
+						+ idev.getIdStr() + " / Result: " + idev.getOpen());
+				if (idev.getName().equals(neededDevice)) {
+					Log.d(LOG_TAG + ".r", "Device " + neededDevice + " found");
 					neededDevicePath = idev.getPath();
 					break;
 				}
@@ -126,59 +95,80 @@ public class ViewCoverHallService extends Service implements Runnable {
 		events.Release();
 		events = null;
 		System.gc();
-		
+
 		events = new Events();
 		events.AddDevice(neededDevicePath);
 
-		Log.e("VCHS-oSC", "Number of device found:" + events.m_Devs.size());
-		
-		InputDevice currentInputDevice = null;
-		for (InputDevice idev:events.m_Devs) {
-			if(!idev.getOpen())
-				idev.Open(true);
-			currentInputDevice = idev;
-			Log.d("VCHS-oSC", "Open: " + currentInputDevice.getPath() + " / Name: " + currentInputDevice.getName() + " / Version: " + currentInputDevice.getVersion() + " / Location: " + currentInputDevice.getLocation() + " / IdStr: " + currentInputDevice.getIdStr() + " / Result: " + currentInputDevice.getOpen());				
-		}
-		
-		if(currentInputDevice == null)
-		{
-			Log.d("VCHS-oSC", "No device");
-			return;
-		}				
+		Log.e(LOG_TAG + ".r", "Number of device found:" + events.m_Devs.size());
 
-		Log.d("VCHS-oSC", "Start read command");
+		InputDevice currentInputDevice = null;
+		for (InputDevice idev : events.m_Devs) {
+			if (!idev.getOpen()) {
+				idev.Open(true, mStateManager.getRootApp());
+			}
+			currentInputDevice = idev;
+			Log.d(LOG_TAG + ".r", "Open: " + currentInputDevice.getPath()
+					+ " / Name: " + currentInputDevice.getName()
+					+ " / Version: " + currentInputDevice.getVersion()
+					+ " / Location: " + currentInputDevice.getLocation()
+					+ " / IdStr: " + currentInputDevice.getIdStr()
+					+ " / Result: " + currentInputDevice.getOpen());
+		}
+
+		if (currentInputDevice == null) {
+			Log.d(LOG_TAG + ".r", "No device");
+			return;
+		}
+
+		Log.d(LOG_TAG + ".r", "Start read command");
 		while (serviceStarted) {
-			if(currentInputDevice.getOpen() && (0 == currentInputDevice.getPollingEvent())) {
-				Log.d("VCHS-oSC", "Reading command: " + currentInputDevice.getSuccessfulPollingType() + "/" + currentInputDevice.getSuccessfulPollingCode() + "/" + currentInputDevice.getSuccessfulPollingValue());
-				if(currentInputDevice.getSuccessfulPollingCode() == 21 && currentInputDevice.getSuccessfulPollingValue() == 0){					
-					Log.i("VCHS-oSC", "Cover closed");
-					Functions.Actions.close_cover(this);
-				}
-				else if(currentInputDevice.getSuccessfulPollingCode() == 21 && currentInputDevice.getSuccessfulPollingValue() == 1){
-					Log.i("VCHS-oSC", "Cover open");
-					Functions.Actions.open_cover(this);
+			if (currentInputDevice.getOpen()
+					&& (0 == currentInputDevice.getPollingEvent())) {
+				Log.d(LOG_TAG + ".r",
+						"Reading command: "
+								+ currentInputDevice.getSuccessfulPollingType()
+								+ "/"
+								+ currentInputDevice.getSuccessfulPollingCode()
+								+ "/"
+								+ currentInputDevice
+										.getSuccessfulPollingValue());
+				if (currentInputDevice.getSuccessfulPollingCode() == 21
+						&& currentInputDevice.getSuccessfulPollingValue() == 0) {
+					Log.i(LOG_TAG + ".r", "Cover closed");
+					Intent intent = new Intent(
+							CoreReceiver.ACTION_LID_STATE_CHANGED);
+					intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
+							CoreReceiver.LID_CLOSED);
+					this.sendBroadcast(intent);
+				} else if (currentInputDevice.getSuccessfulPollingCode() == 21
+						&& currentInputDevice.getSuccessfulPollingValue() == 1) {
+					Log.i(LOG_TAG + ".r", "Cover open");
+					Intent intent = new Intent(
+							CoreReceiver.ACTION_LID_STATE_CHANGED);
+					intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
+							CoreReceiver.LID_OPEN);
+					this.sendBroadcast(intent);
 				}
 			}
 		}
-		Log.d("VCHS-oSC", "Stop read command");
+		Log.d(LOG_TAG + ".r", "Stop read command");
 		events.Release();
 		events = null;
-		Log.d("VCHS-oSC", "Memory cleaned");
+		Log.d(LOG_TAG + ".r", "Memory cleaned");
 		System.gc();
 	}
-	
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
-	
+
 	@Override
 	public void onDestroy() {
-		Log.d("VCHS.onStartCommand", "View cover Hall service stopped");
+		Log.d(LOG_TAG + ".oD", "View cover Hall service stopped");
 		serviceStarted = false;
-		unregisterReceiver(mHeadset);
 		System.gc();
-		
+
 		super.onDestroy();
 	}
 

@@ -44,8 +44,8 @@
     <string name="pref_enabled_title">General Settings</string>
     <string name="pref_notifications">Show notification icons</string>
     <string name="pref_notifications_summary">If this is enabled, you will see the current notifications icons when the screen turns on while the cover is closed.</string>
-    <string name="pref_delay">Covered lock screen timeout</string>
-    <string name="pref_delay_summary">When the cover is closed, Hall Monitor stays up for this many milliseconds. If set to 0, the screen turns off immediately.</string>
+    <string name="pref_delay">Covered screen timeout</string>
+    <string name="pref_delay_summary">When the cover is closed, Hall Monitor stays up for this many milliseconds. If set to 0, the screen turns off immediately (lock the device if lock mode).</string>
     <string name="pref_dim">Dim covered lock screen</string>
     <string name="pref_dim_summary">When the cover is closed and Hall Monitor is up (see above), should the screen dim?</string>
     <string name="pref_keep_admin">Keep device admin status</string>
@@ -59,15 +59,25 @@
     <string name="pref_keyguard_summary">If checked, dismiss the default lock screen when user open the cover. Not working with secure lock screen (Password, PIN, etc.).</string>
     <string name="pref_layout">Layouts</string>
     <string name="pref_layout_summary">Switch between default layout and an alternative layout.</string>
-    
+    <string name="pref_realfullscreen">Use Real FullScreen</string>
+    <string name="pref_realfullscreen_summary">Hide all system bar: navigation bar,...</string>
+    <string name="pref_realfullscreen_enabled">Real FullScreen is enable, please disable it to use Disable button</string>
+    <string name="pref_lockmode">Use lock</string>
+    <string name="pref_lockmode_summary">If on, lock the device at timeout instead of put device in sleep. Require admin permission. Disable only available as system app.</string>
+
     <string name="pref_runasroot">Root Features</string>
     <string name="pref_runasroot_summary">Should the app run with root permissions (required for most features) - allow permanent root access for best results.</string>
     <string name="pref_runasroot_title">Root settings</string>
+
+    <string name="pref_internalservice">Use internal service</string>
+    <string name="pref_internalservice_summary">Use internal service Real Hall instead of ROM integrated LID event. Turn off if your ROM support it.</string>
+    <string name="pref_internalservice_title">Internal Service</string>
     <string name="pref_realhall">Use Real Hall</string>
-    <string name="pref_realhall_summary">Use real hall sensor or use proximity sensor.</string>
-    <string name="pref_realfullscreen">Use Real FullScreen</string>
-    <string name="pref_realfullscreen_summary">Hide all system bar: navigation bar,...</string>
-    <string name="pref_realhall_enabled">Real FullScreen is enable, please disable it to use Disable button</string>
+    <string name="pref_realhall_summary">Use real hall sensor.</string>
+    <string name="pref_realhall_requirement">Proximity is enable or Root is disable, please disable Proximity and enable Root to use Real Hall</string>
+    <string name="pref_proximity">Use Proximity sensor</string>
+    <string name="pref_proximity_summary">Use proximity sensor.</string>
+    <string name="pref_proximity_requirement">Real Hall is enable, please disable it to use Proximity</string>
     
     <string name="pref_optional">Optional Features</string>
     <string name="pref_optional_summary">Click through to enable/disable features</string>
@@ -82,8 +92,6 @@
     <string name="pref_alarm_controls">Alarm Controls</string>
     <string name="pref_alarm_controls_summary">Whether to show alarm dismiss and snooze buttons in the cover window if the alarm goes off whilst the cover is closed (touch for more)</string>
     <string name="pref_alarm_screen_title">Alarm Controls</string>
-    <string name="pref_alarm_layout">Experimental alarm controls</string>
-    <string name="pref_alarm_layout_summary">!EXPERIMENTAL! Switch between the default alarm push button controls and the experimental functions that uses real swipe control. This function may not work properly, use at your own risk</string>
     
     <string name="pref_phone_screen">Phone Controls</string>
     <string name="pref_phone_screen_summary">Whether to show phone call accept and reject buttons if the phone rings whilst the cover is closed (touch for more)</string>
@@ -98,16 +106,23 @@
     <string name="pref_phone_controls_speaker_summary">suppress headset check</string>
     <string name="pref_phone_preview_summary">Enter a number and verify your setup.</string>
     <string name="pref_phone_preview_input_message">enter a number</string>
-    <string name="pref_incoming_call_layout">Experimental incoming call controls</string>
-    <string name="pref_incoming_call_layout_summary">!EXPERIMENTAL! Switch between the default incoming call drag and drop controls and the experimental functions that uses real swipe control. This function may not work properly, use at your own risk</string>
     
     <string name="pref_flash_controls">Torch Controls</string>
     <string name="pref_flash_controls_summary">Whether to include a button to turn the torch on and off on the lock screen (touch for more)</string>
     <string name="pref_flash_controls_alternative">Alternative Torch Controls</string>
     <string name="pref_flash_controls_alternative_summary">This is an alternative to stock CM torch App for users that installs HallMonitor in non-CM roms (touch for more)</string>
-    <string name="pref_torch_screen_title">Torch Controls</string>
-    <string name="pref_torch_layout">Experimental torch controls</string>
-    <string name="pref_torch_layout_summary">!EXPERIMENTAL! Switch between the default torch push button controls and the experimental functions that uses real swipe control. This function may not work properly, use at your own risk</string>
+
+    <string name="pref_input_settings">Input Controls</string>
+    <string name="pref_input_screen_title">Input Controls</string>
+    <string name="pref_input_settings_summary">Switch some input event</string>
+    <string name="pref_alarm_input">Swipe alarm controls</string>
+    <string name="pref_alarm_input_summary">Switch between the default alarm push button controls and the experimental functions that uses real swipe control. This function may not work properly, use at your own risk</string>
+    <string name="pref_torch_input">Swipe torch controls</string>
+    <string name="pref_torch_input_summary">Switch between the default torch push button controls and the experimental functions that uses real swipe control. This function may not work properly, use at your own risk</string>
+    <string name="pref_camera_input">Swipe camera controls</string>
+    <string name="pref_camera_input_summary">Switch between the default camera push button controls and the experimental functions that uses real swipe control. This function may not work properly, use at your own risk</string>
+    <string name="pref_incoming_call_input">Swipe incoming call controls</string>
+    <string name="pref_incoming_call_input_summary">Switch between the default incoming call drag and drop controls and the experimental functions that uses real swipe control. This function may not work properly, use at your own risk</string>
 
     <string name="pref_camera_controls">Camera Controls</string>
     <string name="pref_camera_controls_summary">Whether to include a button to activate the camera on the lock screen</string>
@@ -120,8 +135,11 @@
     <string name="pref_security_settings">Screen Lock Settings</string>
     <string name="pref_security_settings_summary">Shortcut to Android screen lock settings</string>
     
+    <string name="pref_force_restart">Force restart Hall Monitor</string>
+    <string name="pref_force_restart_summary">Exit application and restart it after 1 second.</string>
+    
     <string name="pref_about">About Hall Monitor</string>
-	<string name="pref_about_summary">Hall Monitor version 0.5.1.\nProduced by Alex Burka (@durka), @manusfreedom, @B--B, @Wallace0, @habeIchVergessen, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+	<string name="pref_about_summary">Hall Monitor version 2.0.0.\nProduced by Alex Burka (@durka), @manusfreedom, @B--B, @Wallace0, @habeIchVergessen, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
     <string name="pref_settings">Settings</string>
     <string name="pref_preview">Preview</string>
     <string name="pref_test">Test</string>
@@ -150,4 +168,3 @@
     <string name="unknown_caller">Unknown caller</string>
 
 </resources>
-

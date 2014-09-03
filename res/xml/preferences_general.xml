@@ -8,6 +8,18 @@
 	    android:summary="@string/pref_layout_summary"
 	    android:defaultValue="false" />
     
+    <org.durka.hallmonitor.PreferenceSwitchable
+        android:key="pref_realfullscreen"
+        android:title="@string/pref_realfullscreen"
+        android:summary="@string/pref_realfullscreen_summary"
+        android:defaultValue="false"/>
+
+    <org.durka.hallmonitor.PreferenceSwitchable
+        android:key="pref_lockmode"
+        android:title="@string/pref_lockmode"
+        android:summary="@string/pref_lockmode_summary"
+        android:defaultValue="false"/>
+
     <com.hlidskialf.android.preference.SeekBarPreference
         android:key="pref_delay"
         android:title="@string/pref_delay"

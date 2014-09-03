@@ -36,6 +36,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import eu.chainfire.libsuperuser.StreamGobbler.OnLineListener;
+import eu.chainfire.libsuperuser.ShellOnMainThreadException;
 
 /**
  * Class providing functionality to execute commands in a (root) shell 

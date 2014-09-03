@@ -1,3 +1,29 @@
+- 2.0.0 beta
+	Major code update:
+		- Rewrite many code to exclude much as possible from UI thread
+		- Add share value between application parts
+	
+	Feature:
+		- Normally support last CM 11 LID action (to test): turn off Use internal service
+		- Support 4x1 widget (from my test)
+		- Add lock mode option when system app (fixed to lock mode if not system app)
+		- New Input Controls menu under Optional Features
+		- Pick Up & Hang Up a call without use command line
+
+	Fixes:
+		- https://github.com/durka/HallMonitor/issues/33 (to test)
+		- Fix swipe
+
+	Know issues:
+		- Alternative layout broken
+		- Must force restart application (through Configuration activity) to get widget content updated after the first attachment
+
+	Next beta (2.1.0):
+		- Gesture/Swipe over the cover (bottom&left to: open camera, hang up call, snooze alarm / bottom right to: toggle torch, pickup call, dismiss alarm / bottom top to: pop-up menu)
+		- Pop-up menu like habeIchVergessen propose (using over cover touch): https://github.com/durka/HallMonitor/issues/18
+		- Network connectivity indicator (WIFI/2G/3G/4G): https://github.com/durka/HallMonitor/issues/24
+		- Add landscape layout to avoid rotate animation & rotate background app
+
 - 0.5.1
 	Features
 		- Add serrano3gxx support (thank habeIchVergessen)

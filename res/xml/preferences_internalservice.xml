@@ -6,12 +6,11 @@
         android:key="pref_realhall"
         android:title="@string/pref_realhall"
         android:summary="@string/pref_realhall_summary"
-        android:defaultValue="false"/>
+        android:defaultValue="false" />
 
     <org.durka.hallmonitor.PreferenceSwitchable
-        android:key="pref_realfullscreen"
-        android:title="@string/pref_realfullscreen"
-        android:summary="@string/pref_realfullscreen_summary"
-        android:defaultValue="false"/>
-
+        android:key="pref_proximity"
+        android:title="@string/pref_proximity"
+        android:summary="@string/pref_proximity_summary"
+        android:defaultValue="false" />
 </PreferenceScreen>

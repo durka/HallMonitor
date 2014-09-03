@@ -17,8 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.durka.hallmonitor"
           android:installLocation="internalOnly"
-          android:versionCode="17"
-          android:versionName="0.5.1">
+          android:versionCode="18"
+          android:versionName="2.0.0">
   <uses-sdk android:minSdkVersion="19"
             android:targetSdkVersion="19" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -29,15 +29,17 @@
   <uses-permission android:name="android.permission.CAMERA" />
   <uses-permission android:name="android.permission.DEVICE_POWER" />
   <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
-  <uses-feature android:name="android.hardware.camera"
-                android:required="false" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.STOP_APP_SWITCHES" />
-  <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
-  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-  <uses-permission android:name="android.permission.FLASHLIGHT"/>
+  <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+  <uses-permission android:name="android.permission.FLASHLIGHT" />
+  <uses-permission android:name="android.permission.GET_TASKS" />
+  <uses-feature android:name="android.hardware.camera"
+                android:required="false" />
   
   <application android:allowBackup="true"
+			android:name="org.durka.hallmonitor.CoreApp"
                android:icon="@drawable/ic_launcher"
                android:label="@string/app_name"
                android:theme="@style/AppTheme">
@@ -54,6 +56,14 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+    <activity android:name="org.durka.hallmonitor.DefaultActivity"
+              android:screenOrientation="portrait"
+              android:configChanges="orientation|keyboardHidden|screenSize"
+              android:launchMode="singleTask"
+              android:theme="@style/FullscreenTheme"
+              android:excludeFromRecents="true">
+    </activity>
+    <service android:name="org.durka.hallmonitor.CoreService" />
     <service android:name="org.durka.hallmonitor.ViewCoverHallService" />
     <service android:name="org.durka.hallmonitor.ViewCoverProximityService" />
     <service android:name=".NotificationService"
@@ -71,18 +81,39 @@
         <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
       </intent-filter>
     </receiver>
-    <receiver android:name="org.durka.hallmonitor.BootReceiver">
+    <receiver android:name="org.durka.hallmonitor.CoreReceiver">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED" />
         <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+        <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.SCREEN_ON" />
+        <action android:name="android.intent.action.SCREEN_OFF" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.HEADSET_PLUG" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="com.android.deskclock.ALARM_ALERT" />
+        <action android:name="com.android.deskclock.ALARM_SNOOZE" />
+        <action android:name="com.android.deskclock.ALARM_DISMISS" />
+        <action android:name="com.android.deskclock.ALARM_DONE" />
+      </intent-filter>
+      <intent-filter>
+		<action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+		<!-- <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" /> -->
+      </intent-filter>
+      <intent-filter>
+        <action android:name="net.cactii.flash2.TOGGLE_FLASHLIGHT" />
+        <action android:name="net.cactii.flash2.TORCH_STATE_CHANGED" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.PHONE_STATE" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.LID_STATE_CHANGED" />
       </intent-filter>
     </receiver>
-    <activity android:name="org.durka.hallmonitor.DefaultActivity"
-              android:screenOrientation="portrait"
-              android:configChanges="orientation|keyboardHidden|screenSize"
-              android:launchMode="singleTask"
-              android:theme="@style/FullscreenTheme"
-              android:excludeFromRecents="true">
-    </activity>
   </application>
 </manifest>

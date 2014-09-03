@@ -4,11 +4,6 @@
 
     <PreferenceCategory
         android:title="@string/pref_settings">
-        <org.durka.hallmonitor.PreferenceSwitchable
-            android:key="pref_incoming_call_layout"
-            android:title="@string/pref_incoming_call_layout"
-            android:summary="@string/pref_incoming_call_layout_summary"
-            android:defaultValue="false" />
         <CheckBoxPreference
             android:key="pref_phone_controls_tts"
             android:title="@string/pref_phone_controls_tts"
