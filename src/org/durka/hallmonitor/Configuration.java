@@ -199,7 +199,7 @@ public class Configuration extends PreferenceActivity {
 						}
 					}
 					if (mStateManager.getPreference().getBoolean(
-							"pref_internalservice", false)) {
+							"pref_do_notifications", false)) {
 						ctx.startService(new Intent(ctx,
 								NotificationService.class));
 					}
