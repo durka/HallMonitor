@@ -180,12 +180,16 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 		if (!mStateManager.getSystemApp()) {
 			prefs.edit().putBoolean("pref_lockmode", true);
-			findPreference("pref_lockmode").setEnabled(false);
+			if (findPreference("pref_lockmode") != null) {
+				findPreference("pref_lockmode").setEnabled(false);
+			}
 		}
 
 		if (!prefs.getBoolean("pref_runasroot", false)) {
-			findPreference("pref_realhall").setEnabled(false);
-			prefs.edit().putBoolean("pref_realhall", false);
+			// prefs.edit().putBoolean("pref_realhall", false);
+			if (findPreference("pref_realhall") != null) {
+				findPreference("pref_realhall").setEnabled(false);
+			}
 		}
 		// phone control
 		enablePhoneScreen(prefs);
@@ -234,6 +238,12 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 					"pref_enabled is now " + prefs.getBoolean(key, false));
 
 			if (prefs.getBoolean(key, false)) {
+				if (!mStateManager.getSystemApp()) {
+					prefs.edit().putBoolean("pref_lockmode", true);
+					if (findPreference("pref_lockmode") != null) {
+						findPreference("pref_lockmode").setEnabled(false);
+					}
+				}
 				if (prefs.getBoolean("pref_runasroot", false)) {
 					AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
 					localSuAvailable.execute();
@@ -273,8 +283,18 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 		} else if (key.equals("pref_runasroot")) {
 
-			AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
-			localSuAvailable.execute();
+			if (prefs.getBoolean(key, false)) {
+				AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
+				localSuAvailable.execute();
+				if (findPreference("pref_realhall") != null) {
+					findPreference("pref_realhall").setEnabled(true);
+				}
+			} else {
+				// prefs.edit().putBoolean("pref_realhall", false);
+				if (findPreference("pref_realhall") != null) {
+					findPreference("pref_realhall").setEnabled(false);
+				}
+			}
 		} else if (key.equals("pref_internalservice")) {
 			mStateManager.stopServices(true);
 			SystemClock.sleep(1000);
