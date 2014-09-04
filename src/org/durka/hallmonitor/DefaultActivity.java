@@ -321,6 +321,8 @@ public class DefaultActivity extends Activity {
 						View.VISIBLE);
 				findViewById(R.id.default_text_clock_date).setVisibility(
 						View.VISIBLE);
+				findViewById(R.id.default_text_fulltime_very_small)
+						.setVisibility(View.GONE);
 			} else {
 				findViewById(R.id.default_text_clock).setVisibility(
 						View.VISIBLE);
@@ -328,6 +330,8 @@ public class DefaultActivity extends Activity {
 						View.GONE);
 				findViewById(R.id.default_text_clock_date).setVisibility(
 						View.GONE);
+				findViewById(R.id.default_text_fulltime_very_small)
+						.setVisibility(View.GONE);
 			}
 		}
 	}
