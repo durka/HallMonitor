@@ -259,18 +259,21 @@ public class CoreService extends Service {
 				break;
 			case CoreApp.CS_TASK_HANGUP_CALL:
 				Log.d(LOG_TAG + ".handler", "hanging up! goodbye");
-				Intent buttonDown = new Intent(Intent.ACTION_MEDIA_BUTTON);
-				buttonDown.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
-						KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK));
-				sendOrderedBroadcast(buttonDown,
+				KeyEvent keyHangup = new KeyEvent(KeyEvent.ACTION_UP,
+						KeyEvent.KEYCODE_HEADSETHOOK);
+				keyHangup = KeyEvent.changeFlags(keyHangup,
+						keyHangup.getFlags() | KeyEvent.FLAG_LONG_PRESS);
+				Intent pressHangUp = new Intent(Intent.ACTION_MEDIA_BUTTON);
+				pressHangUp.putExtra(Intent.EXTRA_KEY_EVENT, keyHangup);
+				sendOrderedBroadcast(pressHangUp,
 						"android.permission.CALL_PRIVILEGED");
 				break;
 			case CoreApp.CS_TASK_PICKUP_CALL:
 				Log.d(LOG_TAG + ".handler", "picking up! hello");
-				Intent buttonUp = new Intent(Intent.ACTION_MEDIA_BUTTON);
-				buttonUp.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
+				Intent pressPickupCall = new Intent(Intent.ACTION_MEDIA_BUTTON);
+				pressPickupCall.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
 						KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK));
-				sendOrderedBroadcast(buttonUp,
+				sendOrderedBroadcast(pressPickupCall,
 						"android.permission.CALL_PRIVILEGED");
 				break;
 			case CoreApp.CS_TASK_INCOMMING_CALL:
