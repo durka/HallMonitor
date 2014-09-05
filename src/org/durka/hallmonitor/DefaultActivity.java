@@ -582,6 +582,11 @@ public class DefaultActivity extends Activity {
 		// Display in fullscreen
 		setRealFullscreen();
 
+		if (mStateManager.getHardwareAccelerated()) {
+			this.getWindow().addFlags(
+					WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+
+		}
 		// Keep screen on during display
 		this.getWindow().addFlags(
 				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

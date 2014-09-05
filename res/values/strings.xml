@@ -43,6 +43,8 @@
   <string name="pref_dim_summary">When the cover is closed and Hall Monitor is up (see above), should the screen dim?</string>
   <string name="pref_keep_admin">Keep device admin status</string>
   <string name="pref_keep_admin_summary">When Hall Monitor is disabled, don\&#39;t relinquish Device Administrator permissions. If checked, Hall Monitor won\&#39;t need to ask to become Device Administrator when you turn it on. May be useful with automation, e.g. Tasker.</string>
+  <string name="pref_hardwareAccelerated">Use hardware accelerated display</string>
+  <string name="pref_hardwareAccelerated_summary">Use hardware accelerated display. Require a Hall Monitor restart.</string>
   <string name="pref_datetime">Display time and date</string>
   <string name="pref_datetime_summary">If checked, display time and date instead of only time.</string>
   <string name="pref_disable_home">Disable buttons</string>

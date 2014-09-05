@@ -64,6 +64,7 @@ public class CoreStateManager {
 	private final boolean adminApp;
 	private final boolean rootApp;
 	private boolean osPowerManagement;
+	private final boolean hardwareAccelerated;
 
 	// audio manager to detect media state
 	private AudioManager audioManager;
@@ -211,6 +212,9 @@ public class CoreStateManager {
 				}
 			}
 		}
+
+		this.hardwareAccelerated = preference_all.getBoolean(
+				"pref_hardwareAccelerated", false);
 
 		// we might have missed a phone-state revelation
 		phone_ringing = ((TelephonyManager) mAppContext
@@ -386,12 +390,12 @@ public class CoreStateManager {
 			if (preference_all.getBoolean("pref_internalservice", false)) {
 				IntentFilter mIntentFilter = new IntentFilter();
 				mIntentFilter.addAction(getActionCover());
-				LocalBroadcastManager.getInstance(mAppContext).registerReceiver(
-						mCoreReceiver, mIntentFilter);
+				LocalBroadcastManager.getInstance(mAppContext)
+						.registerReceiver(mCoreReceiver, mIntentFilter);
 			} else {
 				intfil.addAction(CoreReceiver.ACTION_LID_STATE_CHANGED);
 			}
-			
+
 			mAppContext.registerReceiver(mCoreReceiver, intfil);
 		}
 	}
@@ -673,5 +677,9 @@ public class CoreStateManager {
 		deviceHasFlash = mAppContext.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_CAMERA_FLASH);
 		return deviceHasFlash;
+	}
+
+	public boolean getHardwareAccelerated() {
+		return hardwareAccelerated;
 	}
 }
