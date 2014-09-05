@@ -37,6 +37,7 @@ import android.hardware.Camera.Parameters;
 import android.media.AudioManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import eu.chainfire.libsuperuser.Shell;

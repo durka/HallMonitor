@@ -18,6 +18,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.manusfreedom.android.Events;
@@ -35,12 +36,14 @@ public class ViewCoverHallService extends Service implements Runnable {
 																		// CM11.x
 
 	private CoreStateManager mStateManager;
+	private LocalBroadcastManager mLocalBroadcastManager;
 
 	@Override
 	public void onCreate() {
 		Log.d(LOG_TAG + ".oC", "Core service creating");
 
 		mStateManager = ((CoreApp) getApplicationContext()).getStateManager();
+		mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
 	}
 
 	@Override
@@ -138,7 +141,7 @@ public class ViewCoverHallService extends Service implements Runnable {
 					Intent intent = new Intent(mStateManager.getActionCover());
 					intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 							CoreReceiver.LID_CLOSED);
-					this.sendBroadcast(intent);
+					this.mLocalBroadcastManager.sendBroadcast(intent);
 				} else if (currentInputDevice.getSuccessfulPollingCode() == 21
 						&& currentInputDevice.getSuccessfulPollingValue() == 1) {
 					Log.i(LOG_TAG + ".r", "Cover open");
@@ -146,7 +149,7 @@ public class ViewCoverHallService extends Service implements Runnable {
 							CoreReceiver.ACTION_LID_STATE_CHANGED);
 					intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 							CoreReceiver.LID_OPEN);
-					this.sendBroadcast(intent);
+					this.mLocalBroadcastManager.sendBroadcast(intent);
 				}
 			}
 		}

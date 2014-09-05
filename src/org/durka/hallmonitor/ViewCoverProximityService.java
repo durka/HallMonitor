@@ -24,6 +24,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class ViewCoverProximityService extends Service implements
@@ -31,6 +32,7 @@ public class ViewCoverProximityService extends Service implements
 	private final String LOG_TAG = "Hall.VCPS";
 
 	private CoreStateManager mStateManager;
+	private LocalBroadcastManager mLocalBroadcastManager;
 
 	private SensorManager mSensorManager;
 
@@ -39,6 +41,7 @@ public class ViewCoverProximityService extends Service implements
 		Log.d(LOG_TAG + ".oC", "Core service creating");
 
 		mStateManager = ((CoreApp) getApplicationContext()).getStateManager();
+		mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
 	}
 
 	@Override
@@ -126,7 +129,7 @@ public class ViewCoverProximityService extends Service implements
 				Intent intent = new Intent(mStateManager.getActionCover());
 				intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 						CoreReceiver.LID_OPEN);
-				sendBroadcast(intent);
+				this.mLocalBroadcastManager.sendBroadcast(intent);
 			}
 		} else {
 			if (mStateManager.getCoverClosed(true)) {
@@ -135,7 +138,7 @@ public class ViewCoverProximityService extends Service implements
 				Intent intent = new Intent(mStateManager.getActionCover());
 				intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 						CoreReceiver.LID_CLOSED);
-				sendBroadcast(intent);
+				this.mLocalBroadcastManager.sendBroadcast(intent);
 			}
 		}
 		// Log.d(LOG_TAG + ".Evt.proximity",
