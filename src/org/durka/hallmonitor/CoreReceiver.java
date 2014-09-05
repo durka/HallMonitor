@@ -68,18 +68,9 @@ public class CoreReceiver extends BroadcastReceiver {
 			Log.d(LOG_TAG + ".boot", "Boot called.");
 			mStateManager.startServices();
 
-		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)
-				|| intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
+		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
 
 			Log.d(LOG_TAG + ".screen", "Screen on event received.");
-
-			if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
-				Intent batteryDAIntent = new Intent(
-						CoreApp.DA_ACTION_BATTERY_REFRESH);
-				LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
-						.getInstance(context);
-				mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
-			}
 
 			if (mStateManager.getCoverClosed()) {
 				Log.d(LOG_TAG + ".onReceive.screen",
@@ -98,12 +89,29 @@ public class CoreReceiver extends BroadcastReceiver {
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 			mStateManager.freeDevice();
 
+		} else if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
+			Intent batteryDAIntent = new Intent(
+					CoreApp.DA_ACTION_BATTERY_REFRESH);
+			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
+					.getInstance(context);
+			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
+
+			Intent mIntent = new Intent(context, CoreService.class);
+			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
+					CoreApp.CS_TASK_WAKEUP_DEVICE);
+			context.startService(mIntent);
+
 		} else if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
 			Intent batteryDAIntent = new Intent(
 					CoreApp.DA_ACTION_BATTERY_REFRESH);
 			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
 					.getInstance(context);
 			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
+
+			Intent mIntent = new Intent(context, CoreService.class);
+			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
+					CoreApp.CS_TASK_WAKEUP_DEVICE);
+			context.startService(mIntent);
 
 		} else if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
 
