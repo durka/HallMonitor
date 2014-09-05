@@ -227,7 +227,8 @@ public class CoreService extends Service {
 					intent.putExtra("strobe", false);
 					intent.putExtra("period", 100);
 					intent.putExtra("bright", false);
-					sendBroadcast(intent);
+					sendBroadcastAsUser(intent,
+							android.os.Process.myUserHandle());
 				} else if (mStateManager.getPreference().getBoolean(
 						"pref_flash_controls_alternative", false)) {
 					if (!mStateManager.getTorchOn()) {
@@ -287,14 +288,16 @@ public class CoreService extends Service {
 				// Broadcast alarm snooze event
 				Intent alarmSnooze = new Intent(
 						CoreReceiver.ALARM_SNOOZE_ACTION);
-				sendBroadcast(alarmSnooze);
+				sendBroadcastAsUser(alarmSnooze,
+						android.os.Process.myUserHandle());
 				break;
 			case CoreApp.CS_TASK_DISMISS_ALARM:
 				ctx = (Context) msg.obj;
 				// Broadcast alarm Dismiss event
 				Intent alarmDismiss = new Intent(
 						CoreReceiver.ALARM_DISMISS_ACTION);
-				sendBroadcast(alarmDismiss);
+				sendBroadcastAsUser(alarmDismiss,
+						android.os.Process.myUserHandle());
 				break;
 			case CoreApp.CS_TASK_INCOMMING_ALARM:
 				ctx = (Context) msg.obj;
