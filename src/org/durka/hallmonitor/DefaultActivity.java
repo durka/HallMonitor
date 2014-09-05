@@ -501,6 +501,7 @@ public class DefaultActivity extends Activity {
 		mStateManager.setBlackScreenTime(0);
 		findViewById(R.id.default_camera).setVisibility(View.VISIBLE);
 		displayCamera();
+		Log.d("LOG_TAG.hm-cam", "started camera");
 	}
 
 	public void captureCamera(View view) {
@@ -510,6 +511,7 @@ public class DefaultActivity extends Activity {
 
 	public void stopCamera(View view) {
 		stopCamera();
+		Log.d("LOG_TAG.hm-cam", "closed camera");
 	}
 
 	public void stopCamera() {
