@@ -204,6 +204,7 @@ public class CoreReceiver extends BroadcastReceiver {
 				Log.d(LOG_TAG + ".onReceive.cover",
 						"Cover is open, stopping Default Activity.");
 				mStateManager.setCoverClosed(false);
+				mStateManager.freeDevice();
 				Intent mIntent = new Intent(context, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_WAKEUP_DEVICE);
