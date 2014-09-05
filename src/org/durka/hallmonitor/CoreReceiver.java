@@ -31,6 +31,7 @@ public class CoreReceiver extends BroadcastReceiver {
 
 	// Action fired when cover state change
 	public static final String ACTION_LID_STATE_CHANGED = "android.intent.action.LID_STATE_CHANGED";
+	public static final String ACTION_INTERNAL_LID_STATE_CHANGED = "org.durka.hallmonitor.LID_STATE_CHANGED";
 	public static final String EXTRA_LID_STATE = "state";
 	public static final int LID_ABSENT = -1;
 	public static final int LID_CLOSED = 0;
@@ -179,7 +180,7 @@ public class CoreReceiver extends BroadcastReceiver {
 			} else {
 				Log.d(LOG_TAG + ".phone", "phone controls are not enabled");
 			}
-		} else if (intent.getAction().equals(ACTION_LID_STATE_CHANGED)) {
+		} else if (intent.getAction().equals(mStateManager.getActionCover())) {
 			int state = intent.getIntExtra(EXTRA_LID_STATE, LID_ABSENT);
 			Log.d(LOG_TAG + ".onReceive.cover", "cover state changed to "
 					+ state);

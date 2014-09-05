@@ -298,6 +298,13 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 				}
 			}
 		} else if (key.equals("pref_internalservice")) {
+			if (prefs.getBoolean(key, false)) {
+				mStateManager
+						.setActionCover(CoreReceiver.ACTION_INTERNAL_LID_STATE_CHANGED);
+			} else {
+				mStateManager
+						.setActionCover(CoreReceiver.ACTION_LID_STATE_CHANGED);
+			}
 			mStateManager.restartServices();
 		} else if (key.equals("pref_realhall")) {
 			if (prefs.getBoolean(key, false)) {

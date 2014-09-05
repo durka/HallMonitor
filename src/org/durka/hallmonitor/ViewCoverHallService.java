@@ -135,8 +135,7 @@ public class ViewCoverHallService extends Service implements Runnable {
 				if (currentInputDevice.getSuccessfulPollingCode() == 21
 						&& currentInputDevice.getSuccessfulPollingValue() == 0) {
 					Log.i(LOG_TAG + ".r", "Cover closed");
-					Intent intent = new Intent(
-							CoreReceiver.ACTION_LID_STATE_CHANGED);
+					Intent intent = new Intent(mStateManager.getActionCover());
 					intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 							CoreReceiver.LID_CLOSED);
 					this.sendBroadcast(intent);

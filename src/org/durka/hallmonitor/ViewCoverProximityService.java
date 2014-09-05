@@ -123,8 +123,7 @@ public class ViewCoverProximityService extends Service implements
 			if (!mStateManager.getCoverClosed(true)) {
 				// proximity false (>0) and cover open - take open_cover
 				// action
-				Intent intent = new Intent(
-						CoreReceiver.ACTION_LID_STATE_CHANGED);
+				Intent intent = new Intent(mStateManager.getActionCover());
 				intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 						CoreReceiver.LID_OPEN);
 				sendBroadcast(intent);
@@ -133,8 +132,7 @@ public class ViewCoverProximityService extends Service implements
 			if (mStateManager.getCoverClosed(true)) {
 				// proximity true (<=0) and cover closed - take
 				// close_cover action
-				Intent intent = new Intent(
-						CoreReceiver.ACTION_LID_STATE_CHANGED);
+				Intent intent = new Intent(mStateManager.getActionCover());
 				intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 						CoreReceiver.LID_CLOSED);
 				sendBroadcast(intent);

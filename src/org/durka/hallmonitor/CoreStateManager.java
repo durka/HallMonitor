@@ -86,6 +86,8 @@ public class CoreStateManager {
 
 	private static long blackscreen_time = 0;
 
+	private String actionCover = CoreReceiver.ACTION_LID_STATE_CHANGED;
+
 	CoreStateManager(Context context) {
 		mAppContext = context;
 
@@ -157,6 +159,11 @@ public class CoreStateManager {
 			Log.d(LOG_TAG + ".lBS", "We are not root.");
 		}
 
+		if (preference_all.getBoolean("pref_internalservice", false)) {
+			actionCover = CoreReceiver.ACTION_INTERNAL_LID_STATE_CHANGED;
+		} else {
+			actionCover = CoreReceiver.ACTION_LID_STATE_CHANGED;
+		}
 		if (preference_all.getBoolean("pref_proximity", false)) {
 			forceCheckCoverState = true;
 		}
@@ -292,6 +299,14 @@ public class CoreStateManager {
 		mainLaunched = enable;
 	}
 
+	public String getActionCover() {
+		return actionCover;
+	}
+
+	public void setActionCover(String mString) {
+		actionCover = mString;
+	}
+
 	public boolean getWidgetSettingsOngoing() {
 		return widget_settings_ongoing;
 	}
@@ -355,6 +370,16 @@ public class CoreStateManager {
 			intfil.addAction(Intent.ACTION_HEADSET_PLUG);
 			intfil.addAction(Intent.ACTION_SCREEN_ON);
 			intfil.addAction(Intent.ACTION_SCREEN_OFF);
+
+			if (preference_all.getBoolean("pref_internalservice", false)) {
+				IntentFilter mIntentFilter = new IntentFilter();
+				mIntentFilter.addAction(getActionCover());
+				LocalBroadcastManager.getInstance(mAppContext).registerReceiver(
+						mCoreReceiver, mIntentFilter);
+			} else {
+				intfil.addAction(CoreReceiver.ACTION_LID_STATE_CHANGED);
+			}
+			
 			mAppContext.registerReceiver(mCoreReceiver, intfil);
 		}
 	}
