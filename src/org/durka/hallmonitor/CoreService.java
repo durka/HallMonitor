@@ -217,7 +217,7 @@ public class CoreService extends Service {
 						bringDefaultActivityToFront(ctx, false);
 					}
 				}
-				mLocalBroadcastManager.sendBroadcastSync(torchDAIntent);
+				mLocalBroadcastManager.sendBroadcast(torchDAIntent);
 				break;
 			case CoreApp.CS_TASK_TORCH_TOGGLE:
 				ctx = (Context) msg.obj;
