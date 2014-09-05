@@ -76,7 +76,7 @@ public class ViewCoverHallService extends Service implements Runnable {
 		events.AddAllDevices();
 		String neededDevicePath = "";
 
-		Log.e(LOG_TAG + ".r", "Number of device found:" + events.m_Devs.size());
+		Log.d(LOG_TAG + ".r", "Number of device found:" + events.m_Devs.size());
 
 		Log.d(LOG_TAG + ".r", "Scan device");
 		for (InputDevice idev : events.m_Devs) {
