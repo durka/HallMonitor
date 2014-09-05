@@ -94,7 +94,7 @@ public class CoreReceiver extends BroadcastReceiver {
 					CoreApp.DA_ACTION_BATTERY_REFRESH);
 			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
 					.getInstance(context);
-			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
+			mLocalBroadcastManager.sendBroadcastSync(batteryDAIntent);
 
 			Intent mIntent = new Intent(context, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
@@ -106,7 +106,7 @@ public class CoreReceiver extends BroadcastReceiver {
 					CoreApp.DA_ACTION_BATTERY_REFRESH);
 			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
 					.getInstance(context);
-			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
+			mLocalBroadcastManager.sendBroadcastSync(batteryDAIntent);
 
 			Intent mIntent = new Intent(context, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
