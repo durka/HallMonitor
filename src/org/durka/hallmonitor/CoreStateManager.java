@@ -35,6 +35,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.media.AudioManager;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -563,6 +564,12 @@ public class CoreStateManager {
 				dpm.removeActiveAdmin(me);
 			}
 		}
+	}
+
+	public void restartServices() {
+		stopServices();
+		SystemClock.sleep(1000);
+		startServices();
 	}
 
 	/**

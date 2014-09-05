@@ -28,7 +28,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -198,7 +197,6 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 		// phone control
 		enablePhoneScreen(prefs);
 		updatePhoneControlTtsDelay(prefs);
-
 	}
 
 	@Override
@@ -300,9 +298,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 				}
 			}
 		} else if (key.equals("pref_internalservice")) {
-			mStateManager.stopServices(true);
-			SystemClock.sleep(1000);
-			mStateManager.startServices();
+			mStateManager.restartServices();
 		} else if (key.equals("pref_realhall")) {
 			if (prefs.getBoolean(key, false)) {
 				if (!prefs.getBoolean("pref_runasroot", false)) {
@@ -316,9 +312,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 							Toast.LENGTH_SHORT).show();
 					prefs.edit().putBoolean(key, false).commit();
 				} else {
-					mStateManager.stopServices(true);
-					SystemClock.sleep(1000);
-					mStateManager.startServices();
+					mStateManager.restartServices();
 				}
 			}
 		} else if (key.equals("pref_proximity")) {
@@ -329,9 +323,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 							Toast.LENGTH_SHORT).show();
 					prefs.edit().putBoolean(key, false).commit();
 				} else {
-					mStateManager.stopServices(true);
-					SystemClock.sleep(1000);
-					mStateManager.startServices();
+					mStateManager.restartServices();
 				}
 			}
 		} else if (key.equals("pref_do_notifications")) {
