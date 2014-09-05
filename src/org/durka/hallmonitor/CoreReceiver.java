@@ -92,8 +92,11 @@ public class CoreReceiver extends BroadcastReceiver {
 				Log.d(LOG_TAG + ".onReceive.screen",
 						"Cover is open, free everything.");
 
-				mStateManager.freeDevice(context);
+				mStateManager.freeDevice();
 			}
+
+		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+			mStateManager.freeDevice();
 
 		} else if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
 			Intent batteryDAIntent = new Intent(
@@ -101,9 +104,6 @@ public class CoreReceiver extends BroadcastReceiver {
 			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
 					.getInstance(context);
 			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
-
-		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-			mStateManager.freeDevice(context);
 
 		} else if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
 
@@ -196,7 +196,6 @@ public class CoreReceiver extends BroadcastReceiver {
 				Log.d(LOG_TAG + ".onReceive.cover",
 						"Cover is open, stopping Default Activity.");
 				mStateManager.setCoverClosed(false);
-				mStateManager.freeDevice(context);
 				Intent mIntent = new Intent(context, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_WAKEUP_DEVICE);

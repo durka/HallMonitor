@@ -468,7 +468,7 @@ public class CoreStateManager {
 		closeConfigurationActivity();
 	}
 
-	public void freeDevice(Context context) {
+	public void freeDevice() {
 		closeAllActivity();
 		setBlackScreenTime(0);
 	}
