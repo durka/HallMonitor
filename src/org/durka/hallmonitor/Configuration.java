@@ -295,7 +295,7 @@ public class Configuration extends PreferenceActivity {
 			Log.d(LOG_TAG + ".Evt.activity_result",
 					"return from checking the box");
 			mStateManager.setNotificationSettingsOngoing(false);
-			if (!mStateManager.service_running(NotificationService.class)) {
+			if (!mStateManager.getServiceRunning(NotificationService.class)) {
 				Toast.makeText(ctx,
 						ctx.getString(R.string.notif_left_unchecked),
 						Toast.LENGTH_SHORT).show();
@@ -307,7 +307,7 @@ public class Configuration extends PreferenceActivity {
 			Log.d(LOG_TAG + ".Evt.activity_result",
 					"return from unchecking the box");
 			mStateManager.setNotificationSettingsOngoing(false);
-			if (mStateManager.service_running(NotificationService.class)) {
+			if (mStateManager.getServiceRunning(NotificationService.class)) {
 				Toast.makeText(ctx, ctx.getString(R.string.notif_left_checked),
 						Toast.LENGTH_SHORT).show();
 				mStateManager.getPreference().edit()

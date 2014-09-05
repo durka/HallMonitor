@@ -171,11 +171,11 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 		prefs.edit()
 				.putBoolean("pref_enabled",
-						mStateManager.service_running(CoreService.class))
+						mStateManager.getServiceRunning(CoreService.class))
 				.putBoolean(
 						"pref_do_notifications",
 						mStateManager
-								.service_running(NotificationService.class))
+								.getServiceRunning(NotificationService.class))
 				.commit();
 
 		if (!mStateManager.getSystemApp()) {
@@ -475,7 +475,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 	private void doNotifications(Activity act, boolean enable) {
 
 		if (enable && !mStateManager.getNotificationSettingsOngoing()
-				&& !mStateManager.service_running(NotificationService.class)) {
+				&& !mStateManager.getServiceRunning(NotificationService.class)) {
 			mStateManager.setNotificationSettingsOngoing(true);
 			Toast.makeText(act, act.getString(R.string.notif_please_check),
 					Toast.LENGTH_SHORT).show();
@@ -483,7 +483,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 					"android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"),
 					CoreApp.NOTIFICATION_LISTENER_ON);
 		} else if (!enable && !mStateManager.getNotificationSettingsOngoing()
-				&& mStateManager.service_running(NotificationService.class)) {
+				&& mStateManager.getServiceRunning(NotificationService.class)) {
 			mStateManager.setNotificationSettingsOngoing(true);
 			Toast.makeText(act, act.getString(R.string.notif_please_uncheck),
 					Toast.LENGTH_SHORT).show();

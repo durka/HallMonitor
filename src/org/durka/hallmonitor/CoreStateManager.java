@@ -539,19 +539,19 @@ public class CoreStateManager {
 
 		Log.d(LOG_TAG + ".stop_service", "Stop service called.");
 
-		if (service_running(ViewCoverHallService.class)) {
+		if (getServiceRunning(ViewCoverHallService.class)) {
 			mAppContext.stopService(new Intent(mAppContext,
 					ViewCoverHallService.class));
 		}
-		if (service_running(ViewCoverProximityService.class)) {
+		if (getServiceRunning(ViewCoverProximityService.class)) {
 			mAppContext.stopService(new Intent(mAppContext,
 					ViewCoverProximityService.class));
 		}
-		if (service_running(NotificationService.class)) {
+		if (getServiceRunning(NotificationService.class)) {
 			mAppContext.stopService(new Intent(mAppContext,
 					NotificationService.class));
 		}
-		if (service_running(CoreService.class)) {
+		if (getServiceRunning(CoreService.class)) {
 			mAppContext.stopService(new Intent(mAppContext, CoreService.class));
 		}
 
@@ -575,7 +575,7 @@ public class CoreStateManager {
 	 *            Application context.
 	 * @return Is the cover closed.
 	 */
-	public boolean service_running(@SuppressWarnings("rawtypes") Class svc) {
+	public boolean getServiceRunning(@SuppressWarnings("rawtypes") Class svc) {
 
 		Log.d(LOG_TAG + ".service_running", "Is service running called.");
 
