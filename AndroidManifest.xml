@@ -26,17 +26,20 @@
   <uses-permission android:name="android.permission.WAKE_LOCK" />
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
   <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-  <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
   <uses-permission android:name="android.permission.READ_CONTACTS" />
   <uses-permission android:name="android.permission.CAMERA" />
-  <uses-permission android:name="android.permission.DEVICE_POWER" />
   <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.STOP_APP_SWITCHES" />
   <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
   <uses-permission android:name="android.permission.FLASHLIGHT" />
   <uses-permission android:name="android.permission.GET_TASKS" />
+
+  <!-- System persmissions -->
+  <uses-permission android:name="android.permission.STOP_APP_SWITCHES" />
+  <uses-permission android:name="android.permission.DEVICE_POWER" />
+  <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
+
   <uses-feature android:name="android.hardware.camera"
                 android:required="false" />
   
