@@ -246,6 +246,7 @@ public class CoreService extends Service {
 						startService(mIntent);
 					}
 				}
+				break;
 			case CoreApp.CS_TASK_HEADSET_PLUG:
 				ctx = (Context) msg.obj;
 				Intent headSetIntent = new Intent(
