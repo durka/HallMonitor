@@ -48,7 +48,6 @@ public class CoreApp extends Application {
 	public static final int CS_TASK_INCOMMING_CALL = 3;
 	public static final int CS_TASK_INCOMMING_ALARM = 4;
 	public static final int CS_TASK_AUTO_BLACKSCREEN = 5;
-	public static final int CS_TASK_CANCEL_BLACKSCREEN = 6;
 	public static final int CS_TASK_LAUNCH_ACTIVITY = 7;
 	public static final int CS_TASK_WAKEUP_DEVICE = 8;
 	public static final int CS_TASK_CHANGE_TOUCHCOVER = 9;

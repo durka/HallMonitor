@@ -493,10 +493,12 @@ public class DefaultActivity extends Activity {
 			mStateManager.turnOffFlash();
 			torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
 		}
-		Intent mIntent = new Intent(this, CoreService.class);
-		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-				CoreApp.CS_TASK_CANCEL_BLACKSCREEN);
-		startService(mIntent);
+		/*
+		 * Intent mIntent = new Intent(this, CoreService.class);
+		 * mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
+		 * CoreApp.CS_TASK_CANCEL_BLACKSCREEN); startService(mIntent);
+		 */
+		mStateManager.setBlackScreenTime(0);
 		findViewById(R.id.default_camera).setVisibility(View.VISIBLE);
 		displayCamera();
 	}

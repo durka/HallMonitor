@@ -444,10 +444,7 @@ public class CoreStateManager {
 
 	public void freeDevice(Context context) {
 		closeAllActivity();
-		Intent mIntent = new Intent(context, CoreService.class);
-		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-				CoreApp.CS_TASK_CANCEL_BLACKSCREEN);
-		context.startService(mIntent);
+		setBlackScreenTime(0);
 	}
 
 	public AudioManager getAudioManager() {

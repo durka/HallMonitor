@@ -19,6 +19,8 @@ public class SwipeTouchListener implements OnTouchListener {
 
 	private final String LOG_TAG = "Hall.Swipe";
 
+	private final CoreStateManager mStateManager;
+
 	public enum ActionMode {
 		MODE_NOTHINGTRUE, MODE_CALL, MODE_ALARM, MODE_TORCH, MODE_CAMERA;
 	}
@@ -33,6 +35,8 @@ public class SwipeTouchListener implements OnTouchListener {
 
 	public SwipeTouchListener(Context context, ActionMode actionMode) {
 		this.ctx = context;
+		mStateManager = ((CoreApp) context.getApplicationContext())
+				.getStateManager();
 		this.actionMode = actionMode;
 		this.gestureDetector = new GestureDetectorCompat(this.ctx,
 				new SwipeGestureListener());
@@ -190,10 +194,7 @@ public class SwipeTouchListener implements OnTouchListener {
 			mActivePointerId = pointerId;
 
 			// Disable sleep/lock timerTask
-			Intent mIntent = new Intent(ctx, CoreService.class);
-			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-					CoreApp.CS_TASK_CANCEL_BLACKSCREEN);
-			ctx.startService(mIntent);
+			mStateManager.setBlackScreenTime(0);
 
 			final int X = (int) MotionEventCompat.getX(event, pointerIndex);
 			// final int Y = (int)MotionEventCompat.getY(event, pointerIndex);
@@ -221,6 +222,8 @@ public class SwipeTouchListener implements OnTouchListener {
 			if (pointerIndex == -1) {
 				break;
 			}
+
+			mStateManager.setBlackScreenTime(0);
 
 			// v.setBackgroundColor(Color.GREEN);
 			// v.invalidate();

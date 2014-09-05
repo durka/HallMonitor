@@ -113,10 +113,6 @@ public class CoreService extends Service {
 						mTouchCoverHandler.sendMessage(msgTCH);
 					}
 					return START_STICKY;
-				case CoreApp.CS_TASK_CANCEL_BLACKSCREEN:
-					Log.d(LOG_TAG + ".handler", "Request Blackscreen canceled");
-					mStateManager.setBlackScreenTime(0);
-					return START_STICKY;
 				case CoreApp.CS_TASK_AUTO_BLACKSCREEN:
 					if (mStateManager.getBlackScreenTime() > 0) {
 						Log.d(LOG_TAG + ".handler",
@@ -449,10 +445,7 @@ public class CoreService extends Service {
 			Log.d(LOG_TAG + ".bDATF", "Launching default activity");
 
 			if (noBlackScreen) {
-				Intent mIntent = new Intent(ctx, CoreService.class);
-				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-						CoreApp.CS_TASK_CANCEL_BLACKSCREEN);
-				ctx.startService(mIntent);
+				mStateManager.setBlackScreenTime(0);
 			}
 
 			// save the cover state
