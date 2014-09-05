@@ -334,10 +334,10 @@ public class CoreService extends Service {
 				}
 				if (mStateManager.getBlackScreenTime() > 0) {
 					launchBlackScreen(ctx);
+					mStateManager.setBlackScreenTime(0);
 				} else {
 					Log.d(LOG_TAG + ".handler", "Blackscreen canceled");
 				}
-				mStateManager.setBlackScreenTime(0);
 				break;
 			case CoreApp.CS_TASK_WAKEUP_DEVICE:
 				ctx = (Context) msg.obj;
