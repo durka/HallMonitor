@@ -115,7 +115,7 @@ public class CameraPreview extends SurfaceView implements
 
 			@Override
 			public void onOrientationChanged(int angle) {
-				mOrientation = ((int) (Math.round(angle / 90.0) * 90) + 90) % 360;
+				mOrientation = ((int) (Math.round(angle / 90.0) * 90)) % 360;
 			}
 
 		};
@@ -137,7 +137,7 @@ public class CameraPreview extends SurfaceView implements
 
 			@Override
 			public void onOrientationChanged(int angle) {
-				mOrientation = ((int) (Math.round(angle / 90.0) * 90) + 90) % 360;
+				mOrientation = ((int) (Math.round(angle / 90.0) * 90)) % 360;
 			}
 
 		};
@@ -159,7 +159,7 @@ public class CameraPreview extends SurfaceView implements
 
 			@Override
 			public void onOrientationChanged(int angle) {
-				mOrientation = ((int) (Math.round(angle / 90.0) * 90) + 90) % 360;
+				mOrientation = ((int) (Math.round(angle / 90.0) * 90)) % 360;
 			}
 
 		};
