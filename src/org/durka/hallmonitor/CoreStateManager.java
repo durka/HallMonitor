@@ -63,6 +63,7 @@ public class CoreStateManager {
 	private final boolean systemApp;
 	private final boolean adminApp;
 	private final boolean rootApp;
+	private boolean osPowerManagement;
 
 	// audio manager to detect media state
 	private AudioManager audioManager;
@@ -159,6 +160,8 @@ public class CoreStateManager {
 		} else {
 			Log.d(LOG_TAG + ".lBS", "We are not root.");
 		}
+		osPowerManagement = preference_all.getBoolean(
+				"pref_os_power_management", false);
 
 		if (preference_all.getBoolean("pref_internalservice", false)) {
 			actionCover = CoreReceiver.ACTION_INTERNAL_LID_STATE_CHANGED;
@@ -298,6 +301,14 @@ public class CoreStateManager {
 
 	public void setMainLaunched(boolean enable) {
 		mainLaunched = enable;
+	}
+
+	public boolean getOsPowerManagement() {
+		return osPowerManagement;
+	}
+
+	public void setOsPowerManagement(boolean enable) {
+		osPowerManagement = enable;
 	}
 
 	public String getActionCover() {

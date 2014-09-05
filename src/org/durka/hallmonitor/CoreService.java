@@ -395,12 +395,9 @@ public class CoreService extends Service {
 
 		private void launchBlackScreen(Context ctx) {
 			if (mStateManager.getCoverClosed()) {
-				if (mStateManager.getLockMode()) {
-					final DevicePolicyManager dpm = (DevicePolicyManager) ctx
-							.getSystemService(Context.DEVICE_POLICY_SERVICE);
-					Log.d(LOG_TAG + ".lBS", "Lock now.");
-					dpm.lockNow();
-				} else {
+				if (mStateManager.getOsPowerManagement()) {
+
+				} else if (mStateManager.getSystemApp()) {
 					PowerManager pm = (PowerManager) ctx
 							.getSystemService(Context.POWER_SERVICE);
 					if (pm.isScreenOn()) {
@@ -409,13 +406,20 @@ public class CoreService extends Service {
 					} else {
 						Log.d(LOG_TAG + ".lBS", "Screen already off.");
 					}
+				} else if (mStateManager.getLockMode()) {
+					final DevicePolicyManager dpm = (DevicePolicyManager) ctx
+							.getSystemService(Context.DEVICE_POLICY_SERVICE);
+					Log.d(LOG_TAG + ".lBS", "Lock now.");
+					dpm.lockNow();
 				}
 			}
 			mStateManager.closeAllActivity();
 		}
 
 		private void wakeUpDevice(Context ctx) {
-			if (mStateManager.getSystemApp()) {
+			if (mStateManager.getOsPowerManagement()) {
+
+			} else if (mStateManager.getSystemApp()) {
 				PowerManager pm = (PowerManager) ctx
 						.getSystemService(Context.POWER_SERVICE);
 				if (!pm.isScreenOn()) {

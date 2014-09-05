@@ -181,7 +181,8 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 								.getServiceRunning(NotificationService.class))
 				.commit();
 
-		if (!mStateManager.getSystemApp()) {
+		if (!mStateManager.getSystemApp()
+				&& !prefs.getBoolean("pref_os_power_management", false)) {
 			prefs.edit().putBoolean("pref_lockmode", true);
 			if (findPreference("pref_lockmode") != null) {
 				findPreference("pref_lockmode").setEnabled(false);
@@ -240,7 +241,8 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 					"pref_enabled is now " + prefs.getBoolean(key, false));
 
 			if (prefs.getBoolean(key, false)) {
-				if (!mStateManager.getSystemApp()) {
+				if (!mStateManager.getSystemApp()
+						&& !prefs.getBoolean("pref_os_power_management", false)) {
 					prefs.edit().putBoolean("pref_lockmode", true);
 					if (findPreference("pref_lockmode") != null) {
 						findPreference("pref_lockmode").setEnabled(false);
@@ -254,6 +256,9 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			} else {
 				mStateManager.stopServices();
 			}
+
+		} else if (key.equals("pref_os_power_management")) {
+			mStateManager.setOsPowerManagement(prefs.getBoolean(key, false));
 
 			// if the default screen widget is being enabled/disabled the key
 			// will be pref_default_widget
