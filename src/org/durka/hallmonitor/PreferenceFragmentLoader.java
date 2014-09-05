@@ -142,7 +142,11 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 			int old_version = prefs.getInt("version", 3);
 			if (old_version < info.versionCode) {
-				prefs.edit().putInt("version", info.versionCode).commit();
+				prefs.edit().putBoolean("pref_default_widget", false)
+						.putBoolean("pref_media_widget", false)
+						.putInt("default_widget_id", -1)
+						.putInt("media_widget_id", -1)
+						.putInt("version", info.versionCode).commit();
 
 				Log.d(LOG_TAG + ".oR", "stored version code");
 			}
