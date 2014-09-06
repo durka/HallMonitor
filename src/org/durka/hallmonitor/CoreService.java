@@ -259,6 +259,15 @@ public class CoreService extends Service {
 				break;
 			case CoreApp.CS_TASK_HANGUP_CALL:
 				Log.d(LOG_TAG + ".handler", "hanging up! goodbye");
+
+				/*
+				 * Intent pressReject = new Intent(Intent.ACTION_MEDIA_BUTTON);
+				 * pressReject.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
+				 * KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK));
+				 * sendOrderedBroadcast(pressReject,
+				 * "android.permission.CALL_PRIVILEGED");
+				 */
+
 				KeyEvent keyHangup = new KeyEvent(KeyEvent.ACTION_UP,
 						KeyEvent.KEYCODE_HEADSETHOOK);
 				keyHangup = KeyEvent.changeFlags(keyHangup,
@@ -383,7 +392,7 @@ public class CoreService extends Service {
 			Log.d(LOG_TAG + ".wpl", "Wait launch of " + pacakgeName);
 			ActivityManager am = (ActivityManager) ctx
 					.getSystemService(Context.ACTIVITY_SERVICE);
-			long maxWaitTime = System.currentTimeMillis() + 5 * 1000;
+			long maxWaitTime = System.currentTimeMillis() + 10 * 1000;
 			while (System.currentTimeMillis() < maxWaitTime) {
 				// The first in the list of RunningTasks is always the
 				// foreground task.
@@ -402,7 +411,7 @@ public class CoreService extends Service {
 		private void launchBlackScreen(Context ctx) {
 			if (mStateManager.getCoverClosed()) {
 				if (mStateManager.getOsPowerManagement()) {
-
+					Log.d(LOG_TAG + ".lBS", "OS must manage screen off.");
 				} else if (mStateManager.getSystemApp()) {
 					PowerManager pm = (PowerManager) ctx
 							.getSystemService(Context.POWER_SERVICE);
