@@ -270,6 +270,9 @@ public class CoreService extends Service {
 
 				KeyEvent keyHangup = new KeyEvent(KeyEvent.ACTION_UP,
 						KeyEvent.KEYCODE_HEADSETHOOK);
+				keyHangup = KeyEvent.changeTimeRepeat(keyHangup,
+						System.currentTimeMillis(), 1, keyHangup.getFlags()
+								| KeyEvent.FLAG_LONG_PRESS);
 				keyHangup = KeyEvent.changeFlags(keyHangup,
 						keyHangup.getFlags() | KeyEvent.FLAG_LONG_PRESS);
 				Intent pressHangUp = new Intent(Intent.ACTION_MEDIA_BUTTON);
