@@ -88,6 +88,9 @@ public class CoreApp extends Application {
 	}
 
 	public void restart() {
+		mStateManager.closeDefaultActivity();
+		mStateManager.stopServices();
 		mStateManager = new CoreStateManager(this);
+		mStateManager.startServices();
 	}
 }

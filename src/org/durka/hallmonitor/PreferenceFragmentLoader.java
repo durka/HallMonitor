@@ -413,13 +413,9 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 		;
 
-		// phone control
-		enablePhoneScreen(prefs);
-
-		((CoreApp) getActivity().getApplicationContext()).restart();
-
 		if (key.equals("pref_force_restart")) {
 			prefs.edit().putBoolean(key, false).commit();
+			((CoreApp) getActivity().getApplicationContext()).restart();
 			Intent mStartActivity = new Intent(getActivity()
 					.getApplicationContext(), Configuration.class);
 			int mPendingIntentId = 123456;
@@ -432,7 +428,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
 					mPendingIntent);
 			System.exit(0);
+		} else {
 		}
+		// phone control
+		enablePhoneScreen(prefs);
 	}
 
 	private void updatePhoneControlTtsDelay(SharedPreferences prefs) {
