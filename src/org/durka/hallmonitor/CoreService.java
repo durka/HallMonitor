@@ -196,7 +196,7 @@ public class CoreService extends Service {
 
 		@Override
 		public void run() {
-			Log.d(LOG_TAG + ".handler", "Thread started: " + msg.arg1);
+			Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1 + ": started");
 
 			Context ctx;
 			switch (msg.what) {
@@ -258,15 +258,8 @@ public class CoreService extends Service {
 				}
 				break;
 			case CoreApp.CS_TASK_HANGUP_CALL:
-				Log.d(LOG_TAG + ".handler", "hanging up! goodbye");
-
-				/*
-				 * Intent pressReject = new Intent(Intent.ACTION_MEDIA_BUTTON);
-				 * pressReject.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
-				 * KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK));
-				 * sendOrderedBroadcast(pressReject,
-				 * "android.permission.CALL_PRIVILEGED");
-				 */
+				Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+						+ ": hanging up! goodbye");
 
 				KeyEvent keyHangup = new KeyEvent(KeyEvent.ACTION_UP,
 						KeyEvent.KEYCODE_HEADSETHOOK);
@@ -281,7 +274,8 @@ public class CoreService extends Service {
 						"android.permission.CALL_PRIVILEGED");
 				break;
 			case CoreApp.CS_TASK_PICKUP_CALL:
-				Log.d(LOG_TAG + ".handler", "picking up! hello");
+				Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+						+ ": picking up! hello");
 				Intent pressPickupCall = new Intent(Intent.ACTION_MEDIA_BUTTON);
 				pressPickupCall.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
 						KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK));
@@ -292,8 +286,8 @@ public class CoreService extends Service {
 				ctx = (Context) msg.obj;
 				wait_package_front_launched(ctx, CoreApp.PACKAGE_PHONE_APP);
 				if (mStateManager.getCoverClosed()) {
-					Log.d(LOG_TAG + ".handler",
-							"the screen is closed. screen my calls");
+					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+							+ ": the screen is closed. screen my calls");
 
 					bringDefaultActivityToFront(ctx, true);
 				}
@@ -318,8 +312,8 @@ public class CoreService extends Service {
 				ctx = (Context) msg.obj;
 				wait_package_front_launched(ctx, CoreApp.PACKAGE_ALARM_APP);
 				if (mStateManager.getCoverClosed()) {
-					Log.d(LOG_TAG + ".handler",
-							"the screen is closed. screen alarm");
+					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+							+ ": the screen is closed. screen alarm");
 
 					bringDefaultActivityToFront(ctx, true);
 				}
@@ -330,19 +324,24 @@ public class CoreService extends Service {
 				if (msg.arg2 == 1) {
 					noBlackScreen = true;
 				}
+				Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+						+ ": Launch activity / " + noBlackScreen);
 				bringDefaultActivityToFront(ctx, noBlackScreen);
 				break;
 			case CoreApp.CS_TASK_AUTO_BLACKSCREEN:
 				ctx = (Context) msg.obj;
 				// already request running
 				if (mStateManager.getBlackScreenTime() > 0) {
+					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+							+ ": Blackscreen already requested");
 					break;
 				}
 				mStateManager.setBlackScreenTime(System.currentTimeMillis()
 						+ mStateManager.getPreference().getInt("pref_delay",
 								10000));
-				Log.d(LOG_TAG + ".handler", "Blackscreen time set to: "
-						+ mStateManager.getBlackScreenTime());
+				Log.d(LOG_TAG + ".handler",
+						"Thread " + msg.arg1 + ": Blackscreen time set to: "
+								+ mStateManager.getBlackScreenTime());
 				while (System.currentTimeMillis() < mStateManager
 						.getBlackScreenTime()) {
 					try {
@@ -351,23 +350,27 @@ public class CoreService extends Service {
 					}
 				}
 				if (mStateManager.getBlackScreenTime() > 0) {
+					Log.d(LOG_TAG + ".handler",
+							"Thread " + msg.arg1 + ": Launch blackscreen at: "
+									+ mStateManager.getBlackScreenTime());
 					launchBlackScreen(ctx);
 					mStateManager.setBlackScreenTime(0);
 				} else {
-					Log.d(LOG_TAG + ".handler", "Blackscreen canceled");
+					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+							+ ": Blackscreen canceled");
 				}
 				break;
 			case CoreApp.CS_TASK_WAKEUP_DEVICE:
+				Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+						+ ": Launch wakeup");
 				ctx = (Context) msg.obj;
 				wakeUpDevice(ctx);
 				break;
 			case CoreApp.CS_TASK_MAINLAUNCH:
 				if (!mStateManager.getMainLaunched()) {
 					mStateManager.setMainLaunched(true);
-					Log.d(LOG_TAG + ".handler", "Mainthread launched");
-					if (mStateManager.getPreference().getBoolean(
-							"pref_phone_controls", false)) {
-					}
+					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+							+ ": Mainthread launched");
 					while (mStateManager.getMainLaunched()
 							&& mStateManager.getPreference().getBoolean(
 									"pref_enabled", false)) {
@@ -378,15 +381,18 @@ public class CoreService extends Service {
 					}
 					mStateManager.setMainLaunched(false);
 					stopSelf();
-					Log.d(LOG_TAG + ".handler", "Mainthread stopped");
-					Log.d(LOG_TAG + ".handler", "Core Service stopping");
+					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+							+ ": Mainthread stopped");
+					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+							+ ": Core Service stopping");
 				} else {
-					Log.d(LOG_TAG + ".handler", "Mainthread already launched");
+					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
+							+ ": Mainthread already launched");
 				}
 				break;
 			}
 
-			Log.d(LOG_TAG + ".handler", "Thread ended: " + msg.arg1);
+			Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1 + ": ended");
 			// Stop the service using the startId, so that we don't stop
 			// the service in the middle of handling another job
 		}
@@ -413,6 +419,7 @@ public class CoreService extends Service {
 
 		private void launchBlackScreen(Context ctx) {
 			if (mStateManager.getCoverClosed()) {
+				Log.d(LOG_TAG + ".lBS", "Cover closed.");
 				if (mStateManager.getOsPowerManagement()) {
 					Log.d(LOG_TAG + ".lBS", "OS must manage screen off.");
 				} else if (mStateManager.getSystemApp()) {
@@ -430,6 +437,8 @@ public class CoreService extends Service {
 					Log.d(LOG_TAG + ".lBS", "Lock now.");
 					dpm.lockNow();
 				}
+			} else {
+				Log.d(LOG_TAG + ".lBS", "Cover open???.");
 			}
 			mStateManager.closeAllActivity();
 		}
