@@ -26,6 +26,8 @@ import android.view.SurfaceView;
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements
 		SurfaceHolder.Callback {
+	private final String LOG_TAG = "Hall.camera";
+
 	private final SurfaceHolder mHolder;
 	private Camera mCamera = null;
 	private final OrientationEventListener mOrientationListener;
@@ -45,7 +47,7 @@ public class CameraPreview extends SurfaceView implements
 		@SuppressLint("SimpleDateFormat")
 		public void onPictureTaken(byte[] data, Camera camera) {
 
-			Log.d("hm-cam", "saving picture to gallery");
+			Log.d(LOG_TAG, "saving picture to gallery");
 
 			// Create a media file name
 			String title = "IMG_"
@@ -75,7 +77,7 @@ public class CameraPreview extends SurfaceView implements
 			values.put(ImageColumns.DATE_TAKEN, System.currentTimeMillis());
 			values.put(ImageColumns.DATA, path);
 			// Clockwise rotation in degrees. 0, 90, 180, or 270.
-			Log.d("hm-cam", "saving photo with orientation=" + mOrientation);
+			Log.d(LOG_TAG, "saving photo with orientation=" + mOrientation);
 			values.put(ImageColumns.ORIENTATION, mOrientation);
 
 			@SuppressWarnings("unused")
@@ -102,7 +104,7 @@ public class CameraPreview extends SurfaceView implements
 	public CameraPreview(Context ctx) {
 		super(ctx);
 
-		Log.d("hm-cam", "context constructor");
+		Log.d(LOG_TAG, "context constructor");
 
 		mStateManager = ((CoreApp) ctx.getApplicationContext())
 				.getStateManager();
@@ -115,7 +117,7 @@ public class CameraPreview extends SurfaceView implements
 
 			@Override
 			public void onOrientationChanged(int angle) {
-				mOrientation = ((int) (Math.round(angle / 90.0) * 90)) % 360;
+				mOrientation = ((int) (Math.round(angle / 90.0) * 90) + 90) % 360;
 			}
 
 		};
@@ -124,7 +126,7 @@ public class CameraPreview extends SurfaceView implements
 	public CameraPreview(Context ctx, AttributeSet as) {
 		super(ctx, as);
 
-		Log.d("hm-cam", "context/attributeset constructor");
+		Log.d(LOG_TAG, "context/attributeset constructor");
 
 		mStateManager = ((CoreApp) ctx.getApplicationContext())
 				.getStateManager();
@@ -137,7 +139,7 @@ public class CameraPreview extends SurfaceView implements
 
 			@Override
 			public void onOrientationChanged(int angle) {
-				mOrientation = ((int) (Math.round(angle / 90.0) * 90)) % 360;
+				mOrientation = ((int) (Math.round(angle / 90.0) * 90) + 90) % 360;
 			}
 
 		};
@@ -146,7 +148,7 @@ public class CameraPreview extends SurfaceView implements
 	public CameraPreview(Context ctx, AttributeSet as, int defStyle) {
 		super(ctx, as, defStyle);
 
-		Log.d("hm-cam", "context/attributeset/defstyle constructor");
+		Log.d(LOG_TAG, "context/attributeset/defstyle constructor");
 
 		mStateManager = ((CoreApp) ctx.getApplicationContext())
 				.getStateManager();
@@ -159,14 +161,14 @@ public class CameraPreview extends SurfaceView implements
 
 			@Override
 			public void onOrientationChanged(int angle) {
-				mOrientation = ((int) (Math.round(angle / 90.0) * 90)) % 360;
+				mOrientation = ((int) (Math.round(angle / 90.0) * 90) + 90) % 360;
 			}
 
 		};
 	}
 
 	public void capture() {
-		Log.d("hm-cam", "capture");
+		Log.d(LOG_TAG, "capture");
 		mCamera.takePicture(null, null, mPicture);
 	}
 
@@ -174,7 +176,7 @@ public class CameraPreview extends SurfaceView implements
 	public void surfaceCreated(SurfaceHolder holder) {
 		// The Surface has been created, now tell the camera where to draw the
 		// preview.
-		Log.d("hm-cam", "surface created!");
+		Log.d(LOG_TAG, "surface created!");
 
 		mOrientationListener.enable();
 
@@ -182,13 +184,13 @@ public class CameraPreview extends SurfaceView implements
 		if (mCamera == null) {
 			mCamera = CameraHelper.getCameraInstance();
 			CameraHelper.updateCameraParametersPreference(
-					mStateManager.getContext(), mCamera);
+					mStateManager.getDefaultActivity(), mCamera);
 
 			try {
 				mCamera.setPreviewDisplay(holder);
 				mCamera.startPreview();
 			} catch (IOException e) {
-				Log.d("hm-cam",
+				Log.e(LOG_TAG,
 						"Error setting camera preview: " + e.getMessage());
 			}
 		}
@@ -197,7 +199,7 @@ public class CameraPreview extends SurfaceView implements
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// empty. Take care of releasing the Camera preview in your activity.
-		Log.d("hm-cam", "surface destroyed!");
+		Log.d(LOG_TAG, "surface destroyed!");
 
 		mOrientationListener.disable();
 
@@ -212,10 +214,10 @@ public class CameraPreview extends SurfaceView implements
 		// If your preview can change or rotate, take care of those events here.
 		// Make sure to stop the preview before resizing or reformatting it.
 
-		Log.d("hm-cam", "surface changed!");
+		Log.d(LOG_TAG, "surface changed!");
 
 		if (mHolder.getSurface() == null
-				|| !mStateManager.getDefaultActivityRunning()) {
+				|| mStateManager.getDefaultActivity() == null) {
 			// preview surface does not exist
 			return;
 		}
@@ -237,8 +239,7 @@ public class CameraPreview extends SurfaceView implements
 			mCamera.setPreviewDisplay(mHolder);
 			mCamera.startPreview();
 		} catch (Exception e) {
-			Log.d("hm-cam",
-					"Error restarting camera preview: " + e.getMessage());
+			Log.d(LOG_TAG, "Error restarting camera preview: " + e.getMessage());
 		}
 	}
 
