@@ -160,10 +160,7 @@ public class CoreStateManager {
 			forceCheckCoverState = true;
 		}
 
-		if (preference_all.getBoolean("pref_media_widget", false)
-				|| preference_all.getBoolean("pref_default_widget", false)) {
-			hmAppWidgetManager = new HMAppWidgetManager(this);
-		}
+		hmAppWidgetManager = new HMAppWidgetManager(this);
 
 		if (preference_all.getBoolean("pref_default_widget", false)) {
 			int widgetId = preference_all.getInt("default_widget_id", -1);

@@ -282,7 +282,6 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			// if the default screen widget is being enabled/disabled the key
 			// will be pref_default_widget
 		} else if (key.equals("pref_default_widget")) {
-
 			if (prefs.getBoolean(key, false)
 					&& !mStateManager.hmAppWidgetManager
 							.doesWidgetExist("default")) {
@@ -296,7 +295,6 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			// if the media screen widget is being enabled/disabled the key will
 			// be pref_media_widget
 		} else if (key.equals("pref_media_widget")) {
-
 			if (prefs.getBoolean(key, false)
 					&& !mStateManager.hmAppWidgetManager
 							.doesWidgetExist("media")) {
@@ -308,7 +306,6 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			}
 
 		} else if (key.equals("pref_runasroot")) {
-
 			if (prefs.getBoolean(key, false)) {
 				AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
 				localSuAvailable.execute();
@@ -321,6 +318,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 					findPreference("pref_realhall").setEnabled(false);
 				}
 			}
+
 		} else if (key.equals("pref_internalservice")) {
 			if (prefs.getBoolean(key, false)) {
 				mStateManager
@@ -330,6 +328,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 						.setActionCover(CoreReceiver.ACTION_LID_STATE_CHANGED);
 			}
 			mStateManager.restartServices();
+
 		} else if (key.equals("pref_realhall")) {
 			if (prefs.getBoolean(key, false)) {
 				if (!prefs.getBoolean("pref_runasroot", false)) {
@@ -346,6 +345,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 					mStateManager.restartServices();
 				}
 			}
+
 		} else if (key.equals("pref_proximity")) {
 			if (prefs.getBoolean(key, false)) {
 				if (prefs.getBoolean("pref_realhall", false)) {
@@ -357,12 +357,11 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 					mStateManager.restartServices();
 				}
 			}
+
 		} else if (key.equals("pref_do_notifications")) {
 			doNotifications(getActivity(), prefs.getBoolean(key, false));
-			// if the flash controls are being enabled/disabled the key will be
-			// pref_widget
-		} else if (key.equals("pref_flash_controls")) {
 
+		} else if (key.equals("pref_flash_controls")) {
 			if (prefs.getBoolean("pref_flash_controls_alternative", false)) {
 				Toast.makeText(getActivity(),
 						getString(R.string.alternative_torch_enabled),
@@ -383,10 +382,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 				}
 			}
 
-			// if the flash controls are being enabled/disabled the key will be
-			// pref_widget
 		} else if (key.equals("pref_flash_controls_alternative")) {
-
 			if (prefs.getBoolean("pref_flash_controls", false)) {
 				Toast.makeText(getActivity(),
 						getString(R.string.default_torch_enabled),
@@ -405,13 +401,13 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			}
 
 		} else if (key.equals("pref_realfullscreen")) {
-
 			if (prefs.getBoolean("pref_disable_home", false)) {
 				Toast.makeText(getActivity(),
 						getString(R.string.pref_disable_enabled),
 						Toast.LENGTH_SHORT).show();
 				prefs.edit().putBoolean(key, false).commit();
 			}
+
 		} else if (key.equals("pref_disable_home")) {
 			if (prefs.getBoolean("pref_realfullscreen", false)) {
 				Toast.makeText(getActivity(),
