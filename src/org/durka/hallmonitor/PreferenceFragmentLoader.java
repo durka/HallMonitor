@@ -266,7 +266,9 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 					findPreference("pref_lockmode").setEnabled(false);
 				}
 			} else {
-				findPreference("pref_lockmode").setEnabled(true);
+				if (findPreference("pref_lockmode") != null) {
+					findPreference("pref_lockmode").setEnabled(true);
+				}
 			}
 
 			// if the default screen widget is being enabled/disabled the key
