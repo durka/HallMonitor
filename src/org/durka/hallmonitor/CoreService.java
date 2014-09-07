@@ -420,7 +420,12 @@ public class CoreService extends Service {
 		private void launchBlackScreen(Context ctx) {
 			if (mStateManager.getCoverClosed()) {
 				Log.d(LOG_TAG + ".lBS", "Cover closed.");
-				if (mStateManager.getOsPowerManagement()) {
+				if (mStateManager.getLockMode()) {
+					final DevicePolicyManager dpm = (DevicePolicyManager) ctx
+							.getSystemService(Context.DEVICE_POLICY_SERVICE);
+					Log.d(LOG_TAG + ".lBS", "Lock now.");
+					dpm.lockNow();
+				} else if (mStateManager.getOsPowerManagement()) {
 					Log.d(LOG_TAG + ".lBS", "OS must manage screen off.");
 				} else if (mStateManager.getSystemApp()) {
 					PowerManager pm = (PowerManager) ctx
@@ -431,11 +436,6 @@ public class CoreService extends Service {
 					} else {
 						Log.d(LOG_TAG + ".lBS", "Screen already off.");
 					}
-				} else if (mStateManager.getLockMode()) {
-					final DevicePolicyManager dpm = (DevicePolicyManager) ctx
-							.getSystemService(Context.DEVICE_POLICY_SERVICE);
-					Log.d(LOG_TAG + ".lBS", "Lock now.");
-					dpm.lockNow();
 				}
 			} else {
 				Log.d(LOG_TAG + ".lBS", "Cover open???.");

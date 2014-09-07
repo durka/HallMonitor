@@ -106,7 +106,7 @@ public class CoreStateManager {
 		}
 
 		// Lock mode
-		if (!systemApp || preference_all.getBoolean("pref_lock_mode", false)) {
+		if (preference_all.getBoolean("pref_lock_mode", false)) {
 			lockMode = true;
 		} else {
 			lockMode = false;
