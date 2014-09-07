@@ -271,6 +271,14 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 				}
 			}
 
+		} else if (key.equals("pref_lockmode")) {
+			if (prefs.getBoolean(key, false)) {
+				mStateManager.setLockMode(true);
+				mStateManager.requestAdmin();
+			} else {
+				mStateManager.setLockMode(false);
+
+			}
 			// if the default screen widget is being enabled/disabled the key
 			// will be pref_default_widget
 		} else if (key.equals("pref_default_widget")) {

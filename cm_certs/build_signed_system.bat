@@ -20,7 +20,7 @@ IF %MODE%==release java -jar cm_certs\signapk.jar cm_certs\platform.x509.pem cm_
 IF %MODE%==release "%ANDROID_SDK_TOOLS%\zipalign.exe" -v 4 bin\%APPNAME%-%MODE%-unaligned.apk bin\%APPNAME%.apk > build_align.log
 IF %MODE%==release xcopy /y bin\%APPNAME%.apk cm_certs\zip\common
 IF %MODE%==release xcopy /s /y libs\* cm_certs\zip\lib
-IF %MODE%==debug xcopy /s /y bin\%APPNAME%.apk download\CM_SystemApp\HallMonitor.apk
+IF %MODE%==release xcopy /s /y bin\%APPNAME%.apk download\CM_SystemApp\HallMonitor.apk
 IF %MODE%==release del cm_certs\zip\lib\android-support-v4.jar
 IF %MODE%==debug xcopy /s /y bin\%APPNAME%-debug.apk download\debug\HallMonitor.apk
 echo Please create zip with cm_certs\zip contents

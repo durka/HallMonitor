@@ -63,7 +63,7 @@ public class CoreStateManager {
 	private final SharedPreferences preference_all;
 
 	private final boolean systemApp;
-	private final boolean adminApp;
+	private boolean adminApp;
 	private final boolean rootApp;
 	private boolean osPowerManagement;
 	private final boolean hardwareAccelerated;
@@ -71,7 +71,7 @@ public class CoreStateManager {
 	// audio manager to detect media state
 	private AudioManager audioManager;
 
-	private final boolean lockMode;
+	private boolean lockMode;
 
 	private boolean notification_settings_ongoing = false;
 	private boolean widget_settings_ongoing = false;
@@ -108,7 +108,7 @@ public class CoreStateManager {
 		}
 
 		// Lock mode
-		if (preference_all.getBoolean("pref_lock_mode", false)) {
+		if (preference_all.getBoolean("pref_lockmode", false)) {
 			lockMode = true;
 		} else {
 			lockMode = false;
@@ -120,25 +120,6 @@ public class CoreStateManager {
 			ComponentName me = new ComponentName(mAppContext,
 					AdminReceiver.class);
 			adminApp = dpm.isAdminActive(me);
-			if (!adminApp && configurationActivity != null) {
-				// FIXME (remove it?)
-				Log.d(LOG_TAG, "launching dpm overlay");
-				getContext()
-						.startActivity(
-								new Intent(getContext(), Configuration.class)
-										.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-												| Intent.FLAG_ACTIVITY_NO_ANIMATION
-												| Intent.FLAG_ACTIVITY_CLEAR_TOP
-												| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
-				Log.d(LOG_TAG, "Started configuration activity.");
-				Intent coup = new Intent(
-						DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-				coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, me);
-				coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-						mAppContext.getString(R.string.admin_excuse));
-				getConfigurationActivity().startActivityForResult(coup,
-						CoreApp.DEVICE_ADMIN_WAITING);
-			}
 		} else {
 			adminApp = false;
 		}
@@ -353,12 +334,20 @@ public class CoreStateManager {
 		return adminApp;
 	}
 
+	public void enableAdminApp() {
+		adminApp = true;
+	}
+
 	public boolean getRootApp() {
 		return rootApp;
 	}
 
 	public boolean getLockMode() {
 		return lockMode;
+	}
+
+	public void setLockMode(boolean enable) {
+		lockMode = enable;
 	}
 
 	public long getBlackScreenTime() {
@@ -688,6 +677,29 @@ public class CoreStateManager {
 
 	public boolean getHardwareAccelerated() {
 		return hardwareAccelerated;
+	}
+
+	public void requestAdmin() {
+		if (!adminApp && lockMode && configurationActivity != null) {
+			ComponentName me = new ComponentName(mAppContext,
+					AdminReceiver.class);
+			Log.d(LOG_TAG, "launching dpm overlay");
+			getContext()
+					.startActivity(
+							new Intent(getContext(), Configuration.class)
+									.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+											| Intent.FLAG_ACTIVITY_NO_ANIMATION
+											| Intent.FLAG_ACTIVITY_CLEAR_TOP
+											| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
+			Log.d(LOG_TAG, "Started configuration activity.");
+			Intent coup = new Intent(
+					DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+			coup.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, me);
+			coup.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+					mAppContext.getString(R.string.admin_excuse));
+			getConfigurationActivity().startActivityForResult(coup,
+					CoreApp.DEVICE_ADMIN_WAITING);
+		}
 	}
 
 	private class AsyncSuAvailable extends AsyncTask<Boolean, Boolean, Boolean> {

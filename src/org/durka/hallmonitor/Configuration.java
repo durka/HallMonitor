@@ -66,6 +66,8 @@ public class Configuration extends PreferenceActivity {
 		if (mStateManager.getDefaultActivityRunning()) {
 			mStateManager.closeDefaultActivity();
 		}
+
+		mStateManager.requestAdmin();
 	}
 
 	@Override
@@ -180,6 +182,7 @@ public class Configuration extends PreferenceActivity {
 		// call back for admin access request
 		case CoreApp.DEVICE_ADMIN_WAITING:
 			if (result == Activity.RESULT_OK) {
+				mStateManager.enableAdminApp();
 				// we asked to be an admin and the user clicked Activate
 				// (the intent receiver takes care of showing a toast)
 				// go ahead and start the service
