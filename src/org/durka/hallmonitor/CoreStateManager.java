@@ -118,12 +118,9 @@ public class CoreStateManager {
 			ComponentName me = new ComponentName(mAppContext,
 					AdminReceiver.class);
 			adminApp = dpm.isAdminActive(me);
-			if (!adminApp) {
+			if (!adminApp && configurationActivity != null) {
 				// FIXME (remove it?)
 				Log.d(LOG_TAG, "launching dpm overlay");
-				// kick off the widget picker, the call back will be picked up
-				// in
-				setWidgetSettingsOngoing(true);
 				getContext()
 						.startActivity(
 								new Intent(getContext(), Configuration.class)

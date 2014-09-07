@@ -88,8 +88,10 @@ public class HMAppWidgetManager {
 		pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		pickIntent.putExtra(CoreApp.EXTRA_APPWIDGET_TYPE, widgetType);
 
-		mStateManager.getConfigurationActivity().startActivityForResult(
-				pickIntent, CoreApp.REQUEST_PICK_APPWIDGET);
+		if (mStateManager.getConfigurationActivity() != null) {
+			mStateManager.getConfigurationActivity().startActivityForResult(
+					pickIntent, CoreApp.REQUEST_PICK_APPWIDGET);
+		}
 	}
 
 	/**
@@ -139,8 +141,11 @@ public class HMAppWidgetManager {
 			intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 			intent.putExtra(CoreApp.EXTRA_APPWIDGET_TYPE, widgetType);
 
-			mStateManager.getConfigurationActivity().startActivityForResult(
-					intent, CoreApp.REQUEST_CONFIGURE_APPWIDGET);
+			if (mStateManager.getConfigurationActivity() != null) {
+				mStateManager.getConfigurationActivity()
+						.startActivityForResult(intent,
+								CoreApp.REQUEST_CONFIGURE_APPWIDGET);
+			}
 		} else {
 
 			Log.d(LOG_TAG + ".configureWidget",
