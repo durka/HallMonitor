@@ -590,6 +590,8 @@ public class DefaultActivity extends Activity {
 		// Keep screen on during display
 		this.getWindow().addFlags(
 				WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+		this.getWindow().addFlags(
+				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		// Display before lock screen
 		this.getWindow().addFlags(
