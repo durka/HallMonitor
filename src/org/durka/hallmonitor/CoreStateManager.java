@@ -403,6 +403,7 @@ public class CoreStateManager {
 	public void unregisterCoreReceiver() {
 		if (mCoreReceiver != null) {
 			mAppContext.unregisterReceiver(mCoreReceiver);
+			mCoreReceiver = null;
 		}
 	}
 
