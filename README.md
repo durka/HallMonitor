@@ -33,11 +33,24 @@ If you test this on something other than the above (including another carrier's 
 
 Installation / Usage
 --------------------
+
+STABLE RELEASE
 The current release is: [0.4.1](https://github.com/durka/HallMonitor/tree/0.4.1) (see [changelog](https://github.com/durka/HallMonitor/blob/0.4.1/CHANGELOG.md))
 
 - The easiest way to install the latest stable version is through [F-Droid](https://f-droid.org/), an "app store" for open source. Here is [Hall Monitor's entry](https://f-droid.org/repository/browse/?fdid=org.durka.hallmonitor).
 - You can download [`bin/HallMonitor-debug.apk`](https://github.com/durka/HallMonitor/blob/0.4.1/bin/HallMonitor-debug.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
 - You can clone the repository at a tagged version and build from source. It's configured as an Eclipse project, but I haven't even used any external libraries yet, so it "should" be "simple" to build with another system such as Android Studio or ant.
+
+CUSTOM RELEASE (manusfreedom)
+- You can download [`HallMonitor.apk`](https://github.com/manusfreedom/HallMonitor/tree/master/download/debug) install it on your phone assuming you have sideloading turned on.
+But becareful, you can not install it over a system version!!!
+- Install in your ROM as system app, use HallMonitor.zip in Recovery mode (https://github.com/manusfreedom/HallMonitor/tree/master/download/CM_SystemApp)
+- To update system app, you must copy to time as root the HallMonitor.apk in /system/app
+
+To switch from one to another you need to completly clean your system (to remove trace of signature):
+- Uninstall HallMonitor
+- Delete all folders&files named : org.durka.hallmonitor in your /data folder.
+	
 
 Limitations / Known Issues
 --------------------------
