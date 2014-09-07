@@ -183,7 +183,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 		if (!mStateManager.getSystemApp()
 				&& !prefs.getBoolean("pref_os_power_management", false)) {
-			prefs.edit().putBoolean("pref_lockmode", true);
+			prefs.edit().putBoolean("pref_lockmode", true).commit();
 			if (findPreference("pref_lockmode") != null) {
 				findPreference("pref_lockmode").setEnabled(false);
 			}
@@ -243,7 +243,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			if (prefs.getBoolean(key, false)) {
 				if (!mStateManager.getSystemApp()
 						&& !prefs.getBoolean("pref_os_power_management", false)) {
-					prefs.edit().putBoolean("pref_lockmode", true);
+					prefs.edit().putBoolean("pref_lockmode", true).commit();
 					if (findPreference("pref_lockmode") != null) {
 						findPreference("pref_lockmode").setEnabled(false);
 					}
@@ -259,6 +259,15 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 		} else if (key.equals("pref_os_power_management")) {
 			mStateManager.setOsPowerManagement(prefs.getBoolean(key, false));
+			if (!mStateManager.getSystemApp()
+					&& !prefs.getBoolean("pref_os_power_management", false)) {
+				prefs.edit().putBoolean("pref_lockmode", true).commit();
+				if (findPreference("pref_lockmode") != null) {
+					findPreference("pref_lockmode").setEnabled(false);
+				}
+			} else {
+				findPreference("pref_lockmode").setEnabled(true);
+			}
 
 			// if the default screen widget is being enabled/disabled the key
 			// will be pref_default_widget
