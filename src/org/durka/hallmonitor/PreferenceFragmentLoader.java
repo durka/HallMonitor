@@ -433,6 +433,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			((CoreApp) getActivity().getApplicationContext()).restart();
 			Intent mStartActivity = new Intent(getActivity()
 					.getApplicationContext(), Configuration.class);
+			mStartActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+					| Intent.FLAG_ACTIVITY_NO_ANIMATION
+					| Intent.FLAG_ACTIVITY_CLEAR_TOP
+					| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 			int mPendingIntentId = 123456;
 			PendingIntent mPendingIntent = PendingIntent.getActivity(
 					getActivity().getApplicationContext(), mPendingIntentId,

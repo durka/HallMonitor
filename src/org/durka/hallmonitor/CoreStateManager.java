@@ -413,13 +413,16 @@ public class CoreStateManager {
 	}
 
 	public boolean setConfigurationActivity(Configuration activityInstance) {
-		// if (configurationActivity == null) {
-		configurationActivity = activityInstance;
-		return true;
-		// } else {
-		// Log.w(LOG_TAG, "Warning already configuration activity set!!!!");
-		// return false;
-		// }
+		if (configurationActivity == null) {
+			configurationActivity = activityInstance;
+			return true;
+		} else if (activityInstance == null) {
+			configurationActivity = null;
+			return true;
+		} else {
+			Log.w(LOG_TAG, "Warning already configuration activity set!!!!");
+			return false;
+		}
 	}
 
 	public DefaultActivity getDefaultActivity() {
