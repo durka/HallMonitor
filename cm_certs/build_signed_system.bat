@@ -1,11 +1,3 @@
-echo To compile for system app set AndroidManifest.xml like that (note coreApp and android:sharedUserId):
-echo <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-echo package="org.durka.hallmonitor"
-echo coreApp="true"
-echo android:sharedUserId="android.uid.system"
-echo android:installLocation="internalOnly"
-echo android:versionCode="18"
-
 REM keytool-importkeypair -k cm_platform.keystore -p android -pk8 platform.pk8 -cert platform.x509.pem -alias platform
 SET JAVA_HOME=c:\Progra~1\Java\jdk1.8
 SET PATH=%PATH%;c:\Progra~1\Java\jdk1.8\Bin;C:\Dev\android-sdk-windows\tools;C:\Dev\android-sdk-windows\platform-tools;C:\Dev\apache-ant\bin
@@ -13,7 +5,7 @@ SET ANDROID_SDK_TOOLS=C:\Dev\android-sdk-windows\build-tools\19.1.0
 SET ANDROID_HOME=C:\\Dev\\android-sdk-windows
 SET ANDROID_NDK=C:\Dev\android-ndk
 SET APPNAME=HallMonitor
-SET MODE=release
+SET MODE=debug
 ant clean
 del bin\%APPNAME%-%MODE%-unaligned.apk
 del bin\%APPNAME%.apk

@@ -74,3 +74,16 @@ This should serve as quick guide if you're trying to find your way around my cod
     - ViewCoverService: the most important file, really, outside of [`Functions.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/Functions.java), is [`ViewCoverService.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/ViewCoverService.java). This is the service that runs all the time and receives events from the proximity sensor, so it can check the hall effect sensor state, and react to view cover events.
 
 Happy hacking! File an issue or contact me at [android@alexburka.com](mailto:android@alexburka.com) with any questions.
+
+Compiling
+---------
+
+To compile for OS system (install using recovery):
+- In AndroidManifest.xml, just after package="org.durka.hallmonitor add (section manifest):
+coreApp="true"
+android:sharedUserId="android.uid.system"
+- In build_signed_system.bat change MODE to release:
+SET MODE=release
+- In build_signed_system.sh change MODE to release:
+MODE=release
+

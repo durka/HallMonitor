@@ -16,8 +16,6 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.durka.hallmonitor"
-          coreApp="true"
-          android:sharedUserId="android.uid.system"
           android:installLocation="internalOnly"
           android:versionCode="18"
           android:versionName="2.0.0">
