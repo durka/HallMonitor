@@ -35,6 +35,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -149,7 +150,8 @@ public class CoreStateManager {
 		}
 
 		if (preference_all.getBoolean("pref_runasroot", false)) {
-			rootApp = Shell.SU.available();
+			AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
+			rootApp = localSuAvailable.execute();
 		} else {
 			rootApp = false;
 		}
@@ -679,5 +681,12 @@ public class CoreStateManager {
 
 	public boolean getHardwareAccelerated() {
 		return hardwareAccelerated;
+	}
+
+	private class AsyncSuAvailable extends AsyncTask<Boolean, Boolean, Boolean> {
+		@Override
+		protected Boolean doInBackground(Boolean... params) {
+			return Shell.SU.available();
+		}
 	}
 }
