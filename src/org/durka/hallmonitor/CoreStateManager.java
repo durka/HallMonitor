@@ -18,6 +18,7 @@ package org.durka.hallmonitor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -151,7 +152,13 @@ public class CoreStateManager {
 
 		if (preference_all.getBoolean("pref_runasroot", false)) {
 			AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
-			rootApp = localSuAvailable.execute();
+			boolean rootAppResult = false;
+			try {
+				rootAppResult = localSuAvailable.execute().get();
+			} catch (InterruptedException e) {
+			} catch (ExecutionException e) {
+			}
+			rootApp = rootAppResult;
 		} else {
 			rootApp = false;
 		}
