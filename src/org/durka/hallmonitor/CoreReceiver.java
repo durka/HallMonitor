@@ -87,7 +87,9 @@ public class CoreReceiver extends BroadcastReceiver {
 
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 			Log.d(LOG_TAG + ".screen", "Screen off event received.");
-			mStateManager.freeDevice();
+			if (!mStateManager.getDefaultActivityStarting()) {
+				mStateManager.freeDevice();
+			}
 
 		} else if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
 			Intent batteryDAIntent = new Intent(

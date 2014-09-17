@@ -87,6 +87,7 @@ public class CoreStateManager {
 	private boolean forceCheckCoverState = false;
 
 	private boolean mainLaunched = false;
+	private boolean defaultActivityStarting = false;
 
 	private CoreReceiver mCoreReceiver;
 
@@ -235,6 +236,14 @@ public class CoreStateManager {
 
 	public void setAlarmFiring(boolean enable) {
 		alarm_firing = enable;
+	}
+
+	public boolean getDefaultActivityStarting() {
+		return defaultActivityStarting;
+	}
+
+	public void setDefaultActivityStarting(boolean enable) {
+		defaultActivityStarting = enable;
 	}
 
 	public boolean getTorchOn() {

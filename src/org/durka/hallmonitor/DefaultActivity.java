@@ -575,6 +575,8 @@ public class DefaultActivity extends Activity {
 
 		mStateManager = ((CoreApp) getApplicationContext()).getStateManager();
 
+		mStateManager.setDefaultActivityStarting(true);
+
 		// pass a reference back to the state manager
 		if (!mStateManager.setDefaultActivity(this)) {
 			Log.w(LOG_TAG + daId, "Warning already default activity set!!!!");
@@ -661,6 +663,8 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onStart() {
 		Log.d(LOG_TAG + daId + ".onStart", "starting");
+		mStateManager.setDefaultActivityStarting(true);
+
 		super.onStart();
 
 		if (NotificationService.that != null) {
@@ -674,6 +678,7 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onResume() {
 		Log.d(LOG_TAG + daId + ".onResume", "resuming");
+		mStateManager.setDefaultActivityStarting(true);
 
 		// Keep screen on during display
 		getWindow().addFlags(
@@ -711,11 +716,13 @@ public class DefaultActivity extends Activity {
 		mainView.requestFocus();
 
 		super.onResume();
+		mStateManager.setDefaultActivityStarting(false);
 	}
 
 	@Override
 	protected void onPause() {
 		Log.d(LOG_TAG + daId + ".onPause", "pausing");
+		mStateManager.setDefaultActivityStarting(false);
 
 		Intent mIntent = new Intent(this, CoreService.class);
 		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
@@ -729,6 +736,8 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onStop() {
 		Log.d(LOG_TAG + daId + ".onStop", "stopping");
+		mStateManager.setDefaultActivityStarting(false);
+
 		if (mStateManager.getPreference().getBoolean("pref_keyguard", true)) {
 			getWindow().addFlags(
 					WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -750,6 +759,8 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		Log.d(LOG_TAG + daId + ".onDestroy", "detroying");
+		mStateManager.setDefaultActivityStarting(false);
+
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(
 				mMessageReceiver);
 		mStateManager.setDefaultActivity(null);
@@ -793,8 +804,12 @@ public class DefaultActivity extends Activity {
 					break;
 				}
 			} else if (action.equals(CoreApp.DA_ACTION_FINISH)) {
-				Log.d(LOG_TAG + daId, "Call to finish");
-				finish();
+				if (mStateManager.getDefaultActivityStarting()) {
+					Log.w(LOG_TAG + daId, "Starting, could not finish");
+				} else {
+					Log.d(LOG_TAG + daId, "Call to finish");
+					finish();
+				}
 			}
 		}
 	};
