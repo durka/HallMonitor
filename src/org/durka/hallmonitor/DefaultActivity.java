@@ -53,11 +53,13 @@ public class DefaultActivity extends Activity {
 
 	private CoreStateManager mStateManager;
 
+	private String daId;
+
 	/**
 	 * Refresh the display taking account of device and application state
 	 */
 	private void refreshDisplay() {
-		Log.d(LOG_TAG + ".rD", "refreshing");
+		Log.d(LOG_TAG + daId + ".rD", "refreshing");
 
 		// if the alarm is firing then show the alarm controls, otherwise
 		if (mStateManager.getAlarmFiring()) {
@@ -169,7 +171,7 @@ public class DefaultActivity extends Activity {
 	private void setupNotifications() {
 		StatusBarNotification[] notifs = NotificationService.that
 				.getActiveNotifications();
-		Log.d(LOG_TAG + ".sN", Integer.toString(notifs.length)
+		Log.d(LOG_TAG + daId + ".sN", Integer.toString(notifs.length)
 				+ " notifications");
 		GridView grid = (GridView) findViewById(R.id.default_icon_container);
 		grid.setNumColumns(notifs.length);
@@ -201,10 +203,10 @@ public class DefaultActivity extends Activity {
 					new SwipeTouchListener(this,
 							SwipeTouchListener.ActionMode.MODE_CALL));
 			findViewById(R.id.swipe_call).setVisibility(View.VISIBLE);
-			Log.d(LOG_TAG + ".sCI", "Call Swipe");
+			Log.d(LOG_TAG + daId + ".sCI", "Call Swipe");
 		} else {
 			findViewById(R.id.swipe_call).setVisibility(View.GONE);
-			Log.d(LOG_TAG + ".sCI", "Call Button");
+			Log.d(LOG_TAG + daId + ".sCI", "Call Button");
 		}
 	}
 
@@ -215,10 +217,10 @@ public class DefaultActivity extends Activity {
 					new SwipeTouchListener(this,
 							SwipeTouchListener.ActionMode.MODE_ALARM));
 			findViewById(R.id.swipe_alarm).setVisibility(View.VISIBLE);
-			Log.d(LOG_TAG + ".sAI", "Alarm Swipe");
+			Log.d(LOG_TAG + daId + ".sAI", "Alarm Swipe");
 		} else {
 			findViewById(R.id.swipe_alarm).setVisibility(View.GONE);
-			Log.d(LOG_TAG + ".sAI", "Alarm Button");
+			Log.d(LOG_TAG + daId + ".sAI", "Alarm Button");
 		}
 	}
 
@@ -236,10 +238,10 @@ public class DefaultActivity extends Activity {
 							SwipeTouchListener.ActionMode.MODE_TORCH));
 			findViewById(R.id.swipe_torch).setVisibility(View.VISIBLE);
 
-			Log.d(LOG_TAG + ".sTI", "Torch Swipe");
+			Log.d(LOG_TAG + daId + ".sTI", "Torch Swipe");
 		} else {
 			findViewById(R.id.swipe_torch).setVisibility(View.GONE);
-			Log.d(LOG_TAG + ".sTI", "Torch Button");
+			Log.d(LOG_TAG + daId + ".sTI", "Torch Button");
 		}
 
 		// Camera swipe/button
@@ -253,10 +255,10 @@ public class DefaultActivity extends Activity {
 							SwipeTouchListener.ActionMode.MODE_CAMERA));
 			findViewById(R.id.swipe_camera).setVisibility(View.VISIBLE);
 
-			Log.d(LOG_TAG + ".sTI", "Camera Swipe");
+			Log.d(LOG_TAG + daId + ".sTI", "Camera Swipe");
 		} else {
 			findViewById(R.id.swipe_camera).setVisibility(View.GONE);
-			Log.d(LOG_TAG + ".sTI", "Camera Button");
+			Log.d(LOG_TAG + daId + ".sTI", "Camera Button");
 		}
 	}
 
@@ -376,7 +378,7 @@ public class DefaultActivity extends Activity {
 			// detach it
 			ViewGroup parent = (ViewGroup) hostView.getParent();
 			if (parent != null) {
-				Log.d(LOG_TAG + ".sWC",
+				Log.d(LOG_TAG + daId + ".sWC",
 						"hostView had already been added to a group, detaching it.");
 				parent.removeView(hostView);
 			}
@@ -402,7 +404,7 @@ public class DefaultActivity extends Activity {
 
 	/** Called when the user touches the snooze button */
 	public void sendSnooze(View view) {
-		Log.d(LOG_TAG, "Alarm button: snooze alarm");
+		Log.d(LOG_TAG + daId, "Alarm button: snooze alarm");
 		Intent alarmSnooze = new Intent(this, CoreService.class);
 		alarmSnooze.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_SNOOZE_ALARM);
@@ -411,7 +413,7 @@ public class DefaultActivity extends Activity {
 
 	/** Called when the user touches the dismiss button */
 	public void sendDismiss(View view) {
-		Log.d(LOG_TAG, "Alarm button: dismiss... I am wake");
+		Log.d(LOG_TAG + daId, "Alarm button: dismiss... I am wake");
 		Intent alarmDismiss = new Intent(this, CoreService.class);
 		alarmDismiss.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_SNOOZE_ALARM);
@@ -444,13 +446,13 @@ public class DefaultActivity extends Activity {
 
 	// from
 	// http://stackoverflow.com/questions/3712112/search-contact-by-phone-number
-	private static String getContactName(Context ctx, String number) {
+	private String getContactName(Context ctx, String number) {
 
 		if (number.equals("")) {
 			return "";
 		}
 
-		Log.d(LOG_TAG + ".contact", "looking up " + number + "...");
+		Log.d(LOG_TAG + daId + ".contact", "looking up " + number + "...");
 
 		Uri uri = Uri.withAppendedPath(
 				ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
@@ -476,7 +478,7 @@ public class DefaultActivity extends Activity {
 			}
 		}
 
-		Log.d(LOG_TAG + ".contact", "...result is " + name);
+		Log.d(LOG_TAG + daId + ".contact", "...result is " + name);
 		return name;
 	}
 
@@ -501,17 +503,17 @@ public class DefaultActivity extends Activity {
 		mStateManager.setBlackScreenTime(0);
 		findViewById(R.id.default_camera).setVisibility(View.VISIBLE);
 		displayCamera();
-		Log.d("LOG_TAG.hm-cam", "started camera");
+		Log.d("LOG_TAG + daId.hm-cam", "started camera");
 	}
 
 	public void captureCamera(View view) {
-		Log.d("LOG_TAG.hm-cam", "say cheese");
+		Log.d("LOG_TAG + daId.hm-cam", "say cheese");
 		((CameraPreview) findViewById(R.id.default_camera)).capture();
 	}
 
 	public void stopCamera(View view) {
 		stopCamera();
-		Log.d("LOG_TAG.hm-cam", "closed camera");
+		Log.d("LOG_TAG + daId.hm-cam", "closed camera");
 	}
 
 	public void stopCamera() {
@@ -564,12 +566,14 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d(LOG_TAG + ".onCreate", "creating");
+		daId = CoreStateManager.createID();
+		Log.d(LOG_TAG + daId + ".onCreate", "creating");
 
 		mStateManager = ((CoreApp) getApplicationContext()).getStateManager();
 
 		// pass a reference back to the state manager
 		if (!mStateManager.setDefaultActivity(this)) {
+			Log.w(LOG_TAG + daId, "Warning already default activity set!!!!");
 			this.finish();
 			return;
 		}
@@ -644,17 +648,17 @@ public class DefaultActivity extends Activity {
 		super.onWindowFocusChanged(hasWindowFocus);
 
 		if (hasWindowFocus) {
-			Log.d(LOG_TAG + ".onWFC", "Get focus.");
+			Log.d(LOG_TAG + daId + ".onWFC", "Get focus.");
 		} else {
-			Log.d(LOG_TAG + ".onWFC", "No focus.");
+			Log.d(LOG_TAG + daId + ".onWFC", "No focus.");
 		}
 
 	}
 
 	@Override
 	protected void onStart() {
+		Log.d(LOG_TAG + daId + ".onStart", "starting");
 		super.onStart();
-		Log.d(LOG_TAG + ".onStart", "starting");
 
 		if (NotificationService.that != null) {
 			// notification listener service is running, show the current
@@ -666,7 +670,7 @@ public class DefaultActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		Log.d(LOG_TAG + ".onPause", "On pause called.");
+		Log.d(LOG_TAG + daId + ".onPause", "On pause called.");
 
 		Intent mIntent = new Intent(this, CoreService.class);
 		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
@@ -680,7 +684,7 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d(LOG_TAG + ".onResume", "On resume called.");
+		Log.d(LOG_TAG + daId + ".onResume", "resuming");
 
 		refreshDisplay();
 
@@ -715,7 +719,7 @@ public class DefaultActivity extends Activity {
 
 	@Override
 	protected void onStop() {
-		Log.d(LOG_TAG + ".onStop", "stopping");
+		Log.d(LOG_TAG + daId + ".onStop", "stopping");
 		if (mStateManager.getPreference().getBoolean("pref_keyguard", true)) {
 			getWindow().addFlags(
 					WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -736,7 +740,7 @@ public class DefaultActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		Log.d(LOG_TAG + ".onDestroy", "detroying");
+		Log.d(LOG_TAG + daId + ".onDestroy", "detroying");
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(
 				mMessageReceiver);
 		mStateManager.setDefaultActivity(null);
