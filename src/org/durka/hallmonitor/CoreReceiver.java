@@ -73,20 +73,20 @@ public class CoreReceiver extends BroadcastReceiver {
 			Log.d(LOG_TAG + ".screen", "Screen on event received.");
 
 			if (mStateManager.getCoverClosed()) {
-				Log.d(LOG_TAG + ".onReceive.screen",
+				Log.d(LOG_TAG + ".screen",
 						"Cover is closed, display Default Activity.");
 				Intent mIntent = new Intent(context, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_LAUNCH_ACTIVITY);
 				context.startService(mIntent);
 			} else {
-				Log.d(LOG_TAG + ".onReceive.screen",
-						"Cover is open, free everything.");
+				Log.d(LOG_TAG + ".screen", "Cover is open, free everything.");
 
 				mStateManager.freeDevice();
 			}
 
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+			Log.d(LOG_TAG + ".screen", "Screen off event received.");
 			mStateManager.freeDevice();
 
 		} else if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
@@ -115,13 +115,13 @@ public class CoreReceiver extends BroadcastReceiver {
 
 		} else if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
 
-			Log.d(LOG_TAG + ".onReceive.alarm", "Alarm on event received.");
+			Log.d(LOG_TAG + ".alarm", "Alarm on event received.");
 
 			// only take action if alarm controls are enabled
 			if (mStateManager.getPreference().getBoolean("pref_alarm_controls",
 					false)) {
 
-				Log.d(LOG_TAG + ".onReceive.alarm",
+				Log.d(LOG_TAG + ".alarm",
 						"Alarm controls are enabled, taking action.");
 				mStateManager.setAlarmFiring(true);
 
@@ -130,8 +130,7 @@ public class CoreReceiver extends BroadcastReceiver {
 						CoreApp.CS_TASK_INCOMMING_ALARM);
 				context.startService(mIntent);
 			} else {
-				Log.d(LOG_TAG + ".onReceive.alarm",
-						"Alarm controls are not enabled.");
+				Log.d(LOG_TAG + ".alarm", "Alarm controls are not enabled.");
 			}
 
 		} else if (intent.getAction().equals(ALARM_DONE_ACTION)) {
@@ -190,10 +189,9 @@ public class CoreReceiver extends BroadcastReceiver {
 			}
 		} else if (intent.getAction().equals(mStateManager.getActionCover())) {
 			int state = intent.getIntExtra(EXTRA_LID_STATE, LID_ABSENT);
-			Log.d(LOG_TAG + ".onReceive.cover", "cover state changed to "
-					+ state);
+			Log.d(LOG_TAG + ".cover", "cover state changed to " + state);
 			if (state == LID_CLOSED) {
-				Log.d(LOG_TAG + ".onReceive.cover",
+				Log.d(LOG_TAG + ".cover",
 						"Cover is close, enable Default Activity.");
 				mStateManager.setCoverClosed(true);
 				Intent mIntent = new Intent(context, CoreService.class);
@@ -201,7 +199,7 @@ public class CoreReceiver extends BroadcastReceiver {
 						CoreApp.CS_TASK_LAUNCH_ACTIVITY);
 				context.startService(mIntent);
 			} else if (state == LID_OPEN) {
-				Log.d(LOG_TAG + ".onReceive.cover",
+				Log.d(LOG_TAG + ".cover",
 						"Cover is open, stopping Default Activity.");
 				mStateManager.setCoverClosed(false);
 				mStateManager.freeDevice();
@@ -214,7 +212,7 @@ public class CoreReceiver extends BroadcastReceiver {
 		} else if (intent.getAction().equals(TORCH_STATE_CHANGED)) {
 			if (mStateManager.getPreference().getBoolean("pref_flash_controls",
 					false)) {
-				Log.d(LOG_TAG + ".onReceive.torch", "torch state changed");
+				Log.d(LOG_TAG + ".torch", "torch state changed");
 				Intent mIntent = new Intent(context, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_TORCH_STATE);
@@ -225,13 +223,12 @@ public class CoreReceiver extends BroadcastReceiver {
 				}
 				context.startService(mIntent);
 			} else {
-				Log.d(LOG_TAG + ".onReceive.torch",
-						"torch controls are not enabled.");
+				Log.d(LOG_TAG + ".torch", "torch controls are not enabled.");
 			}
 
 		} else if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
 			int state = intent.getExtras().getInt("state");
-			Log.d(LOG_TAG + ".onReceive.headset", "headset is "
+			Log.d(LOG_TAG + ".headset", "headset is "
 					+ (state == 0 ? "gone" : "here") + "!");
 			Intent mIntent = new Intent(context, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
@@ -239,7 +236,7 @@ public class CoreReceiver extends BroadcastReceiver {
 			context.startService(mIntent);
 
 		} else if (intent.getAction().equals("org.durka.hallmonitor.debug")) {
-			Log.d(LOG_TAG + ".onReceive", "received debug intent");
+			Log.d(LOG_TAG + "", "received debug intent");
 			// test intent to show/hide a notification
 			boolean showhide = false;
 			switch (intent.getIntExtra("notif", 0)) {
