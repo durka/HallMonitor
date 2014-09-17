@@ -36,6 +36,7 @@ public class Configuration extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d(LOG_TAG + ".onCreate", "creating");
 
 		mStateManager = ((CoreApp) getApplicationContext()).getStateManager();
 
@@ -59,9 +60,16 @@ public class Configuration extends PreferenceActivity {
 	}
 
 	@Override
+	protected void onStart() {
+		Log.d(LOG_TAG + ".onStart", "starting");
+
+		super.onStart();
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d(LOG_TAG + ".onResume", "On resume called.");
+		Log.d(LOG_TAG + ".onResume", "resuming");
 
 		if (mStateManager.getDefaultActivityRunning()) {
 			mStateManager.closeDefaultActivity();
@@ -72,13 +80,22 @@ public class Configuration extends PreferenceActivity {
 
 	@Override
 	protected void onPause() {
-		// finish();
+		Log.d(LOG_TAG + ".onPause", "pausing");
+
 		super.onPause();
+	}
+
+	@Override
+	protected void onStop() {
+		Log.d(LOG_TAG + ".onStop", "stopping");
+
+		super.onStop();
 	}
 
 	@Override
 	protected void onDestroy() {
 		Log.d(LOG_TAG + ".onDestroy", "detroying");
+
 		mStateManager.setConfigurationActivity(null);
 		super.onDestroy();
 	}
