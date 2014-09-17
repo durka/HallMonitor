@@ -70,6 +70,7 @@ public class CoreApp extends Application {
 	public static final String DA_ACTION_NOTIFICATION_REFRESH = "org.durka.hallmonitor.DA_NOTIFICATION_REFRESH";
 	public static final String DA_ACTION_BATTERY_REFRESH = "org.durka.hallmonitor.DA_BATTERY_REFRESH";
 	public static final String DA_ACTION_START_CAMERA = "org.durka.hallmonitor.DA_START_CAMERA";
+	public static final String DA_ACTION_FINISH = "org.durka.hallmonitor.DA_FINISH";
 	public static final String DA_EXTRA_STATE = "state";
 	public static final int DA_EXTRA_STATE_NORMAL = 0;
 	public static final int DA_EXTRA_STATE_ALARM = 1;

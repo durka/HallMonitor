@@ -465,9 +465,10 @@ public class CoreStateManager {
 	}
 
 	public void closeDefaultActivity() {
-		if (defaultActivity != null) {
-			defaultActivity.finish();
-		}
+		Log.w(LOG_TAG, "Send close default activity");
+		Intent torchDAIntent = new Intent(CoreApp.DA_ACTION_FINISH);
+		LocalBroadcastManager.getInstance(mAppContext).sendBroadcast(
+				torchDAIntent);
 	}
 
 	public void closeConfigurationActivity() {
@@ -477,6 +478,7 @@ public class CoreStateManager {
 	}
 
 	public void closeAllActivity() {
+		Log.w(LOG_TAG, "Try close all activity");
 		closeDefaultActivity();
 		closeConfigurationActivity();
 	}

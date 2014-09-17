@@ -636,6 +636,7 @@ public class DefaultActivity extends Activity {
 
 		IntentFilter mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction(CoreApp.DA_ACTION_BATTERY_REFRESH);
+		mIntentFilter.addAction(CoreApp.DA_ACTION_FINISH);
 		mIntentFilter.addAction(CoreApp.DA_ACTION_NOTIFICATION_REFRESH);
 		mIntentFilter.addAction(CoreApp.DA_ACTION_START_CAMERA);
 		mIntentFilter.addAction(CoreApp.DA_ACTION_STATE_CHANGED);
@@ -708,7 +709,7 @@ public class DefaultActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		Log.d(LOG_TAG + daId + ".onPause", "On pause called.");
+		Log.d(LOG_TAG + daId + ".onPause", "pausing");
 
 		Intent mIntent = new Intent(this, CoreService.class);
 		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
@@ -785,6 +786,9 @@ public class DefaultActivity extends Activity {
 					displayCamera();
 					break;
 				}
+			} else if (action.equals(CoreApp.DA_ACTION_FINISH)) {
+				Log.d(LOG_TAG + daId, "Call to finish");
+				finish();
 			}
 		}
 	};
