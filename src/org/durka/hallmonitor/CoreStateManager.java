@@ -111,9 +111,9 @@ public class CoreStateManager {
 		// Enable access to sleep mode
 		systemApp = (mAppContext.getApplicationInfo().flags & (ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0;
 		if (systemApp) {
-			Log.d(LOG_TAG, "We are a system app.");
+			Log.d(LOG_TAG + ".init", "We are a system app.");
 		} else {
-			Log.d(LOG_TAG, "We are not a system app.");
+			Log.d(LOG_TAG + ".init", "We are not a system app.");
 		}
 
 		// Lock mode
@@ -134,9 +134,9 @@ public class CoreStateManager {
 		}
 
 		if (adminApp) {
-			Log.d(LOG_TAG + ".lBS", "We are an admin.");
+			Log.d(LOG_TAG + ".init", "We are an admin.");
 		} else {
-			Log.d(LOG_TAG + ".lBS",
+			Log.d(LOG_TAG + ".init",
 					"We are not an admin so cannot do anything.");
 		}
 
@@ -153,9 +153,9 @@ public class CoreStateManager {
 			rootApp = false;
 		}
 		if (rootApp) {
-			Log.d(LOG_TAG + ".lBS", "We are root.");
+			Log.d(LOG_TAG + ".init", "We are root.");
 		} else {
-			Log.d(LOG_TAG + ".lBS", "We are not root.");
+			Log.d(LOG_TAG + ".init", "We are not root.");
 		}
 		osPowerManagement = preference_all.getBoolean(
 				"pref_os_power_management", false);
