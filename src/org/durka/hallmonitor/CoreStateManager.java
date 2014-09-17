@@ -95,6 +95,8 @@ public class CoreStateManager {
 
 	private String actionCover = CoreReceiver.ACTION_LID_STATE_CHANGED;
 
+	private static AtomicInteger idCounter = new AtomicInteger();
+
 	CoreStateManager(Context context) {
 		mAppContext = context;
 
