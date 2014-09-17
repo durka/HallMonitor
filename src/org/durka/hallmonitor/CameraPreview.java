@@ -102,47 +102,11 @@ public class CameraPreview extends SurfaceView implements
 	};
 
 	public CameraPreview(Context ctx) {
-		super(ctx);
-
-		Log.d(LOG_TAG, "context constructor");
-
-		mStateManager = ((CoreApp) ctx.getApplicationContext())
-				.getStateManager();
-
-		mHolder = getHolder();
-		mHolder.addCallback(this);
-
-		mOrientationListener = new OrientationEventListener(ctx,
-				SensorManager.SENSOR_DELAY_NORMAL) {
-
-			@Override
-			public void onOrientationChanged(int angle) {
-				mOrientation = ((int) (Math.round(angle / 90.0) * 90) + 90) % 360;
-			}
-
-		};
+		this(ctx, null, 0);
 	}
 
 	public CameraPreview(Context ctx, AttributeSet as) {
-		super(ctx, as);
-
-		Log.d(LOG_TAG, "context/attributeset constructor");
-
-		mStateManager = ((CoreApp) ctx.getApplicationContext())
-				.getStateManager();
-
-		mHolder = getHolder();
-		mHolder.addCallback(this);
-
-		mOrientationListener = new OrientationEventListener(ctx,
-				SensorManager.SENSOR_DELAY_NORMAL) {
-
-			@Override
-			public void onOrientationChanged(int angle) {
-				mOrientation = ((int) (Math.round(angle / 90.0) * 90) + 90) % 360;
-			}
-
-		};
+		this(ctx, as, 0);
 	}
 
 	public CameraPreview(Context ctx, AttributeSet as, int defStyle) {
