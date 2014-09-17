@@ -675,6 +675,12 @@ public class DefaultActivity extends Activity {
 	protected void onResume() {
 		Log.d(LOG_TAG + daId + ".onResume", "resuming");
 
+		// Keep screen on during display
+		getWindow().addFlags(
+				WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
 		refreshDisplay();
 
 		/*
