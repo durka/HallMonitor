@@ -47,6 +47,7 @@ public class DefaultActivity extends Activity {
 	private ImageButton torchButton = null;
 	private ImageButton cameraButton = null;
 	private ViewGroup defaultWidgetAreaVG = null;
+	private View mainView = null;
 
 	// manager for home key hack
 	private HomeKeyLocker homeKeyLocker;
@@ -193,6 +194,9 @@ public class DefaultActivity extends Activity {
 		} else {
 			setContentView(R.layout.activity_default);
 		}
+		mainView = findViewById(R.id.default_main);
+		mainView.setFocusable(true);
+		mainView.setFocusableInTouchMode(true);
 	}
 
 	private void setCallInput() {
@@ -695,6 +699,9 @@ public class DefaultActivity extends Activity {
 				CoreApp.CS_TASK_CHANGE_TOUCHCOVER);
 		touchCoverIntent.putExtra(CoreApp.CS_EXTRA_STATE, true);
 		startService(touchCoverIntent);
+
+		mainView.requestLayout();
+		mainView.requestFocus();
 
 		super.onResume();
 	}
