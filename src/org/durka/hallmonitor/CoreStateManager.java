@@ -49,7 +49,8 @@ import eu.chainfire.libsuperuser.Shell;
 public class CoreStateManager {
 	private final String LOG_TAG = "Hall.CSM";
 
-	private final Context mAppContext;
+	private static Context mAppContext;
+	private static boolean init = false;
 
 	// All we need for alternative torch
 	private Camera camera;
@@ -223,9 +224,14 @@ public class CoreStateManager {
 		torch_on = stateIntent != null
 				&& stateIntent.getIntExtra("state", 0) != 0;
 
+		init = true;
 	}
 
-	public Context getContext() {
+	public static boolean getInitialized() {
+		return init;
+	}
+
+	public static Context getContext() {
 		return mAppContext;
 	}
 

@@ -19,6 +19,8 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -28,6 +30,7 @@ public class CoreReceiver extends BroadcastReceiver {
 	private final String LOG_TAG = "Hall.CR";
 
 	private CoreStateManager mStateManager;
+	private Context localContext;
 
 	// Action fired when cover state change
 	public static final String ACTION_LID_STATE_CHANGED = "android.intent.action.LID_STATE_CHANGED";
@@ -55,30 +58,41 @@ public class CoreReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		mStateManager = ((CoreApp) context.getApplicationContext())
-				.getStateManager();
+		if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)
+				|| intent.getAction().equals(QUICKBOOT_POWERON)
+				|| intent.getAction().equals(HTC_QUICKBOOT_POWERON)) {
+			Log.d(LOG_TAG + ".boot", "Boot called.");
+			SharedPreferences prefs = PreferenceManager
+					.getDefaultSharedPreferences(context);
+			if (prefs.getBoolean("pref_enabled", false)) {
+				Intent mIntent = new Intent(context, CoreService.class);
+				mIntent.putExtra(CoreApp.CS_EXTRA_TASK, CoreApp.CS_TASK_BOOT);
+				context.startService(mIntent);
+			}
+		}
+
+		if (CoreStateManager.getInitialized()) {
+			localContext = CoreStateManager.getContext();
+			mStateManager = ((CoreApp) localContext).getStateManager();
+		} else {
+			return;
+		}
 
 		if (!mStateManager.getPreference().getBoolean("pref_enabled", false)) {
 			return;
 		}
 
-		if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)
-				|| intent.getAction().equals(QUICKBOOT_POWERON)
-				|| intent.getAction().equals(HTC_QUICKBOOT_POWERON)) {
-			Log.d(LOG_TAG + ".boot", "Boot called.");
-			mStateManager.startServices();
-
-		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+		if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
 
 			Log.d(LOG_TAG + ".screen", "Screen on event received.");
 
 			if (mStateManager.getCoverClosed()) {
 				Log.d(LOG_TAG + ".screen",
 						"Cover is closed, display Default Activity.");
-				Intent mIntent = new Intent(context, CoreService.class);
+				Intent mIntent = new Intent(localContext, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_LAUNCH_ACTIVITY);
-				context.startService(mIntent);
+				localContext.startService(mIntent);
 			} else {
 				Log.d(LOG_TAG + ".screen", "Cover is open, free everything.");
 
@@ -95,25 +109,25 @@ public class CoreReceiver extends BroadcastReceiver {
 			Intent batteryDAIntent = new Intent(
 					CoreApp.DA_ACTION_BATTERY_REFRESH);
 			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
-					.getInstance(context);
+					.getInstance(localContext);
 			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
 
-			Intent mIntent = new Intent(context, CoreService.class);
+			Intent mIntent = new Intent(localContext, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_WAKEUP_DEVICE);
-			context.startService(mIntent);
+			localContext.startService(mIntent);
 
 		} else if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
 			Intent batteryDAIntent = new Intent(
 					CoreApp.DA_ACTION_BATTERY_REFRESH);
 			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
-					.getInstance(context);
+					.getInstance(localContext);
 			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
 
-			Intent mIntent = new Intent(context, CoreService.class);
+			Intent mIntent = new Intent(localContext, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_WAKEUP_DEVICE);
-			context.startService(mIntent);
+			localContext.startService(mIntent);
 
 		} else if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
 
@@ -127,10 +141,10 @@ public class CoreReceiver extends BroadcastReceiver {
 						"Alarm controls are enabled, taking action.");
 				mStateManager.setAlarmFiring(true);
 
-				Intent mIntent = new Intent(context, CoreService.class);
+				Intent mIntent = new Intent(localContext, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_INCOMMING_ALARM);
-				context.startService(mIntent);
+				localContext.startService(mIntent);
 			} else {
 				Log.d(LOG_TAG + ".alarm", "Alarm controls are not enabled.");
 			}
@@ -147,10 +161,10 @@ public class CoreReceiver extends BroadcastReceiver {
 				mStateManager.setAlarmFiring(false);
 
 				if (mStateManager.getCoverClosed()) {
-					Intent mIntent = new Intent(context, CoreService.class);
+					Intent mIntent = new Intent(localContext, CoreService.class);
 					mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 							CoreApp.CS_TASK_LAUNCH_ACTIVITY);
-					context.startService(mIntent);
+					localContext.startService(mIntent);
 				}
 			}
 		} else if (intent.getAction().equals(
@@ -168,21 +182,19 @@ public class CoreReceiver extends BroadcastReceiver {
 							.setCallFrom(intent
 									.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER));
 					Log.d(LOG_TAG, "call from " + mStateManager.getCallFrom());
-					mIntent = new Intent(mStateManager.getContext(),
-							CoreService.class);
+					mIntent = new Intent(localContext, CoreService.class);
 					mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 							CoreApp.CS_TASK_INCOMMING_CALL);
-					mStateManager.getContext().startService(mIntent);
+					localContext.startService(mIntent);
 				} else if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 					Intent mIntent;
 					mStateManager.setPhoneRinging(false);
 					Log.d(LOG_TAG, "call is over, cleaning up");
 					if (mStateManager.getCoverClosed()) {
-						mIntent = new Intent(mStateManager.getContext(),
-								CoreService.class);
+						mIntent = new Intent(localContext, CoreService.class);
 						mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 								CoreApp.CS_TASK_LAUNCH_ACTIVITY);
-						mStateManager.getContext().startService(mIntent);
+						localContext.startService(mIntent);
 					}
 				} else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
 				}
@@ -196,26 +208,26 @@ public class CoreReceiver extends BroadcastReceiver {
 				Log.d(LOG_TAG + ".cover",
 						"Cover is close, enable Default Activity.");
 				mStateManager.setCoverClosed(true);
-				Intent mIntent = new Intent(context, CoreService.class);
+				Intent mIntent = new Intent(localContext, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_LAUNCH_ACTIVITY);
-				context.startService(mIntent);
+				localContext.startService(mIntent);
 			} else if (state == LID_OPEN) {
 				Log.d(LOG_TAG + ".cover",
 						"Cover is open, stopping Default Activity.");
 				mStateManager.setCoverClosed(false);
 				mStateManager.freeDevice();
-				Intent mIntent = new Intent(context, CoreService.class);
+				Intent mIntent = new Intent(localContext, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_WAKEUP_DEVICE);
-				context.startService(mIntent);
+				localContext.startService(mIntent);
 			}
 
 		} else if (intent.getAction().equals(TORCH_STATE_CHANGED)) {
 			if (mStateManager.getPreference().getBoolean("pref_flash_controls",
 					false)) {
 				Log.d(LOG_TAG + ".torch", "torch state changed");
-				Intent mIntent = new Intent(context, CoreService.class);
+				Intent mIntent = new Intent(localContext, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_TORCH_STATE);
 				if (intent.getIntExtra("state", 0) != 0) {
@@ -223,7 +235,7 @@ public class CoreReceiver extends BroadcastReceiver {
 				} else {
 					mIntent.putExtra(CoreApp.CS_EXTRA_STATE, false);
 				}
-				context.startService(mIntent);
+				localContext.startService(mIntent);
 			} else {
 				Log.d(LOG_TAG + ".torch", "torch controls are not enabled.");
 			}
@@ -232,10 +244,10 @@ public class CoreReceiver extends BroadcastReceiver {
 			int state = intent.getExtras().getInt("state");
 			Log.d(LOG_TAG + ".headset", "headset is "
 					+ (state == 0 ? "gone" : "here") + "!");
-			Intent mIntent = new Intent(context, CoreService.class);
+			Intent mIntent = new Intent(localContext, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_HEADSET_PLUG);
-			context.startService(mIntent);
+			localContext.startService(mIntent);
 
 		} else if (intent.getAction().equals("org.durka.hallmonitor.debug")) {
 			Log.d(LOG_TAG + "", "received debug intent");
@@ -251,15 +263,15 @@ public class CoreReceiver extends BroadcastReceiver {
 			}
 			if (showhide) {
 				Notification.Builder mBuilder = new Notification.Builder(
-						context).setSmallIcon(R.drawable.ic_launcher)
+						localContext).setSmallIcon(R.drawable.ic_launcher)
 						.setContentTitle("Hall Monitor")
 						.setContentText("Debugging is fun!");
 
-				NotificationManager mNotificationManager = (NotificationManager) context
+				NotificationManager mNotificationManager = (NotificationManager) localContext
 						.getSystemService(Context.NOTIFICATION_SERVICE);
 				mNotificationManager.notify(42, mBuilder.build());
 			} else {
-				NotificationManager mNotificationManager = (NotificationManager) context
+				NotificationManager mNotificationManager = (NotificationManager) localContext
 						.getSystemService(Context.NOTIFICATION_SERVICE);
 				mNotificationManager.cancel(42);
 			}

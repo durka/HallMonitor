@@ -92,12 +92,16 @@ public class CoreService extends Service {
 			ServiceThread svcThread = new ServiceThread(msg);
 			svcThread.start();
 		}
+
 		if (intent != null && intent.hasExtra(CoreApp.CS_EXTRA_TASK)) {
 			int requestedTaskMode = intent
 					.getIntExtra(CoreApp.CS_EXTRA_TASK, 0);
 			if (requestedTaskMode > 0) {
 				int msgArg2 = 0;
 				switch (requestedTaskMode) {
+				case CoreApp.CS_TASK_BOOT:
+					mStateManager.startServices();
+					return START_STICKY;
 				case CoreApp.CS_TASK_CHANGE_TOUCHCOVER:
 					boolean sendTouchCoverRequest = intent.getBooleanExtra(
 							CoreApp.CS_EXTRA_STATE, false);
