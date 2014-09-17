@@ -38,6 +38,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.media.AudioManager;
 import android.os.AsyncTask;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -95,10 +96,14 @@ public class CoreStateManager {
 
 	private String actionCover = CoreReceiver.ACTION_LID_STATE_CHANGED;
 
+	private final PowerManager mPowerManager;
+
 	private static AtomicInteger idCounter = new AtomicInteger();
 
 	CoreStateManager(Context context) {
 		mAppContext = context;
+		mPowerManager = (PowerManager) mAppContext
+				.getSystemService(Context.POWER_SERVICE);
 
 		preference_all = PreferenceManager
 				.getDefaultSharedPreferences(mAppContext);
@@ -305,6 +310,10 @@ public class CoreStateManager {
 
 	public boolean getOsPowerManagement() {
 		return osPowerManagement;
+	}
+
+	public PowerManager getPowerManager() {
+		return mPowerManager;
 	}
 
 	public void setOsPowerManagement(boolean enable) {

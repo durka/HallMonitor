@@ -428,11 +428,10 @@ public class CoreService extends Service {
 				} else if (mStateManager.getOsPowerManagement()) {
 					Log.d(LOG_TAG + ".lBS", "OS must manage screen off.");
 				} else if (mStateManager.getSystemApp()) {
-					PowerManager pm = (PowerManager) ctx
-							.getSystemService(Context.POWER_SERVICE);
-					if (pm.isScreenOn()) {
+					if (mStateManager.getPowerManager().isScreenOn()) {
 						Log.d(LOG_TAG + ".lBS", "Go to sleep now.");
-						pm.goToSleep(SystemClock.uptimeMillis());
+						mStateManager.getPowerManager().goToSleep(
+								SystemClock.uptimeMillis());
 					} else {
 						Log.d(LOG_TAG + ".lBS", "Screen already off.");
 					}
@@ -444,14 +443,11 @@ public class CoreService extends Service {
 		}
 
 		private void wakeUpDevice(Context ctx) {
-			if (mStateManager.getOsPowerManagement()) {
-
-			} else if (mStateManager.getSystemApp()) {
-				PowerManager pm = (PowerManager) ctx
-						.getSystemService(Context.POWER_SERVICE);
-				if (!pm.isScreenOn()) {
+			if (mStateManager.getSystemApp()) {
+				if (!mStateManager.getPowerManager().isScreenOn()) {
 					Log.d(LOG_TAG + ".wUD", "WakeUp device.");
-					pm.wakeUp(SystemClock.uptimeMillis());
+					mStateManager.getPowerManager().wakeUp(
+							SystemClock.uptimeMillis());
 				} else {
 					Log.d(LOG_TAG + ".wUD", "Screen already on.");
 				}
@@ -459,13 +455,12 @@ public class CoreService extends Service {
 				// FIXME Would be nice to remove the deprecated FULL_WAKE_LOCK
 				// if possible
 				Log.d(LOG_TAG + ".wUD", "aww why can't I hit snooze");
-				PowerManager pm = (PowerManager) ctx
-						.getSystemService(Context.POWER_SERVICE);
 				@SuppressWarnings("deprecation")
-				PowerManager.WakeLock wl = pm.newWakeLock(
-						PowerManager.FULL_WAKE_LOCK
-								| PowerManager.ACQUIRE_CAUSES_WAKEUP,
-						ctx.getString(R.string.app_name));
+				PowerManager.WakeLock wl = mStateManager.getPowerManager()
+						.newWakeLock(
+								PowerManager.FULL_WAKE_LOCK
+										| PowerManager.ACQUIRE_CAUSES_WAKEUP,
+								ctx.getString(R.string.app_name));
 				wl.acquire();
 				wl.release();
 			}
