@@ -666,13 +666,6 @@ public class DefaultActivity extends Activity {
 		mStateManager.setDefaultActivityStarting(true);
 
 		super.onStart();
-
-		if (NotificationService.that != null) {
-			// notification listener service is running, show the current
-			// notifications
-			setupNotifications();
-			refreshNotifications();
-		}
 	}
 
 	@Override
@@ -685,6 +678,12 @@ public class DefaultActivity extends Activity {
 				WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
 						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+		if (NotificationService.that != null) {
+			// notification listener service is running, show the current
+			// notifications
+			setupNotifications();
+			refreshNotifications();
+		}
 
 		refreshDisplay();
 
