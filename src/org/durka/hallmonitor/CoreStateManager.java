@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -707,5 +708,9 @@ public class CoreStateManager {
 		protected Boolean doInBackground(Boolean... params) {
 			return Shell.SU.available();
 		}
+	}
+
+	public static String createID() {
+		return String.valueOf(idCounter.getAndIncrement());
 	}
 }
