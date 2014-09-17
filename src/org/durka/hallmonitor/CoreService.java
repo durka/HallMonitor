@@ -99,9 +99,6 @@ public class CoreService extends Service {
 			if (requestedTaskMode > 0) {
 				int msgArg2 = 0;
 				switch (requestedTaskMode) {
-				case CoreApp.CS_TASK_BOOT:
-					mStateManager.startServices();
-					return START_STICKY;
 				case CoreApp.CS_TASK_CHANGE_TOUCHCOVER:
 					boolean sendTouchCoverRequest = intent.getBooleanExtra(
 							CoreApp.CS_EXTRA_STATE, false);
@@ -373,6 +370,7 @@ public class CoreService extends Service {
 			case CoreApp.CS_TASK_MAINLAUNCH:
 				if (!mStateManager.getMainLaunched()) {
 					mStateManager.setMainLaunched(true);
+					mStateManager.startServices();
 					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
 							+ ": Mainthread launched");
 					while (mStateManager.getMainLaunched()

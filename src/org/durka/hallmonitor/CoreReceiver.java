@@ -66,7 +66,6 @@ public class CoreReceiver extends BroadcastReceiver {
 					.getDefaultSharedPreferences(context);
 			if (prefs.getBoolean("pref_enabled", false)) {
 				Intent mIntent = new Intent(context, CoreService.class);
-				mIntent.putExtra(CoreApp.CS_EXTRA_TASK, CoreApp.CS_TASK_BOOT);
 				context.startService(mIntent);
 			}
 		}

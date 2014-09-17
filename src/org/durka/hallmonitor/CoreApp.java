@@ -59,7 +59,6 @@ public class CoreApp extends Application {
 	public static final int CS_TASK_DISMISS_ALARM = 15;
 	public static final int CS_TASK_HANGUP_CALL = 16;
 	public static final int CS_TASK_PICKUP_CALL = 17;
-	public static final int CS_TASK_BOOT = 99;
 
 	public static final String PACKAGE_PHONE_APP = "com.android.dialer";
 	public static final String PACKAGE_ALARM_APP = "com.android.deskclock";
