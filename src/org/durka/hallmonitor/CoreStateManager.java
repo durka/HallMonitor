@@ -484,8 +484,8 @@ public class CoreStateManager {
 	}
 
 	public void freeDevice() {
-		closeAllActivity();
 		setBlackScreenTime(0);
+		closeAllActivity();
 	}
 
 	public AudioManager getAudioManager() {
