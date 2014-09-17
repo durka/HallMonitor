@@ -530,11 +530,11 @@ public class DefaultActivity extends Activity {
 		if (mStateManager.getPreference().getBoolean("pref_realfullscreen",
 				false)) {
 			// Remove notification bar
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().clearFlags(
 					WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			// Remove navigation bar
-			View decorView = this.getWindow().getDecorView();
+			View decorView = getWindow().getDecorView();
 			decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 					| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 					| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -574,35 +574,33 @@ public class DefaultActivity extends Activity {
 		// pass a reference back to the state manager
 		if (!mStateManager.setDefaultActivity(this)) {
 			Log.w(LOG_TAG + daId, "Warning already default activity set!!!!");
-			this.finish();
+			finish();
 			return;
 		}
 
 		mStateManager.closeConfigurationActivity();
 
 		// Remove title bar
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		// Display in fullscreen
 		setRealFullscreen();
 
 		if (mStateManager.getHardwareAccelerated()) {
-			this.getWindow().addFlags(
+			getWindow().addFlags(
 					WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
 		}
+
 		// Keep screen on during display
-		this.getWindow().addFlags(
-				WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-		this.getWindow().addFlags(
-				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		// Display before lock screen
-		this.getWindow().addFlags(
-				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
 		// Enable multitouch started outside view
-		this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SPLIT_TOUCH);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SPLIT_TOUCH);
 
 		setMainLayout();
 
@@ -669,21 +667,7 @@ public class DefaultActivity extends Activity {
 	}
 
 	@Override
-	protected void onPause() {
-		Log.d(LOG_TAG + daId + ".onPause", "On pause called.");
-
-		Intent mIntent = new Intent(this, CoreService.class);
-		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-				CoreApp.CS_TASK_CHANGE_TOUCHCOVER);
-		startService(mIntent);
-		homeKeyLocker.unlock();
-
-		super.onPause();
-	}
-
-	@Override
 	protected void onResume() {
-		super.onResume();
 		Log.d(LOG_TAG + daId + ".onResume", "resuming");
 
 		refreshDisplay();
@@ -705,16 +689,27 @@ public class DefaultActivity extends Activity {
 		if (mStateManager.getPreference().getBoolean("pref_disable_home", true)) {
 			homeKeyLocker.lock(this);
 		}
+
+		Intent touchCoverIntent = new Intent(this, CoreService.class);
+		touchCoverIntent.putExtra(CoreApp.CS_EXTRA_TASK,
+				CoreApp.CS_TASK_CHANGE_TOUCHCOVER);
+		touchCoverIntent.putExtra(CoreApp.CS_EXTRA_STATE, true);
+		startService(touchCoverIntent);
+
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		Log.d(LOG_TAG + daId + ".onPause", "On pause called.");
+
 		Intent mIntent = new Intent(this, CoreService.class);
 		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_CHANGE_TOUCHCOVER);
-		mIntent.putExtra(CoreApp.CS_EXTRA_STATE, true);
 		startService(mIntent);
+		homeKeyLocker.unlock();
 
-		// if(findViewById(R.id.default_content).isInTouchMode())
-		// findViewById(R.id.default_content).requestFocusFromTouch();
-		// else
-		// findViewById(R.id.default_content).requestFocus();
+		super.onPause();
 	}
 
 	@Override
