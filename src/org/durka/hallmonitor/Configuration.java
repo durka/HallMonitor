@@ -46,8 +46,6 @@ public class Configuration extends PreferenceActivity {
 			return;
 		}
 
-		mStateManager.closeDefaultActivity();
-
 		PreferenceFragment preferenceFragment = new PreferenceFragmentLoader();
 
 		// add extra resource to load xml
