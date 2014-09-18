@@ -67,7 +67,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			Log.d(LOG_TAG + ".oC", "loading preferences from " + resourceName
 					+ ".xml");
 
-			Context context = mStateManager.getContext();
+			Context context = CoreStateManager.getContext();
 
 			// debug
 			mDebug = getPreferenceManager().getSharedPreferences().getBoolean(
@@ -430,7 +430,6 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 		if (key.equals("pref_force_restart")) {
 			prefs.edit().putBoolean(key, false).commit();
-			((CoreApp) getActivity().getApplicationContext()).restart();
 			Intent mStartActivity = new Intent(getActivity()
 					.getApplicationContext(), Configuration.class);
 			mStartActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
@@ -446,6 +445,7 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 							Context.ALARM_SERVICE);
 			mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
 					mPendingIntent);
+			((CoreApp) mStateManager.getContext()).restart();
 			System.exit(0);
 		} else {
 		}
