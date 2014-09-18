@@ -175,7 +175,7 @@ public class CoreStateManager {
 		if (preference_all.getBoolean("pref_default_widget", false)) {
 			int widgetId = preference_all.getInt("default_widget_id", -1);
 			if (widgetId == -1) {
-				register_widget("default");
+				registerWidget("default");
 			} else {
 				createWidget("default");
 			}
@@ -187,7 +187,7 @@ public class CoreStateManager {
 
 			int widgetId = preference_all.getInt("media_widget_id", -1);
 			if (widgetId == -1) {
-				register_widget("media");
+				registerWidget("media");
 			} else {
 				createWidget("media");
 			}
@@ -531,7 +531,7 @@ public class CoreStateManager {
 	 *            The type of widget (e.g. 'default', 'media', 'notification'
 	 *            etc.)
 	 */
-	public void register_widget(String widgetType) {
+	public void registerWidget(String widgetType) {
 
 		Log.d(LOG_TAG + ".register_widget", "Register widget called for type: "
 				+ widgetType);
@@ -553,7 +553,7 @@ public class CoreStateManager {
 	 *            The type of widget (e.g. 'default', 'media', 'notification'
 	 *            etc.)
 	 */
-	public void unregister_widget(String widgetType) {
+	public void unregisterWidget(String widgetType) {
 
 		Log.d(LOG_TAG + ".unregister_widget",
 				"unregister widget called for type: " + widgetType);

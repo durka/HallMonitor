@@ -285,11 +285,11 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			if (prefs.getBoolean(key, false)
 					&& !mStateManager.hmAppWidgetManager
 							.doesWidgetExist("default")) {
-				mStateManager.register_widget("default");
+				mStateManager.registerWidget("default");
 			} else if (!prefs.getBoolean(key, false)
 					&& mStateManager.hmAppWidgetManager
 							.doesWidgetExist("default")) {
-				mStateManager.unregister_widget("default");
+				mStateManager.unregisterWidget("default");
 			}
 
 			// if the media screen widget is being enabled/disabled the key will
@@ -298,11 +298,11 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			if (prefs.getBoolean(key, false)
 					&& !mStateManager.hmAppWidgetManager
 							.doesWidgetExist("media")) {
-				mStateManager.register_widget("media");
+				mStateManager.registerWidget("media");
 			} else if (!prefs.getBoolean(key, false)
 					&& mStateManager.hmAppWidgetManager
 							.doesWidgetExist("media")) {
-				mStateManager.unregister_widget("media");
+				mStateManager.unregisterWidget("media");
 			}
 
 		} else if (key.equals("pref_runasroot")) {
