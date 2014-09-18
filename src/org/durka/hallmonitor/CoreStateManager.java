@@ -177,14 +177,7 @@ public class CoreStateManager {
 			if (widgetId == -1) {
 				register_widget("default");
 			} else {
-				if (!hmAppWidgetManager.doesWidgetExist("default")) {
-					Log.d(LOG_TAG + ".sWC", "creating default widget with id="
-							+ widgetId);
-					Intent data = new Intent();
-					data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
-
-					hmAppWidgetManager.createWidget("default", data);
-				}
+				createWidget("default");
 			}
 		}
 
@@ -196,14 +189,7 @@ public class CoreStateManager {
 			if (widgetId == -1) {
 				register_widget("media");
 			} else {
-				if (!hmAppWidgetManager.doesWidgetExist("media")) {
-					Log.d(LOG_TAG + ".sWC", "creating media widget with id="
-							+ widgetId);
-					Intent data = new Intent();
-					data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
-
-					hmAppWidgetManager.createWidget("media", data);
-				}
+				createWidget("media");
 			}
 		}
 
@@ -516,6 +502,20 @@ public class CoreStateManager {
 
 	public AudioManager getAudioManager() {
 		return audioManager;
+	}
+
+	public void createWidget(String widgetType) {
+		int widgetId = preference_all.getInt(widgetType + "_widget_id", -1);
+		if (widgetId != -1) {
+			if (!hmAppWidgetManager.doesWidgetExist(widgetType)) {
+				Log.d(LOG_TAG + ".sWC", "creating " + widgetType
+						+ " widget with id=" + widgetId);
+				Intent data = new Intent();
+				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+
+				hmAppWidgetManager.createWidget(widgetType, data);
+			}
+		}
 	}
 
 	/**

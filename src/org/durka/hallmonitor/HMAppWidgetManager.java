@@ -34,14 +34,14 @@ public class HMAppWidgetManager {
 		mStateManager = stateManager;
 
 		if (mAppWidgetManager == null) {
-			mAppWidgetManager = AppWidgetManager.getInstance(mStateManager
+			mAppWidgetManager = AppWidgetManager.getInstance(CoreStateManager
 					.getContext());
 		} else {
 			Log.e(LOG_TAG + ".constructor",
 					"HMAppWidgetManager uneable to get AppWidgetManager.");
 		}
 		if (mAppWidgetHost == null) {
-			mAppWidgetHost = new AppWidgetHost(mStateManager.getContext(),
+			mAppWidgetHost = new AppWidgetHost(CoreStateManager.getContext(),
 					R.id.APPWIDGET_HOST_ID);
 		} else {
 			Log.e(LOG_TAG + ".constructor",
@@ -75,8 +75,8 @@ public class HMAppWidgetManager {
 
 		// kick off the widget picker, the call back will be picked up in
 		mStateManager.setWidgetSettingsOngoing(true);
-		mStateManager.getContext().startActivity(
-				new Intent(mStateManager.getContext(), Configuration.class)
+		CoreStateManager.getContext().startActivity(
+				new Intent(CoreStateManager.getContext(), Configuration.class)
 						.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 								| Intent.FLAG_ACTIVITY_NO_ANIMATION
 								| Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -122,10 +122,10 @@ public class HMAppWidgetManager {
 					"This is a configurable widget, launching widget configuraiton activity");
 
 			mStateManager.setWidgetSettingsOngoing(true);
-			mStateManager
+			CoreStateManager
 					.getContext()
 					.startActivity(
-							new Intent(mStateManager.getContext(),
+							new Intent(CoreStateManager.getContext(),
 									Configuration.class)
 									.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 											| Intent.FLAG_ACTIVITY_NO_ANIMATION
@@ -200,7 +200,7 @@ public class HMAppWidgetManager {
 
 		// create the hostView - this effectively represents our widget
 		AppWidgetHostView hostView = mAppWidgetHost.createView(
-				mStateManager.getContext(), appWidgetId, appWidgetInfo);
+				CoreStateManager.getContext(), appWidgetId, appWidgetInfo);
 		// bizarrely this is needed to tell the hostView about the widget
 		// (again!)
 		hostView.setAppWidget(appWidgetId, appWidgetInfo);
@@ -248,8 +248,9 @@ public class HMAppWidgetManager {
 				"Unregister widget called with type: " + widgetType);
 
 		widgetsMap.remove(widgetType);
-
-		// FIXME: Should we also clear up the app widget ID?
+		mStateManager.getPreference().edit()
+				.putBoolean("pref_" + widgetType + "_widget", false)
+				.putInt(widgetType + "_widget_id", -1).commit();
 	}
 
 	/**
@@ -263,6 +264,8 @@ public class HMAppWidgetManager {
 
 		Log.d(LOG_TAG + ".getAppWidgetHostViewByType",
 				"Widget requested of type: " + widgetType);
+
+		mStateManager.createWidget(widgetType);
 
 		AppWidgetHostView thisWidget = widgetsMap.get(widgetType);
 		;
