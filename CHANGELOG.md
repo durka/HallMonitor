@@ -1,3 +1,29 @@
+- 2.0.1 beta
+	Major code update:
+		- Clean/Reorder preferences
+		- Clean/Reorder strings
+		- Better preferences change/update
+		- Better preferences dependencies
+	
+	Feature:
+		- Support 3 modes:
+			Lock (require admin)
+			OS PowerManagement
+			Internal/HallMonitor Powermanagement (require system app)
+
+	Fixes:
+		- Fix CM 11 LID support
+		- Fix widget crash (to confirm)
+
+	Know issues:
+		- Alternative layout broken
+
+	Next big beta (2.1.0):
+		- Gesture/Swipe over the cover (bottom&left to: open camera, hang up call, snooze alarm / bottom right to: toggle torch, pickup call, dismiss alarm / bottom top to: pop-up menu)
+		- Pop-up menu like habeIchVergessen propose (using over cover touch): https://github.com/durka/HallMonitor/issues/18
+		- Network connectivity indicator (WIFI/2G/3G/4G): https://github.com/durka/HallMonitor/issues/24
+		- Add landscape layout to avoid rotate animation & rotate background app
+
 - 2.0.0 beta
 	Major code update:
 		- Rewrite many code to exclude much as possible from UI thread
