@@ -412,7 +412,8 @@ public class CoreStateManager {
 		}
 	}
 
-	public boolean setDefaultActivity(DefaultActivity activityInstance) {
+	public synchronized boolean setDefaultActivity(
+			DefaultActivity activityInstance) {
 		if (defaultActivity == null) {
 			defaultActivity = activityInstance;
 			return true;
@@ -425,7 +426,8 @@ public class CoreStateManager {
 		}
 	}
 
-	public boolean setConfigurationActivity(Configuration activityInstance) {
+	public synchronized boolean setConfigurationActivity(
+			Configuration activityInstance) {
 		if (configurationActivity == null) {
 			configurationActivity = activityInstance;
 			return true;
@@ -438,11 +440,11 @@ public class CoreStateManager {
 		}
 	}
 
-	public DefaultActivity getDefaultActivity() {
+	public synchronized DefaultActivity getDefaultActivity() {
 		return defaultActivity;
 	}
 
-	public Configuration getConfigurationActivity() {
+	public synchronized Configuration getConfigurationActivity() {
 		return configurationActivity;
 	}
 
@@ -478,9 +480,10 @@ public class CoreStateManager {
 
 	public void closeDefaultActivity() {
 		Log.w(LOG_TAG, "Send close default activity");
-		Intent torchDAIntent = new Intent(CoreApp.DA_ACTION_FINISH);
+		setDefaultActivityStarting(false);
+		Intent finishDAIntent = new Intent(CoreApp.DA_ACTION_FINISH);
 		LocalBroadcastManager.getInstance(mAppContext).sendBroadcast(
-				torchDAIntent);
+				finishDAIntent);
 	}
 
 	public void closeConfigurationActivity() {

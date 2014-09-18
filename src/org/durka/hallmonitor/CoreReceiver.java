@@ -88,21 +88,25 @@ public class CoreReceiver extends BroadcastReceiver {
 			if (mStateManager.getCoverClosed()) {
 				Log.d(LOG_TAG + ".screen",
 						"Cover is closed, display Default Activity.");
+				mStateManager.setBlackScreenTime(0);
 				Intent mIntent = new Intent(localContext, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_LAUNCH_ACTIVITY);
 				localContext.startService(mIntent);
 			} else {
-				Log.d(LOG_TAG + ".screen", "Cover is open, free everything.");
-
-				mStateManager.freeDevice();
+				// Log.d(LOG_TAG + ".screen",
+				// "Cover is open, free everything.");
+				// mStateManager.freeDevice();
+				Log.d(LOG_TAG + ".screen", "Cover is open, send to background.");
+				Intent stbDAIntent = new Intent(
+						CoreApp.DA_ACTION_SEND_TO_BACKGROUND);
+				LocalBroadcastManager.getInstance(localContext).sendBroadcast(
+						stbDAIntent);
 			}
 
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 			Log.d(LOG_TAG + ".screen", "Screen off event received.");
-			if (!mStateManager.getDefaultActivityStarting()) {
-				mStateManager.freeDevice();
-			}
+			// mStateManager.freeDevice();
 
 		} else if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
 			Intent batteryDAIntent = new Intent(
@@ -212,10 +216,15 @@ public class CoreReceiver extends BroadcastReceiver {
 						CoreApp.CS_TASK_LAUNCH_ACTIVITY);
 				localContext.startService(mIntent);
 			} else if (state == LID_OPEN) {
-				Log.d(LOG_TAG + ".cover",
-						"Cover is open, stopping Default Activity.");
+				// Log.d(LOG_TAG + ".cover",
+				// "Cover is open, stopping Default Activity.");
 				mStateManager.setCoverClosed(false);
-				mStateManager.freeDevice();
+				// mStateManager.freeDevice();
+				Log.d(LOG_TAG + ".screen", "Cover is open, send to background.");
+				Intent stbDAIntent = new Intent(
+						CoreApp.DA_ACTION_SEND_TO_BACKGROUND);
+				LocalBroadcastManager.getInstance(localContext).sendBroadcast(
+						stbDAIntent);
 				Intent mIntent = new Intent(localContext, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_WAKEUP_DEVICE);

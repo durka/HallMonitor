@@ -427,8 +427,16 @@ public class CoreService extends Service {
 							.getSystemService(Context.DEVICE_POLICY_SERVICE);
 					Log.d(LOG_TAG + ".lBS", "Lock now.");
 					dpm.lockNow();
+					Intent freeScreenDAIntent = new Intent(
+							CoreApp.DA_ACTION_FREE_SCREEN);
+					LocalBroadcastManager.getInstance(ctx).sendBroadcast(
+							freeScreenDAIntent);
 				} else if (mStateManager.getOsPowerManagement()) {
 					Log.d(LOG_TAG + ".lBS", "OS must manage screen off.");
+					Intent freeScreenDAIntent = new Intent(
+							CoreApp.DA_ACTION_FREE_SCREEN);
+					LocalBroadcastManager.getInstance(ctx).sendBroadcast(
+							freeScreenDAIntent);
 				} else if (mStateManager.getSystemApp()) {
 					if (mStateManager.getPowerManager().isScreenOn()) {
 						Log.d(LOG_TAG + ".lBS", "Go to sleep now.");
@@ -441,7 +449,6 @@ public class CoreService extends Service {
 			} else {
 				Log.d(LOG_TAG + ".lBS", "Cover open???.");
 			}
-			mStateManager.closeAllActivity();
 		}
 
 		private void wakeUpDevice(Context ctx) {
@@ -477,19 +484,19 @@ public class CoreService extends Service {
 				mStateManager.setBlackScreenTime(0);
 			}
 
-			if (!mStateManager.getDefaultActivityStarting()) {
-				// bring up the default activity window
-				// we are using the show when locked flag as we'll re-use this
-				// method to show the screen on power button press
-				ctx.startActivity(new Intent(ctx, DefaultActivity.class)
-						.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-								| Intent.FLAG_ACTIVITY_NO_ANIMATION
-								| Intent.FLAG_ACTIVITY_CLEAR_TOP
-								| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
-				Log.d(LOG_TAG + ".bDATF", "Started activity.");
-			} else {
-				Log.d(LOG_TAG + ".bDATF", "Activity already starting.");
-			}
+			// if (!mStateManager.getDefaultActivityStarting()) {
+			// bring up the default activity window
+			// we are using the show when locked flag as we'll re-use this
+			// method to show the screen on power button press
+			ctx.startActivity(new Intent(ctx, DefaultActivity.class)
+					.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+							| Intent.FLAG_ACTIVITY_NO_ANIMATION
+							| Intent.FLAG_ACTIVITY_CLEAR_TOP
+							| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
+			Log.d(LOG_TAG + ".bDATF", "Started activity.");
+			// } else {
+			// Log.d(LOG_TAG + ".bDATF", "Activity already starting.");
+			// }
 
 			if (!noBlackScreen) {
 				// step 2: wait for the delay period and turn the screen off

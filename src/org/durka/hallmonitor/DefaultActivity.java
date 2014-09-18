@@ -55,6 +55,7 @@ public class DefaultActivity extends Activity {
 	private CoreStateManager mStateManager;
 
 	private String daId;
+	private BroadcastReceiver mMessageReceiver;
 
 	/**
 	 * Refresh the display taking account of device and application state
@@ -635,11 +636,77 @@ public class DefaultActivity extends Activity {
 		findViewById(R.id.default_undercover).setOnTouchListener(
 				new SwipeTouchListener(this,
 						SwipeTouchListener.ActionMode.MODE_NOTHINGTRUE));
+		mMessageReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				String action = intent.getAction();
+				if (action.equals(CoreApp.DA_ACTION_TORCH_STATE_CHANGED)) {
+					if (intent.getBooleanExtra(CoreApp.DA_EXTRA_STATE, false)) {
+						torchButton
+								.setImageResource(R.drawable.ic_appwidget_torch_on);
+
+					} else {
+						torchButton
+								.setImageResource(R.drawable.ic_appwidget_torch_off);
+					}
+
+				} else if (action.equals(CoreApp.DA_ACTION_WIDGET_REFRESH)) {
+					setWidgetContent();
+
+				} else if (action.equals(CoreApp.DA_ACTION_BATTERY_REFRESH)) {
+					setBatteryIcon();
+
+				} else if (action
+						.equals(CoreApp.DA_ACTION_NOTIFICATION_REFRESH)) {
+					refreshNotifications();
+
+				} else if (action.equals(CoreApp.DA_ACTION_START_CAMERA)) {
+					startCamera();
+
+				} else if (action.equals(CoreApp.DA_ACTION_STATE_CHANGED)) {
+					switch (intent.getIntExtra(CoreApp.DA_EXTRA_STATE, 0)) {
+					case CoreApp.DA_EXTRA_STATE_NORMAL:
+						displayNormal();
+						break;
+					case CoreApp.DA_EXTRA_STATE_ALARM:
+						displayAlarm();
+						break;
+					case CoreApp.DA_EXTRA_STATE_PHONE:
+						displayPhone();
+						break;
+					case CoreApp.DA_EXTRA_STATE_CAMERA:
+						displayCamera();
+						break;
+					}
+
+				} else if (action.equals(CoreApp.DA_ACTION_SEND_TO_BACKGROUND)) {
+					Log.d(LOG_TAG + daId, "Send to background");
+					moveTaskToBack(true);
+
+				} else if (action.equals(CoreApp.DA_ACTION_FREE_SCREEN)) {
+					Log.d(LOG_TAG + daId, "Call to finish");
+					getWindow()
+							.clearFlags(
+									WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+											| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+				} else if (action.equals(CoreApp.DA_ACTION_FINISH)) {
+					if (mStateManager.getDefaultActivityStarting()) {
+						Log.w(LOG_TAG + daId, "Starting, could not finish");
+					} else {
+						Log.d(LOG_TAG + daId, "Call to finish");
+						finish();
+					}
+				}
+			}
+		};
 
 		IntentFilter mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction(CoreApp.DA_ACTION_BATTERY_REFRESH);
 		mIntentFilter.addAction(CoreApp.DA_ACTION_FINISH);
+		mIntentFilter.addAction(CoreApp.DA_ACTION_FREE_SCREEN);
 		mIntentFilter.addAction(CoreApp.DA_ACTION_NOTIFICATION_REFRESH);
+		mIntentFilter.addAction(CoreApp.DA_ACTION_SEND_TO_BACKGROUND);
 		mIntentFilter.addAction(CoreApp.DA_ACTION_START_CAMERA);
 		mIntentFilter.addAction(CoreApp.DA_ACTION_STATE_CHANGED);
 		mIntentFilter.addAction(CoreApp.DA_ACTION_TORCH_STATE_CHANGED);
@@ -715,13 +782,11 @@ public class DefaultActivity extends Activity {
 		mainView.requestFocus();
 
 		super.onResume();
-		mStateManager.setDefaultActivityStarting(false);
 	}
 
 	@Override
 	protected void onPause() {
 		Log.d(LOG_TAG + daId + ".onPause", "pausing");
-		mStateManager.setDefaultActivityStarting(false);
 
 		Intent mIntent = new Intent(this, CoreService.class);
 		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
@@ -735,7 +800,6 @@ public class DefaultActivity extends Activity {
 	@Override
 	protected void onStop() {
 		Log.d(LOG_TAG + daId + ".onStop", "stopping");
-		mStateManager.setDefaultActivityStarting(false);
 
 		if (mStateManager.getPreference().getBoolean("pref_keyguard", true)) {
 			getWindow().addFlags(
@@ -765,51 +829,4 @@ public class DefaultActivity extends Activity {
 		mStateManager.setDefaultActivity(null);
 		super.onDestroy();
 	}
-
-	private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-			if (action.equals(CoreApp.DA_ACTION_TORCH_STATE_CHANGED)) {
-				if (intent.getBooleanExtra(CoreApp.DA_EXTRA_STATE, false)) {
-					torchButton
-							.setImageResource(R.drawable.ic_appwidget_torch_on);
-
-				} else {
-					torchButton
-							.setImageResource(R.drawable.ic_appwidget_torch_off);
-				}
-			} else if (action.equals(CoreApp.DA_ACTION_WIDGET_REFRESH)) {
-				setWidgetContent();
-			} else if (action.equals(CoreApp.DA_ACTION_BATTERY_REFRESH)) {
-				setBatteryIcon();
-			} else if (action.equals(CoreApp.DA_ACTION_NOTIFICATION_REFRESH)) {
-				refreshNotifications();
-			} else if (action.equals(CoreApp.DA_ACTION_START_CAMERA)) {
-				startCamera();
-			} else if (action.equals(CoreApp.DA_ACTION_STATE_CHANGED)) {
-				switch (intent.getIntExtra(CoreApp.DA_EXTRA_STATE, 0)) {
-				case CoreApp.DA_EXTRA_STATE_NORMAL:
-					displayNormal();
-					break;
-				case CoreApp.DA_EXTRA_STATE_ALARM:
-					displayAlarm();
-					break;
-				case CoreApp.DA_EXTRA_STATE_PHONE:
-					displayPhone();
-					break;
-				case CoreApp.DA_EXTRA_STATE_CAMERA:
-					displayCamera();
-					break;
-				}
-			} else if (action.equals(CoreApp.DA_ACTION_FINISH)) {
-				if (mStateManager.getDefaultActivityStarting()) {
-					Log.w(LOG_TAG + daId, "Starting, could not finish");
-				} else {
-					Log.d(LOG_TAG + daId, "Call to finish");
-					finish();
-				}
-			}
-		}
-	};
 }
