@@ -22,11 +22,6 @@
                                                        android:dialogMessage="@string/pref_delay_summary"
                                                        android:defaultValue="10000"
                                                        android:max="30000" />
-  <CheckBoxPreference android:key="pref_dim"
-                      android:title="@string/pref_dim"
-                      android:summary="@string/pref_dim_summary"
-                      android:dependency="pref_delay"
-                      android:defaultValue="true" />
   <afzkl.development.colorpickerview.preference.ColorPickerPreference android:key="pref_default_bgcolor"
                                                                       android:title="@string/pref_default_bgcolor"
                                                                       android:summary="@string/pref_default_bgcolor_summary"
