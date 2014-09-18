@@ -67,8 +67,9 @@ public class CoreStateManager {
 
 	private final boolean systemApp;
 	private boolean adminApp;
-	private final boolean rootApp;
+	private boolean rootApp;
 	private boolean osPowerManagement;
+	private boolean internalPowerManagement;
 	private final boolean hardwareAccelerated;
 
 	// audio manager to detect media state
@@ -115,57 +116,20 @@ public class CoreStateManager {
 			Log.d(LOG_TAG + ".init", "We are a system app.");
 		} else {
 			Log.d(LOG_TAG + ".init", "We are not a system app.");
+			preference_all.edit()
+					.putBoolean("pref_internal_power_management", false)
+					.commit();
 		}
 
-		// Lock mode
-		if (preference_all.getBoolean("pref_lockmode", false)) {
-			lockMode = true;
-		} else {
-			lockMode = false;
-		}
+		refreshAdminApp();
+		refreshRootApp();
 
-		if (lockMode) {
-			final DevicePolicyManager dpm = (DevicePolicyManager) mAppContext
-					.getSystemService(Context.DEVICE_POLICY_SERVICE);
-			ComponentName me = new ComponentName(mAppContext,
-					AdminReceiver.class);
-			adminApp = dpm.isAdminActive(me);
-		} else {
-			adminApp = false;
-		}
+		refreshLockMode();
+		refreshOsPowerManagement();
+		refreshInternalPowerManagement();
 
-		if (adminApp) {
-			Log.d(LOG_TAG + ".init", "We are an admin.");
-		} else {
-			Log.d(LOG_TAG + ".init",
-					"We are not an admin so cannot do anything.");
-		}
+		refreshInternalService();
 
-		if (preference_all.getBoolean("pref_runasroot", false)) {
-			AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
-			boolean rootAppResult = false;
-			try {
-				rootAppResult = localSuAvailable.execute().get();
-			} catch (InterruptedException e) {
-			} catch (ExecutionException e) {
-			}
-			rootApp = rootAppResult;
-		} else {
-			rootApp = false;
-		}
-		if (rootApp) {
-			Log.d(LOG_TAG + ".init", "We are root.");
-		} else {
-			Log.d(LOG_TAG + ".init", "We are not root.");
-		}
-		osPowerManagement = preference_all.getBoolean(
-				"pref_os_power_management", false);
-
-		if (preference_all.getBoolean("pref_internalservice", false)) {
-			actionCover = CoreReceiver.ACTION_INTERNAL_LID_STATE_CHANGED;
-		} else {
-			actionCover = CoreReceiver.ACTION_LID_STATE_CHANGED;
-		}
 		if (preference_all.getBoolean("pref_proximity", false)) {
 			forceCheckCoverState = true;
 		}
@@ -304,12 +268,22 @@ public class CoreStateManager {
 		return osPowerManagement;
 	}
 
-	public PowerManager getPowerManager() {
-		return mPowerManager;
+	public void refreshOsPowerManagement() {
+		osPowerManagement = preference_all.getBoolean(
+				"pref_os_power_management", false);
 	}
 
-	public void setOsPowerManagement(boolean enable) {
-		osPowerManagement = enable;
+	public boolean getInternalPowerManagement() {
+		return internalPowerManagement;
+	}
+
+	public void refreshInternalPowerManagement() {
+		internalPowerManagement = preference_all.getBoolean(
+				"pref_internal_power_management", false);
+	}
+
+	public PowerManager getPowerManager() {
+		return mPowerManager;
 	}
 
 	public String getActionCover() {
@@ -344,20 +318,65 @@ public class CoreStateManager {
 		return adminApp;
 	}
 
-	public void enableAdminApp() {
-		adminApp = true;
+	public void refreshAdminApp() {
+		final DevicePolicyManager dpm = (DevicePolicyManager) mAppContext
+				.getSystemService(Context.DEVICE_POLICY_SERVICE);
+		ComponentName me = new ComponentName(mAppContext, AdminReceiver.class);
+		adminApp = dpm.isAdminActive(me);
+		if (adminApp) {
+			Log.d(LOG_TAG + ".init", "We are an admin.");
+		} else {
+			Log.d(LOG_TAG + ".init",
+					"We are not an admin so cannot do anything.");
+		}
+		refreshLockMode();
 	}
 
 	public boolean getRootApp() {
 		return rootApp;
 	}
 
+	public void refreshRootApp() {
+		if (preference_all.getBoolean("pref_runasroot", false)) {
+			AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
+			boolean rootAppResult = false;
+			try {
+				rootAppResult = localSuAvailable.execute().get();
+			} catch (InterruptedException e) {
+			} catch (ExecutionException e) {
+			}
+			rootApp = rootAppResult;
+		} else {
+			rootApp = false;
+			preference_all.edit().putBoolean("pref_runasroot", false).commit();
+		}
+		if (rootApp) {
+			Log.d(LOG_TAG + ".init", "We are root.");
+		} else {
+			Log.d(LOG_TAG + ".init", "We are not root.");
+		}
+	}
+
+	public void refreshInternalService() {
+		if (preference_all.getBoolean("pref_internalservice", false)) {
+			actionCover = CoreReceiver.ACTION_INTERNAL_LID_STATE_CHANGED;
+		} else {
+			actionCover = CoreReceiver.ACTION_LID_STATE_CHANGED;
+		}
+		restartServices();
+	}
+
 	public boolean getLockMode() {
 		return lockMode;
 	}
 
-	public void setLockMode(boolean enable) {
-		lockMode = enable;
+	public void refreshLockMode() {
+		if (preference_all.getBoolean("pref_lockmode", false) && adminApp) {
+			lockMode = true;
+		} else {
+			lockMode = false;
+			preference_all.edit().putBoolean("pref_lockmode", false).commit();
+		}
 	}
 
 	public long getBlackScreenTime() {
@@ -712,7 +731,8 @@ public class CoreStateManager {
 	}
 
 	public void requestAdmin() {
-		if (!adminApp && lockMode && configurationActivity != null) {
+		if (!adminApp && preference_all.getBoolean("pref_lockmode", false)
+				&& configurationActivity != null) {
 			ComponentName me = new ComponentName(mAppContext,
 					AdminReceiver.class);
 			Log.d(LOG_TAG, "launching dpm overlay");

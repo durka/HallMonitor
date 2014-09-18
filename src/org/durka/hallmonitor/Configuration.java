@@ -197,50 +197,14 @@ public class Configuration extends PreferenceActivity {
 		// call back for admin access request
 		case CoreApp.DEVICE_ADMIN_WAITING:
 			if (result == Activity.RESULT_OK) {
-				mStateManager.enableAdminApp();
-				// we asked to be an admin and the user clicked Activate
-				// (the intent receiver takes care of showing a toast)
-				// go ahead and start the service
-				if (mStateManager.getPreference().getBoolean("pref_enabled",
-						false)) {
-					ctx.startService(new Intent(ctx, CoreService.class));
-					if (mStateManager.getPreference().getBoolean(
-							"pref_internalservice", false)) {
-						if (mStateManager.getPreference().getBoolean(
-								"pref_realhall", false)) {
-							ctx.startService(new Intent(ctx,
-									ViewCoverHallService.class));
-						} else if (mStateManager.getPreference().getBoolean(
-								"pref_proximity", false)) {
-							ctx.startService(new Intent(ctx,
-									ViewCoverProximityService.class));
-						}
-					}
-					if (mStateManager.getPreference().getBoolean(
-							"pref_do_notifications", false)) {
-						ctx.startService(new Intent(ctx,
-								NotificationService.class));
-					}
-				}
+				mStateManager.refreshAdminApp();
 			} else {
+				mStateManager.refreshAdminApp();
 				// we asked to be an admin and the user clicked Cancel
 				// (why?)
 				// complain, and un-check pref_enabled
 				Toast.makeText(ctx, ctx.getString(R.string.admin_refused),
 						Toast.LENGTH_SHORT).show();
-				Log.d(LOG_TAG + ".Evt.activity_result",
-						"pref_enabled = "
-								+ Boolean.toString(mStateManager
-										.getPreference().getBoolean(
-												"pref_enabled", true)));
-				mStateManager.getPreference().edit()
-						.putBoolean("pref_enabled", false).commit();
-				Log.d(LOG_TAG + ".Evt.activity_result",
-						"pref_enabled = "
-								+ Boolean.toString(mStateManager
-										.getPreference().getBoolean(
-												"pref_enabled", true)));
-
 			}
 			break;
 		// call back for appwidget pick

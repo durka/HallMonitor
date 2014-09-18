@@ -437,7 +437,7 @@ public class CoreService extends Service {
 							CoreApp.DA_ACTION_FREE_SCREEN);
 					LocalBroadcastManager.getInstance(ctx).sendBroadcast(
 							freeScreenDAIntent);
-				} else if (mStateManager.getSystemApp()) {
+				} else if (mStateManager.getInternalPowerManagement()) {
 					if (mStateManager.getPowerManager().isScreenOn()) {
 						Log.d(LOG_TAG + ".lBS", "Go to sleep now.");
 						mStateManager.getPowerManager().goToSleep(
@@ -452,7 +452,7 @@ public class CoreService extends Service {
 		}
 
 		private void wakeUpDevice(Context ctx) {
-			if (mStateManager.getSystemApp()) {
+			if (mStateManager.getInternalPowerManagement()) {
 				if (!mStateManager.getPowerManager().isScreenOn()) {
 					Log.d(LOG_TAG + ".wUD", "WakeUp device.");
 					mStateManager.getPowerManager().wakeUp(

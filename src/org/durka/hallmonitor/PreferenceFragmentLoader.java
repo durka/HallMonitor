@@ -147,6 +147,14 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 						.putInt("media_widget_id", -1)
 						.putInt("version", info.versionCode).commit();
 
+				if (prefs.getBoolean("pref_do_notifications", false)) {
+					doNotifications(getActivity(), true);
+				}
+
+				if (prefs.getBoolean("pref_lockmode", false)) {
+					mStateManager.requestAdmin();
+				}
+
 				Log.d(LOG_TAG + ".oR", "stored version code");
 			}
 
@@ -179,25 +187,23 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 						"pref_do_notifications",
 						mStateManager
 								.getServiceRunning(NotificationService.class))
+				.putBoolean(
+						"pref_realhall",
+						mStateManager
+								.getServiceRunning(ViewCoverHallService.class))
+				.putBoolean(
+						"pref_proximity",
+						mStateManager
+								.getServiceRunning(ViewCoverProximityService.class))
 				.commit();
 
-		if (!mStateManager.getSystemApp()
-				&& !prefs.getBoolean("pref_os_power_management", false)) {
-			prefs.edit().putBoolean("pref_lockmode", true).commit();
-			if (findPreference("pref_lockmode") != null) {
-				findPreference("pref_lockmode").setEnabled(false);
-			}
-		}
+		setSystemApp(prefs);
 
-		if (!prefs.getBoolean("pref_runasroot", false)) {
-			// prefs.edit().putBoolean("pref_realhall", false);
-			if (findPreference("pref_realhall") != null) {
-				findPreference("pref_realhall").setEnabled(false);
-			}
-		}
-		// phone control
+		// Rebuild dependency
+		// RealHall
+		enableRealHall(prefs);
+		// Phone Control
 		enablePhoneScreen(prefs);
-		updatePhoneControlTtsDelay(prefs);
 	}
 
 	@Override
@@ -234,54 +240,83 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 					.getBoolean(key, false));
 		}
 
-		// if the service is being enabled/disabled the key will be pref_enabled
+		// MAIN SCREEN
 		if (key.equals("pref_enabled")) {
-
 			Log.d(LOG_TAG + ".oSPC",
 					"pref_enabled is now " + prefs.getBoolean(key, false));
 
 			if (prefs.getBoolean(key, false)) {
-				if (!mStateManager.getSystemApp()
-						&& !prefs.getBoolean("pref_os_power_management", false)) {
-					prefs.edit().putBoolean("pref_lockmode", true).commit();
-					if (findPreference("pref_lockmode") != null) {
-						findPreference("pref_lockmode").setEnabled(false);
-					}
-				}
-				if (prefs.getBoolean("pref_runasroot", false)) {
-					AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
-					localSuAvailable.execute();
-				}
 				mStateManager.startServices();
 			} else {
 				mStateManager.stopServices();
 			}
+		}
 
-		} else if (key.equals("pref_os_power_management")) {
-			mStateManager.setOsPowerManagement(prefs.getBoolean(key, false));
-			if (!mStateManager.getSystemApp()
-					&& !prefs.getBoolean("pref_os_power_management", false)) {
-				prefs.edit().putBoolean("pref_lockmode", true).commit();
-				if (findPreference("pref_lockmode") != null) {
-					findPreference("pref_lockmode").setEnabled(false);
-				}
-			} else {
-				if (findPreference("pref_lockmode") != null) {
-					findPreference("pref_lockmode").setEnabled(true);
-				}
+		// GENERAL SCREEN
+		else if (key.equals("pref_os_power_management")) {
+			if (prefs.getBoolean(key, false)) {
+				setMode("os");
+			}
+
+		} else if (key.equals("pref_internal_power_management")) {
+			if (prefs.getBoolean(key, false)) {
+				setMode("internal");
 			}
 
 		} else if (key.equals("pref_lockmode")) {
 			if (prefs.getBoolean(key, false)) {
-				mStateManager.setLockMode(true);
-				mStateManager.requestAdmin();
-			} else {
-				mStateManager.setLockMode(false);
-
+				setMode("lock");
 			}
-			// if the default screen widget is being enabled/disabled the key
-			// will be pref_default_widget
-		} else if (key.equals("pref_default_widget")) {
+
+		} else if (key.equals("pref_runasroot")) {
+			if (prefs.getBoolean(key, false)) {
+				AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
+				localSuAvailable.execute();
+			}
+
+		} else if (key.equals("pref_internalservice")) {
+			mStateManager.refreshInternalService();
+
+		} else if (key.equals("pref_disable_home")) {
+			if (prefs.getBoolean("pref_realfullscreen", false)) {
+				Toast.makeText(getActivity(),
+						getString(R.string.pref_realfullscreen_enabled),
+						Toast.LENGTH_SHORT).show();
+				prefs.edit().putBoolean(key, false).commit();
+			}
+		}
+
+		// INTERNAL SERVICE SCREEN
+		else if (key.equals("pref_realhall")) {
+			if (prefs.getBoolean(key, false)
+					&& prefs.getBoolean("pref_runasroot", false)) {
+				prefs.edit().putBoolean("pref_proximity", false).commit();
+			} else {
+				prefs.edit().putBoolean(key, false).commit();
+			}
+			mStateManager.restartServices();
+
+		} else if (key.equals("pref_proximity")) {
+			if (prefs.getBoolean(key, false)) {
+				prefs.edit().putBoolean("pref_realhall", false).commit();
+			}
+			mStateManager.restartServices();
+		}
+
+		// DISPLAY SCREEN
+		else if (key.equals("pref_realfullscreen")) {
+			if (prefs.getBoolean("pref_disable_home", false)) {
+				Toast.makeText(getActivity(),
+						getString(R.string.pref_disable_enabled),
+						Toast.LENGTH_SHORT).show();
+				prefs.edit().putBoolean(key, false).commit();
+			}
+		}
+
+		// WIDGET SCREEN
+		// if the default screen widget is being enabled/disabled the key
+		// will be pref_default_widget
+		else if (key.equals("pref_default_widget")) {
 			if (prefs.getBoolean(key, false)
 					&& !mStateManager.hmAppWidgetManager
 							.doesWidgetExist("default")) {
@@ -292,9 +327,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 				mStateManager.unregisterWidget("default");
 			}
 
-			// if the media screen widget is being enabled/disabled the key will
-			// be pref_media_widget
-		} else if (key.equals("pref_media_widget")) {
+		} else
+		// if the media screen widget is being enabled/disabled the key will
+		// be pref_media_widget
+		if (key.equals("pref_media_widget")) {
 			if (prefs.getBoolean(key, false)
 					&& !mStateManager.hmAppWidgetManager
 							.doesWidgetExist("media")) {
@@ -305,60 +341,10 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 				mStateManager.unregisterWidget("media");
 			}
 
-		} else if (key.equals("pref_runasroot")) {
-			if (prefs.getBoolean(key, false)) {
-				AsyncSuAvailable localSuAvailable = new AsyncSuAvailable();
-				localSuAvailable.execute();
-				if (findPreference("pref_realhall") != null) {
-					findPreference("pref_realhall").setEnabled(true);
-				}
-			} else {
-				// prefs.edit().putBoolean("pref_realhall", false);
-				if (findPreference("pref_realhall") != null) {
-					findPreference("pref_realhall").setEnabled(false);
-				}
-			}
+		}
 
-		} else if (key.equals("pref_internalservice")) {
-			if (prefs.getBoolean(key, false)) {
-				mStateManager
-						.setActionCover(CoreReceiver.ACTION_INTERNAL_LID_STATE_CHANGED);
-			} else {
-				mStateManager
-						.setActionCover(CoreReceiver.ACTION_LID_STATE_CHANGED);
-			}
-			mStateManager.restartServices();
-
-		} else if (key.equals("pref_realhall")) {
-			if (prefs.getBoolean(key, false)) {
-				if (!prefs.getBoolean("pref_runasroot", false)) {
-					Toast.makeText(getActivity(),
-							getString(R.string.pref_realhall_requirement),
-							Toast.LENGTH_SHORT).show();
-					prefs.edit().putBoolean(key, false).commit();
-				} else if (prefs.getBoolean("pref_proximity", false)) {
-					Toast.makeText(getActivity(),
-							getString(R.string.pref_realhall_requirement),
-							Toast.LENGTH_SHORT).show();
-					prefs.edit().putBoolean(key, false).commit();
-				} else {
-					mStateManager.restartServices();
-				}
-			}
-
-		} else if (key.equals("pref_proximity")) {
-			if (prefs.getBoolean(key, false)) {
-				if (prefs.getBoolean("pref_realhall", false)) {
-					Toast.makeText(getActivity(),
-							getString(R.string.pref_proximity_requirement),
-							Toast.LENGTH_SHORT).show();
-					prefs.edit().putBoolean(key, false).commit();
-				} else {
-					mStateManager.restartServices();
-				}
-			}
-
-		} else if (key.equals("pref_do_notifications")) {
+		// FEATURES SCREEN
+		else if (key.equals("pref_do_notifications")) {
 			doNotifications(getActivity(), prefs.getBoolean(key, false));
 
 		} else if (key.equals("pref_flash_controls")) {
@@ -400,34 +386,18 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 				}
 			}
 
-		} else if (key.equals("pref_realfullscreen")) {
-			if (prefs.getBoolean("pref_disable_home", false)) {
-				Toast.makeText(getActivity(),
-						getString(R.string.pref_disable_enabled),
-						Toast.LENGTH_SHORT).show();
-				prefs.edit().putBoolean(key, false).commit();
-			}
+		}
 
-		} else if (key.equals("pref_disable_home")) {
-			if (prefs.getBoolean("pref_realfullscreen", false)) {
-				Toast.makeText(getActivity(),
-						getString(R.string.pref_realfullscreen_enabled),
-						Toast.LENGTH_SHORT).show();
-				prefs.edit().putBoolean(key, false).commit();
-			}
-
-			// preferences_phone
-		} else if (key.equals("pref_phone_controls_tts_delay")) {
-			updatePhoneControlTtsDelay(prefs);
-
-			// preferences_phone
-		} else if (key.equals("pref_phone_controls_tts_delay")) {
+		// PHONE SCREEN
+		// preferences_phone
+		else if (key.equals("pref_phone_controls_tts_delay")) {
 			updatePhoneControlTtsDelay(prefs);
 
 		}
 
 		;
 
+		// Special case of restart
 		if (key.equals("pref_force_restart")) {
 			prefs.edit().putBoolean(key, false).commit();
 			Intent mStartActivity = new Intent(getActivity()
@@ -449,8 +419,16 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			System.exit(0);
 		} else {
 		}
-		// phone control
+
+		// Rebuild dependency
+		// RealHall
+		enableRealHall(prefs);
+		// Phone Control
 		enablePhoneScreen(prefs);
+		// Power Mode
+		mStateManager.refreshInternalPowerManagement();
+		mStateManager.refreshOsPowerManagement();
+		mStateManager.refreshLockMode();
 	}
 
 	private void updatePhoneControlTtsDelay(SharedPreferences prefs) {
@@ -476,6 +454,67 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 			prefs.edit().putBoolean("pref_phone_controls", !phoneControlConfig)
 					.commit();
 		}
+	}
+
+	private void setSystemApp(SharedPreferences prefs) {
+		if (mStateManager.getSystemApp()) {
+			if (findPreference("pref_internal_power_management") != null) {
+				findPreference("pref_internal_power_management").setEnabled(
+						true);
+			}
+			if (findPreference("pref_os_power_management") != null) {
+				findPreference("pref_os_power_management").setEnabled(true);
+			}
+			if (findPreference("pref_lockmode") != null) {
+				findPreference("pref_lockmode").setEnabled(true);
+			}
+		} else {
+			prefs.edit().putBoolean("pref_internal_power_management", false)
+					.commit();
+			if (findPreference("pref_internal_power_management") != null) {
+				findPreference("pref_internal_power_management").setEnabled(
+						false);
+			}
+			if (findPreference("pref_os_power_management") != null) {
+				findPreference("pref_os_power_management").setEnabled(true);
+			}
+			if (findPreference("pref_lockmode") != null) {
+				findPreference("pref_lockmode").setEnabled(true);
+			}
+		}
+	}
+
+	private void setMode(String mode) {
+		SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
+		if (mode == "internal" && mStateManager.getSystemApp()) {
+			prefs.edit().putBoolean("pref_os_power_management", false)
+					.putBoolean("pref_lockmode", false).commit();
+		} else if (mode == "os") {
+			prefs.edit().putBoolean("pref_internal_power_management", false)
+					.putBoolean("pref_lockmode", false).commit();
+		} else if (mode == "lock") {
+			prefs.edit().putBoolean("pref_internal_power_management", false)
+					.putBoolean("pref_os_power_management", false).commit();
+			mStateManager.requestAdmin();
+		} else {
+			prefs.edit().putBoolean("pref_internal_power_management", false)
+					.putBoolean("pref_os_power_management", false)
+					.putBoolean("pref_lockmode", false).commit();
+		}
+	}
+
+	private void enableRealHall(SharedPreferences prefs) {
+		if (prefs.getBoolean("pref_runasroot", false)) {
+			if (findPreference("pref_realhall") != null) {
+				findPreference("pref_realhall").setEnabled(true);
+			}
+		} else {
+			prefs.edit().putBoolean("pref_realhall", false);
+			if (findPreference("pref_realhall") != null) {
+				findPreference("pref_realhall").setEnabled(false);
+			}
+		}
+
 	}
 
 	private void Log_d(String tag, String message) {
@@ -571,13 +610,18 @@ public class PreferenceFragmentLoader extends PreferenceFragment implements
 
 		@Override
 		protected void onPostExecute(Boolean result) {
-			if (!result) {
+			if (result) {
+				getPreferenceManager().getSharedPreferences().edit()
+						.putBoolean("pref_runasroot", true).commit();
+				mStateManager.refreshRootApp();
+			} else {
 				Toast.makeText(
 						getActivity(),
 						"Root access not granted - cannot enable root features!",
 						Toast.LENGTH_SHORT).show();
 				getPreferenceManager().getSharedPreferences().edit()
 						.putBoolean("pref_runasroot", false).commit();
+				mStateManager.refreshRootApp();
 			}
 		}
 	}

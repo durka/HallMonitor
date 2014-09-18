@@ -39,28 +39,33 @@
             android:value="@string/pref_enabled_title" />
     </org.durka.hallmonitor.PreferenceSwitchable>
     
-    <org.durka.hallmonitor.PreferenceSwitchable
-        android:key="pref_runasroot"
-        android:title="@string/pref_runasroot"
-        android:summary="@string/pref_runasroot_summary"
-        android:defaultValue="false"
-        android:dependency="pref_enabled">
-    </org.durka.hallmonitor.PreferenceSwitchable>
-    
-    <org.durka.hallmonitor.PreferenceSwitchable
-        android:key="pref_internalservice"
-        android:title="@string/pref_internalservice"
-        android:summary="@string/pref_internalservice_summary"
-        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader"
-        android:defaultValue="false"
-        android:dependency="pref_enabled">
+    <PreferenceScreen
+        android:title="@string/pref_optional"
+        android:summary="@string/pref_optional_summary"
+        android:dependency="pref_enabled"
+        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader">
+	    
+	    <extra
+	        android:name="resource"
+	        android:value="preferences_features" />
+	    <extra
+	        android:name="title"
+	        android:value="@string/pref_optional" />	    
+	</PreferenceScreen>
+
+    <PreferenceScreen
+        android:title="@string/pref_displayoptions"
+        android:summary="@string/pref_displayoptions_summary"
+        android:dependency="pref_enabled"
+        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader">
+        
         <extra
-            android:name="resource"
-            android:value="preferences_internalservice" />
-        <extra
-            android:name="title"
-            android:value="@string/pref_internalservice_title" />
-    </org.durka.hallmonitor.PreferenceSwitchable>
+	        android:name="resource"
+	        android:value="preferences_display" />
+	    <extra
+	        android:name="title"
+	        android:value="@string/pref_displayoptions" />
+    </PreferenceScreen>
     
     <PreferenceScreen
         android:title="@string/pref_widgets"
@@ -74,24 +79,8 @@
 	    <extra
 	        android:name="title"
 	        android:value="@string/pref_widgets" />
-    
     </PreferenceScreen>
     
-    <PreferenceScreen
-        android:title="@string/pref_optional"
-        android:summary="@string/pref_optional_summary"
-        android:dependency="pref_enabled"
-        android:fragment="org.durka.hallmonitor.PreferenceFragmentLoader">
-	    
-	    <extra
-	        android:name="resource"
-	        android:value="preferences_features" />
-	    <extra
-	        android:name="title"
-	        android:value="@string/pref_optional" />
-	    
-	</PreferenceScreen>
-
     <Preference
         android:title="@string/pref_security_settings"
         android:summary="@string/pref_security_settings_summary">

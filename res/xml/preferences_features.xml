@@ -8,6 +8,12 @@
 	        android:summary="@string/pref_notifications_summary"
 	        android:defaultValue="false" />
 	    
+		<Preference
+	        android:key="pref_features_instructions"
+	        android:title="@string/pref_features_instructions"
+	        android:summary="@string/pref_features_instructions_summary"
+	        android:selectable="false" />
+    
 	    <org.durka.hallmonitor.PreferenceSwitchable
 	        android:key="pref_flash_controls"
 	        android:title="@string/pref_flash_controls"
@@ -26,7 +32,8 @@
 	        android:key="pref_camera_controls"
 	        android:title="@string/pref_camera_controls"
 	        android:summary="@string/pref_camera_controls_summary"
-	        android:defaultValue="false"/>
+	        android:defaultValue="false">
+	    </org.durka.hallmonitor.PreferenceSwitchable>
 	
 	    <org.durka.hallmonitor.PreferenceSwitchable
 	        android:key="pref_alarm_controls"

@@ -24,23 +24,4 @@
             android:defaultValue="false" />
     </PreferenceCategory>
 
-    <!--
-    <PreferenceCategory
-        android:title="@string/pref_test">
-        <PreferenceScreen
-            android:title="@string/pref_preview"
-            android:summary="@string/pref_phone_preview_summary">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:targetPackage="org.durka.hallmonitor"
-                android:targetClass="org.durka.hallmonitor.DefaultActivity">
-                <extra
-                    android:name="preview"
-                    android:value="phoneWidget"
-                />
-            </intent>
-        </PreferenceScreen>
-    </PreferenceCategory>
-    -->
-
 </PreferenceScreen>
