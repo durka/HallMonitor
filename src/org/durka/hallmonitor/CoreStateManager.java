@@ -771,13 +771,11 @@ public class CoreStateManager {
 			ComponentName me = new ComponentName(mAppContext,
 					AdminReceiver.class);
 			Log.d(LOG_TAG, "launching dpm overlay");
-			getContext()
-					.startActivity(
-							new Intent(getContext(), Configuration.class)
-									.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-											| Intent.FLAG_ACTIVITY_NO_ANIMATION
-											| Intent.FLAG_ACTIVITY_CLEAR_TOP
-											| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
+			mAppContext.startActivity(new Intent(getContext(),
+					Configuration.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+					| Intent.FLAG_ACTIVITY_NO_ANIMATION
+					| Intent.FLAG_ACTIVITY_CLEAR_TOP
+					| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
 			Log.d(LOG_TAG, "Started configuration activity.");
 			Intent coup = new Intent(
 					DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
