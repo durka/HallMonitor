@@ -129,7 +129,7 @@ public class ViewCoverProximityService extends Service implements
 				Intent intent = new Intent(mStateManager.getActionCover());
 				intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 						CoreReceiver.LID_OPEN);
-				this.mLocalBroadcastManager.sendBroadcast(intent);
+				this.mLocalBroadcastManager.sendBroadcastSync(intent);
 			}
 		} else {
 			if (mStateManager.getCoverClosed(true)) {
@@ -138,7 +138,7 @@ public class ViewCoverProximityService extends Service implements
 				Intent intent = new Intent(mStateManager.getActionCover());
 				intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 						CoreReceiver.LID_CLOSED);
-				this.mLocalBroadcastManager.sendBroadcast(intent);
+				this.mLocalBroadcastManager.sendBroadcastSync(intent);
 			}
 		}
 		// Log.d(LOG_TAG + ".Evt.proximity",

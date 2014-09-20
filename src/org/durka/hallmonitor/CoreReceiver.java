@@ -100,8 +100,8 @@ public class CoreReceiver extends BroadcastReceiver {
 				Log.d(LOG_TAG + ".screen", "Cover is open, send to background.");
 				Intent stbDAIntent = new Intent(
 						CoreApp.DA_ACTION_SEND_TO_BACKGROUND);
-				LocalBroadcastManager.getInstance(localContext).sendBroadcast(
-						stbDAIntent);
+				LocalBroadcastManager.getInstance(localContext)
+						.sendBroadcastSync(stbDAIntent);
 			}
 
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
@@ -111,9 +111,8 @@ public class CoreReceiver extends BroadcastReceiver {
 		} else if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
 			Intent batteryDAIntent = new Intent(
 					CoreApp.DA_ACTION_BATTERY_REFRESH);
-			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
-					.getInstance(localContext);
-			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
+			LocalBroadcastManager.getInstance(localContext).sendBroadcastSync(
+					batteryDAIntent);
 
 			Intent mIntent = new Intent(localContext, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
@@ -123,9 +122,8 @@ public class CoreReceiver extends BroadcastReceiver {
 		} else if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
 			Intent batteryDAIntent = new Intent(
 					CoreApp.DA_ACTION_BATTERY_REFRESH);
-			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
-					.getInstance(localContext);
-			mLocalBroadcastManager.sendBroadcast(batteryDAIntent);
+			LocalBroadcastManager.getInstance(localContext).sendBroadcastSync(
+					batteryDAIntent);
 
 			Intent mIntent = new Intent(localContext, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
@@ -223,8 +221,8 @@ public class CoreReceiver extends BroadcastReceiver {
 				Log.d(LOG_TAG + ".screen", "Cover is open, send to background.");
 				Intent stbDAIntent = new Intent(
 						CoreApp.DA_ACTION_SEND_TO_BACKGROUND);
-				LocalBroadcastManager.getInstance(localContext).sendBroadcast(
-						stbDAIntent);
+				LocalBroadcastManager.getInstance(localContext)
+						.sendBroadcastSync(stbDAIntent);
 				Intent mIntent = new Intent(localContext, CoreService.class);
 				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 						CoreApp.CS_TASK_WAKEUP_DEVICE);

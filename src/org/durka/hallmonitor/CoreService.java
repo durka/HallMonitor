@@ -218,7 +218,7 @@ public class CoreService extends Service {
 						bringDefaultActivityToFront(ctx, false);
 					}
 				}
-				mLocalBroadcastManager.sendBroadcast(torchDAIntent);
+				mLocalBroadcastManager.sendBroadcastSync(torchDAIntent);
 				break;
 			case CoreApp.CS_TASK_TORCH_TOGGLE:
 				ctx = (Context) msg.obj;
@@ -253,7 +253,7 @@ public class CoreService extends Service {
 				ctx = (Context) msg.obj;
 				Intent headSetIntent = new Intent(
 						CoreApp.DA_ACTION_WIDGET_REFRESH);
-				mLocalBroadcastManager.sendBroadcast(headSetIntent);
+				mLocalBroadcastManager.sendBroadcastSync(headSetIntent);
 				if (mStateManager.getCoverClosed()) {
 					bringDefaultActivityToFront(ctx, false);
 				}
@@ -429,14 +429,14 @@ public class CoreService extends Service {
 					dpm.lockNow();
 					Intent freeScreenDAIntent = new Intent(
 							CoreApp.DA_ACTION_FREE_SCREEN);
-					LocalBroadcastManager.getInstance(ctx).sendBroadcast(
-							freeScreenDAIntent);
+					mLocalBroadcastManager
+							.sendBroadcastSync(freeScreenDAIntent);
 				} else if (mStateManager.getOsPowerManagement()) {
 					Log.d(LOG_TAG + ".lBS", "OS must manage screen off.");
 					Intent freeScreenDAIntent = new Intent(
 							CoreApp.DA_ACTION_FREE_SCREEN);
-					LocalBroadcastManager.getInstance(ctx).sendBroadcast(
-							freeScreenDAIntent);
+					mLocalBroadcastManager
+							.sendBroadcastSync(freeScreenDAIntent);
 				} else if (mStateManager.getInternalPowerManagement()) {
 					if (mStateManager.getPowerManager().isScreenOn()) {
 						Log.d(LOG_TAG + ".lBS", "Go to sleep now.");

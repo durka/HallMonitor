@@ -501,7 +501,7 @@ public class CoreStateManager {
 		Log.w(LOG_TAG, "Send close default activity");
 		setDefaultActivityStarting(false);
 		Intent finishDAIntent = new Intent(CoreApp.DA_ACTION_FINISH);
-		LocalBroadcastManager.getInstance(mAppContext).sendBroadcast(
+		LocalBroadcastManager.getInstance(mAppContext).sendBroadcastSync(
 				finishDAIntent);
 	}
 

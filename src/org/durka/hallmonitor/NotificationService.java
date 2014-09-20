@@ -55,14 +55,14 @@ public class NotificationService extends NotificationListenerService {
 	public void onNotificationPosted(StatusBarNotification sbn) {
 		Log.d(LOG_TAG + ".oNP", "notification posted: " + sbn.toString());
 		Intent mIntent = new Intent(CoreApp.DA_ACTION_NOTIFICATION_REFRESH);
-		mLocalBroadcastManager.sendBroadcast(mIntent);
+		mLocalBroadcastManager.sendBroadcastSync(mIntent);
 	}
 
 	@Override
 	public void onNotificationRemoved(StatusBarNotification sbn) {
 		Log.d(LOG_TAG + ".oNR", "notification removed: " + sbn.toString());
 		Intent mIntent = new Intent(CoreApp.DA_ACTION_NOTIFICATION_REFRESH);
-		mLocalBroadcastManager.sendBroadcast(mIntent);
+		mLocalBroadcastManager.sendBroadcastSync(mIntent);
 	}
 
 	@Override

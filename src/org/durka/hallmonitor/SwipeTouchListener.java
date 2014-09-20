@@ -72,7 +72,7 @@ public class SwipeTouchListener implements OnTouchListener {
 			Intent cameraIntent = new Intent(CoreApp.DA_ACTION_START_CAMERA);
 			LocalBroadcastManager mLocalBroadcastManager = LocalBroadcastManager
 					.getInstance(ctx);
-			mLocalBroadcastManager.sendBroadcast(cameraIntent);
+			mLocalBroadcastManager.sendBroadcastSync(cameraIntent);
 			break;
 		case MODE_NOTHINGTRUE:
 			break;

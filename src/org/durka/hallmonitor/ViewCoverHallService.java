@@ -141,14 +141,14 @@ public class ViewCoverHallService extends Service implements Runnable {
 					Intent intent = new Intent(mStateManager.getActionCover());
 					intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 							CoreReceiver.LID_CLOSED);
-					this.mLocalBroadcastManager.sendBroadcast(intent);
+					this.mLocalBroadcastManager.sendBroadcastSync(intent);
 				} else if (currentInputDevice.getSuccessfulPollingCode() == 21
 						&& currentInputDevice.getSuccessfulPollingValue() == 1) {
 					Log.i(LOG_TAG + ".r", "Cover open");
 					Intent intent = new Intent(mStateManager.getActionCover());
 					intent.putExtra(CoreReceiver.EXTRA_LID_STATE,
 							CoreReceiver.LID_OPEN);
-					this.mLocalBroadcastManager.sendBroadcast(intent);
+					this.mLocalBroadcastManager.sendBroadcastSync(intent);
 				}
 			}
 		}
