@@ -1,128 +1,101 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#000000"
-    android:id="@+id/default_main"
-    tools:context=".DefaultActivity"
-    android:splitMotionEvents="true" >
-
-    <RelativeLayout
-        android:id="@+id/default_undercover"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-	    android:background="#000000"
-        android:splitMotionEvents="true" >
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/default_content"
-        android:layout_width="310dp"
-        android:layout_height="135dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/rounded"
-        android:gravity="center"
-        android:splitMotionEvents="true" >
-
-        <RelativeLayout
-            android:id="@+id/default_content_camera"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="invisible"
-            android:splitMotionEvents="true" >
-
-            <org.durka.hallmonitor.CameraPreview
-                android:id="@+id/default_camera"
-                android:layout_width="125dp"
-                android:layout_height="125dp"
-                android:layout_centerHorizontal="true"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:visibility="invisible" />
-
-            <ImageButton
-                android:id="@+id/default_camera_capture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_gravity="left"
-                android:onClick="captureCamera"
-                android:src="@drawable/ic_notification" />
-
-            <ImageButton
-                android:id="@+id/default_camera_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="right"
-                android:onClick="stopCamera"
-                android:src="@drawable/ic_menu_trash_holo_light" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/default_content_alarm"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="invisible"
-            android:splitMotionEvents="true" >
-
-            <ImageButton
-                android:id="@+id/snoozebutton"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:onClick="sendSnooze"
-                android:src="@drawable/snooze_button" />
-
-            <ImageButton
-                android:id="@+id/dismissbutton"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:onClick="sendDismiss"
-                android:src="@drawable/dismiss_button" />
-
-            <RelativeLayout
-                android:id="@+id/swipe_alarm"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-	            android:visibility="gone"
-                android:splitMotionEvents="true" />
-            
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/default_content_phone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="invisible"
-            android:splitMotionEvents="true" >
-
-            <ImageView
-                android:id="@+id/accept_slide"
-                android:layout_width="80dp"
-                android:layout_height="25dp"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="60dp"
-                android:src="@drawable/ic_call_accept_slide" />
-            
-			<ImageView
-                android:id="@+id/reject_slide"
-                android:layout_width="80dp"
-                android:layout_height="25dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="60dp"
-                android:src="@drawable/ic_call_reject_slide" />
-            
-            <TextView
-                android:id="@+id/call_from"
+                android:background="#000000"
+                android:id="@+id/default_main"
+                tools:context=".DefaultActivity"
+                android:splitMotionEvents="true">
+  <RelativeLayout android:id="@+id/default_undercover"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:background="#000000"
+                  android:splitMotionEvents="true"></RelativeLayout>
+  <RelativeLayout android:id="@+id/default_content"
+                  android:layout_width="310dp"
+                  android:layout_height="135dp"
+                  android:layout_centerHorizontal="true"
+                  android:layout_marginTop="8dp"
+                  android:background="@drawable/rounded"
+                  android:gravity="center"
+                  android:splitMotionEvents="true">
+    <RelativeLayout android:id="@+id/default_content_camera"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:keepScreenOn="true"
+                    android:splitMotionEvents="true">
+      <org.durka.hallmonitor.CameraPreview android:id="@+id/default_camera"
+                                           android:layout_width="125dp"
+                                           android:layout_height="125dp"
+                                           android:layout_centerHorizontal="true"
+                                           android:layout_marginLeft="50dp"
+                                           android:layout_marginRight="50dp"
+                                           android:visibility="invisible" />
+      <ImageButton android:id="@+id/default_camera_capture"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentTop="true"
+                   android:layout_gravity="left"
+                   android:onClick="captureCamera"
+                   android:src="@drawable/ic_notification" />
+      <ImageButton android:id="@+id/default_camera_back"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentRight="true"
+                   android:layout_gravity="right"
+                   android:onClick="stopCamera"
+                   android:src="@drawable/ic_menu_trash_holo_light" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@+id/default_content_alarm"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:keepScreenOn="true"
+                    android:splitMotionEvents="true">
+      <ImageButton android:id="@+id/snoozebutton"
+                   style="?android:attr/buttonStyleSmall"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentLeft="true"
+                   android:layout_centerVertical="true"
+                   android:onClick="sendSnooze"
+                   android:src="@drawable/snooze_button" />
+      <ImageButton android:id="@+id/dismissbutton"
+                   style="?android:attr/buttonStyleSmall"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentRight="true"
+                   android:layout_centerVertical="true"
+                   android:onClick="sendDismiss"
+                   android:src="@drawable/dismiss_button" />
+      <RelativeLayout android:id="@+id/swipe_alarm"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:visibility="gone"
+                      android:splitMotionEvents="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@+id/default_content_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:keepScreenOn="true"
+                    android:splitMotionEvents="true">
+      <ImageView android:id="@+id/accept_slide"
+                 android:layout_width="80dp"
+                 android:layout_height="25dp"
+                 android:layout_alignParentLeft="true"
+                 android:layout_centerVertical="true"
+                 android:layout_marginLeft="60dp"
+                 android:src="@drawable/ic_call_accept_slide" />
+      <ImageView android:id="@+id/reject_slide"
+                 android:layout_width="80dp"
+                 android:layout_height="25dp"
+                 android:layout_alignParentRight="true"
+                 android:layout_centerVertical="true"
+                 android:layout_marginRight="60dp"
+                 android:src="@drawable/ic_call_reject_slide" />
+      <TextView android:id="@+id/call_from"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -130,128 +103,99 @@
                 android:text="@string/unknown_caller"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffff" />
-
-            <RelativeLayout
-                android:id="@+id/incoming_call_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:orientation="horizontal"
-                android:visibility="visible"
-                android:splitMotionEvents="true" >
-
-            	<ImageView
-            	    android:id="@+id/pickup_button"
-            	    style="?android:attr/buttonBarButtonStyle"
-            	    android:layout_width="wrap_content"
-            	    android:layout_height="wrap_content"
-	                android:layout_alignParentLeft="true"
-            	    android:src="@drawable/ic_jog_dial_answer" />
-
-            	<ImageView
-            	    android:id="@+id/hangup_button"
-            	    style="?android:attr/buttonBarButtonStyle"
-            	    android:layout_width="wrap_content"
-            	    android:layout_height="wrap_content"
-	                android:layout_alignParentRight="true"
-            	    android:src="@drawable/ic_jog_dial_decline" />
-
-            </RelativeLayout>
-            	
-            <LinearLayout
-                android:id="@+id/callchoice"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_centerInParent="true"
-                android:orientation="vertical"
-                android:visibility="visible" />
-            
-            <RelativeLayout
-                android:id="@+id/swipe_call"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-	            android:visibility="gone"
-                android:splitMotionEvents="true" />
-            	            
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/default_content_normal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible"
-            android:splitMotionEvents="true" >
-
-            <RelativeLayout
-                android:id="@+id/default_widget"
-                android:layout_width="270dp"
-                android:layout_height="95dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:gravity="center"  >
-
-                <RelativeLayout
-                    android:id="@+id/default_widget_area"
-                    android:layout_width="270dp"
-                    android:layout_height="95dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_margin="0dp" />
-
-                <TextView
-                    android:id="@+id/default_text_fulltime_very_small"
-                    android:layout_width="270dp"
-                    android:layout_height="10dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignBottom="@id/default_widget_area"
-                    android:gravity="center"
-                    android:textColor="#33b5e5"
-                    android:textSize="8dp"
-                    android:textStyle="bold"
-                    android:text="11:36 PM Aug 22, 2014"  />
-
-                <TextClock
-                    android:id="@+id/default_text_clock"
-                    android:layout_width="270dp"
-                    android:layout_height="95dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textColor="#33b5e5"
-                    android:textSize="55sp"
-                    android:textStyle="bold" />
-
-                <TextClock
-                    android:id="@+id/default_text_clock_hour"
-                    android:layout_width="270dp"
-                    android:layout_height="60dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:padding="2dp"
-                    android:gravity="center"
-                    android:textColor="#33b5e5"
-                    android:textSize="50sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/default_text_clock_date"
-                    android:layout_width="270dp"
-                    android:layout_height="35dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@id/default_text_clock_hour"
-                    android:padding="5dp"
-                    android:gravity="center"
-                    android:textColor="#33b5e5"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:text="Aug 22, 2014" />
-
-            </RelativeLayout>
-
-            <GridView
-                android:id="@+id/default_icon_container"
+      <RelativeLayout android:id="@+id/incoming_call_layout"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_alignParentLeft="true"
+                      android:layout_centerVertical="true"
+                      android:orientation="horizontal"
+                      android:visibility="visible"
+                      android:splitMotionEvents="true">
+        <ImageView android:id="@+id/pickup_button"
+                   style="?android:attr/buttonBarButtonStyle"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentLeft="true"
+                   android:src="@drawable/ic_jog_dial_answer" />
+        <ImageView android:id="@+id/hangup_button"
+                   style="?android:attr/buttonBarButtonStyle"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentRight="true"
+                   android:src="@drawable/ic_jog_dial_decline" />
+      </RelativeLayout>
+      <LinearLayout android:id="@+id/callchoice"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical"
+                    android:visibility="visible" />
+      <RelativeLayout android:id="@+id/swipe_call"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:visibility="gone"
+                      android:splitMotionEvents="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@+id/default_content_normal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible"
+                    android:splitMotionEvents="true">
+      <RelativeLayout android:id="@+id/default_widget"
+                      android:layout_width="270dp"
+                      android:layout_height="95dp"
+                      android:layout_alignParentLeft="true"
+                      android:layout_alignParentTop="true"
+                      android:gravity="center">
+        <RelativeLayout android:id="@+id/default_widget_area"
+                        android:layout_width="270dp"
+                        android:layout_height="95dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_margin="0dp" />
+        <TextView android:id="@+id/default_text_fulltime_very_small"
+                  android:layout_width="270dp"
+                  android:layout_height="10dp"
+                  android:layout_alignParentLeft="true"
+                  android:layout_alignBottom="@id/default_widget_area"
+                  android:gravity="center"
+                  android:textColor="#33b5e5"
+                  android:textSize="8dp"
+                  android:textStyle="bold"
+                  android:text="11:36 PM Aug 22, 2014" />
+        <TextClock android:id="@+id/default_text_clock"
+                   android:layout_width="270dp"
+                   android:layout_height="95dp"
+                   android:layout_alignParentLeft="true"
+                   android:layout_alignParentTop="true"
+                   android:padding="5dp"
+                   android:gravity="center"
+                   android:textColor="#33b5e5"
+                   android:textSize="55sp"
+                   android:textStyle="bold" />
+        <TextClock android:id="@+id/default_text_clock_hour"
+                   android:layout_width="270dp"
+                   android:layout_height="60dp"
+                   android:layout_alignParentLeft="true"
+                   android:layout_alignParentTop="true"
+                   android:padding="2dp"
+                   android:gravity="center"
+                   android:textColor="#33b5e5"
+                   android:textSize="50sp"
+                   android:textStyle="bold" />
+        <TextView android:id="@+id/default_text_clock_date"
+                  android:layout_width="270dp"
+                  android:layout_height="35dp"
+                  android:layout_alignParentLeft="true"
+                  android:layout_below="@id/default_text_clock_hour"
+                  android:padding="5dp"
+                  android:gravity="center"
+                  android:textColor="#33b5e5"
+                  android:textSize="20sp"
+                  android:textStyle="bold"
+                  android:text="Aug 22, 2014" />
+      </RelativeLayout>
+      <GridView android:id="@+id/default_icon_container"
                 android:layout_width="270dp"
                 android:layout_height="30dp"
                 android:layout_alignParentBottom="true"
@@ -261,49 +205,41 @@
                 android:numColumns="0"
                 android:padding="3dp"
                 android:gravity="center" />
-            
-            <ImageButton
-                android:id="@+id/torchbutton"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="0dp"
-                android:padding="2dp"
-                android:onClick="sendToggleTorch"
-                android:background="#1F000000"
-                android:src="@drawable/ic_appwidget_torch_off" />
-
-            <ImageButton
-                android:id="@+id/camerabutton"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="30dp"
-                android:padding="2dp"
-                android:onClick="startCamera"
-                android:background="#1F000000"
-                android:src="@drawable/ic_notification" />
-
- 	        <ImageView
- 	            android:id="@+id/default_battery_picture_horizontal"
- 	            android:layout_width="30dp"
- 	            android:layout_height="20dp"
- 	            android:layout_alignParentRight="true"
- 	            android:layout_alignParentTop="true"
- 	            android:layout_marginTop="5dp"
- 	            android:src="@drawable/stat_sys_battery_horizontal" />
-
-            <TextView
-                android:id="@+id/default_battery_percent"
+      <ImageButton android:id="@+id/torchbutton"
+                   style="?android:attr/buttonBarButtonStyle"
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
+                   android:layout_alignParentRight="true"
+                   android:layout_alignParentBottom="true"
+                   android:layout_marginBottom="0dp"
+                   android:padding="2dp"
+                   android:onClick="sendToggleTorch"
+                   android:background="#1F000000"
+                   android:src="@drawable/ic_appwidget_torch_off" />
+      <ImageButton android:id="@+id/camerabutton"
+                   style="?android:attr/buttonBarButtonStyle"
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
+                   android:layout_alignParentRight="true"
+                   android:layout_alignParentBottom="true"
+                   android:layout_marginBottom="30dp"
+                   android:padding="2dp"
+                   android:onClick="startCamera"
+                   android:background="#1F000000"
+                   android:src="@drawable/ic_notification" />
+      <ImageView android:id="@+id/default_battery_picture_horizontal"
+                 android:layout_width="30dp"
+                 android:layout_height="20dp"
+                 android:layout_alignParentRight="true"
+                 android:layout_alignParentTop="true"
+                 android:layout_marginTop="5dp"
+                 android:src="@drawable/stat_sys_battery_horizontal" />
+      <TextView android:id="@+id/default_battery_percent"
                 android:layout_width="30dp"
                 android:layout_height="20dp"
- 	            android:layout_alignParentRight="true"
- 	            android:layout_alignParentTop="true"
- 	            android:layout_marginTop="5dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="5dp"
                 android:paddingBottom="0dp"
                 android:paddingLeft="4dp"
                 android:paddingRight="2dp"
@@ -312,23 +248,18 @@
                 android:text="999"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#ffffff" />
-
-            <RelativeLayout
-                android:id="@+id/swipe_torch"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-   	            android:layout_alignParentBottom="true"
-                android:layout_marginBottom="0dp"
-	            android:visibility="gone" >
-			</RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/swipe_camera"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_alignParentBottom="true"
-   	            android:layout_marginBottom="30dp"
-	            android:visibility="gone" >
-			</RelativeLayout>
-        </RelativeLayout>
+      <RelativeLayout android:id="@+id/swipe_torch"
+                      android:layout_width="match_parent"
+                      android:layout_height="30dp"
+                      android:layout_alignParentBottom="true"
+                      android:layout_marginBottom="0dp"
+                      android:visibility="gone"></RelativeLayout>
+      <RelativeLayout android:id="@+id/swipe_camera"
+                      android:layout_width="match_parent"
+                      android:layout_height="30dp"
+                      android:layout_alignParentBottom="true"
+                      android:layout_marginBottom="30dp"
+                      android:visibility="gone"></RelativeLayout>
     </RelativeLayout>
+  </RelativeLayout>
 </RelativeLayout>

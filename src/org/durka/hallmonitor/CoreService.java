@@ -132,9 +132,12 @@ public class CoreService extends Service {
 					}
 					return START_STICKY;
 				case CoreApp.CS_TASK_AUTO_BLACKSCREEN:
-					if (mStateManager.getBlackScreenTime() > 0) {
-						Log.d(LOG_TAG + ".handler",
-								"Blackscreen already requested");
+					if (mStateManager.getInActivity()) {
+						Log.d(LOG_TAG + ".oSC",
+								"Blackscreen requested canceled during activity");
+						return START_STICKY;
+					} else if (mStateManager.getBlackScreenTime() > 0) {
+						Log.d(LOG_TAG + ".oSC", "Blackscreen already requested");
 						return START_STICKY;
 					}
 					break;

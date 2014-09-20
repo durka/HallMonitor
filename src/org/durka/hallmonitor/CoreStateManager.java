@@ -797,4 +797,12 @@ public class CoreStateManager {
 	public static String createID() {
 		return String.valueOf(idCounter.getAndIncrement());
 	}
+
+	public boolean getInActivity() {
+		if (camera_up | phone_ringing | alarm_firing) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
