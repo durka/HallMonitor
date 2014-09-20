@@ -47,7 +47,7 @@
   <string name="pref_force_restart">Force restart Hall Monitor</string>
   <string name="pref_force_restart_summary">Exit application and restart it after 1 second.</string>
   <string name="pref_about">About Hall Monitor</string>
-  <string name="pref_about_summary">Hall Monitor version 2.0.1.\nProduced by Alex Burka (@durka), @manusfreedom, @B--B, @Wallace0, @habeIchVergessen, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
+  <string name="pref_about_summary">Hall Monitor version 2.0.2.\nProduced by Alex Burka (@durka), @manusfreedom, @B--B, @Wallace0, @habeIchVergessen, released under the Apache v2 License.\nFeedback: android@alexburka.com</string>
   
   <!-- preferences general screen -->
   <string name="pref_enabled_title">General Settings</string>

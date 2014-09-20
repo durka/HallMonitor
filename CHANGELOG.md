@@ -1,3 +1,22 @@
+- 2.0.2 beta
+	Major code update:
+		- Boost performance
+
+	Fixes:
+		- Fix possible crash turning on/off torch
+		- Fix camera log
+		- Fix not all but main security warning in log
+		- Fix screen off during alert/activity
+
+	Know issues:
+		- Alternative layout broken
+
+	Next big beta (2.1.0):
+		- Gesture/Swipe over the cover (bottom&left to: open camera, hang up call, snooze alarm / bottom right to: toggle torch, pickup call, dismiss alarm / bottom top to: pop-up menu)
+		- Pop-up menu like habeIchVergessen propose (using over cover touch): https://github.com/durka/HallMonitor/issues/18
+		- Network connectivity indicator (WIFI/2G/3G/4G): https://github.com/durka/HallMonitor/issues/24
+		- Add landscape layout to avoid rotate animation & rotate background app
+
 - 2.0.1 beta
 	Major code update:
 		- Clean/Reorder preferences
