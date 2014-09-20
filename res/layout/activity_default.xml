@@ -162,7 +162,7 @@
                   android:textColor="#33b5e5"
                   android:textSize="8dp"
                   android:textStyle="bold"
-                  android:text="11:36 PM Aug 22, 2014" />
+                  android:text="@string/full_datetime_sample" />
         <TextClock android:id="@+id/default_text_clock"
                    android:layout_width="270dp"
                    android:layout_height="95dp"
@@ -245,7 +245,7 @@
                 android:paddingRight="2dp"
                 android:paddingTop="0dp"
                 android:gravity="left|center_vertical"
-                android:text="999"
+                android:text="@string/battery_percent_sample"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#ffffff" />
       <RelativeLayout android:id="@+id/swipe_torch"
