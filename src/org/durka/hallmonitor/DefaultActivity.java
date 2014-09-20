@@ -366,6 +366,7 @@ public class DefaultActivity extends Activity {
 	 * (which is part of the default layout so will show anyway) will do this
 	 * simply by setting the widgetType
 	 */
+	@SuppressWarnings("deprecation")
 	public void setWidgetContent() {
 		if (!(mStateManager.getPreference().getBoolean("pref_media_widget",
 				false) || mStateManager.getPreference().getBoolean(
