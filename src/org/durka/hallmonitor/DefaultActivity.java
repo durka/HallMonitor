@@ -642,12 +642,21 @@ public class DefaultActivity extends Activity {
 				String action = intent.getAction();
 				if (action.equals(CoreApp.DA_ACTION_TORCH_STATE_CHANGED)) {
 					if (intent.getBooleanExtra(CoreApp.DA_EXTRA_STATE, false)) {
-						torchButton
-								.setImageResource(R.drawable.ic_appwidget_torch_on);
-
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								torchButton
+										.setImageResource(R.drawable.ic_appwidget_torch_on);
+							}
+						});
 					} else {
-						torchButton
-								.setImageResource(R.drawable.ic_appwidget_torch_off);
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								torchButton
+										.setImageResource(R.drawable.ic_appwidget_torch_off);
+							}
+						});
 					}
 
 				} else if (action.equals(CoreApp.DA_ACTION_WIDGET_REFRESH)) {
