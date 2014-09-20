@@ -415,7 +415,7 @@ public class DefaultActivity extends Activity {
 		Intent alarmSnooze = new Intent(this, CoreService.class);
 		alarmSnooze.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_SNOOZE_ALARM);
-		startService(alarmSnooze);
+		mStateManager.sendToCoreService(alarmSnooze);
 	}
 
 	/** Called when the user touches the dismiss button */
@@ -424,7 +424,7 @@ public class DefaultActivity extends Activity {
 		Intent alarmDismiss = new Intent(this, CoreService.class);
 		alarmDismiss.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_SNOOZE_ALARM);
-		startService(alarmDismiss);
+		mStateManager.sendToCoreService(alarmDismiss);
 	}
 
 	/** Called when the user touches the hangup button */
@@ -432,7 +432,7 @@ public class DefaultActivity extends Activity {
 		Intent hangUpCallIntent = new Intent(this, CoreService.class);
 		hangUpCallIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_HANGUP_CALL);
-		startService(hangUpCallIntent);
+		mStateManager.sendToCoreService(hangUpCallIntent);
 	}
 
 	/** Called when the user touches the pickup button */
@@ -440,7 +440,7 @@ public class DefaultActivity extends Activity {
 		Intent pickUpCallIntent = new Intent(this, CoreService.class);
 		pickUpCallIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_PICKUP_CALL);
-		startService(pickUpCallIntent);
+		mStateManager.sendToCoreService(pickUpCallIntent);
 	}
 
 	/** Called when the user touches the torch button */
@@ -448,7 +448,7 @@ public class DefaultActivity extends Activity {
 		Intent torchIntent = new Intent(this, CoreService.class);
 		torchIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_TORCH_TOGGLE);
-		startService(torchIntent);
+		mStateManager.sendToCoreService(torchIntent);
 	}
 
 	// from
@@ -530,7 +530,7 @@ public class DefaultActivity extends Activity {
 		Intent mIntent = new Intent(this, CoreService.class);
 		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_AUTO_BLACKSCREEN);
-		startService(mIntent);
+		mStateManager.sendToCoreService(mIntent);
 	}
 
 	private void setRealFullscreen() {
@@ -784,7 +784,7 @@ public class DefaultActivity extends Activity {
 		touchCoverIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_CHANGE_TOUCHCOVER);
 		touchCoverIntent.putExtra(CoreApp.CS_EXTRA_STATE, true);
-		startService(touchCoverIntent);
+		mStateManager.sendToCoreService(touchCoverIntent);
 
 		mainView.requestLayout();
 		mainView.requestFocus();
@@ -799,7 +799,7 @@ public class DefaultActivity extends Activity {
 		Intent mIntent = new Intent(this, CoreService.class);
 		mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 				CoreApp.CS_TASK_CHANGE_TOUCHCOVER);
-		startService(mIntent);
+		mStateManager.sendToCoreService(mIntent);
 		homeKeyLocker.unlock();
 
 		super.onPause();
@@ -819,7 +819,7 @@ public class DefaultActivity extends Activity {
 			Intent torchIntent = new Intent(this, CoreService.class);
 			torchIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_TORCH_TOGGLE);
-			startService(torchIntent);
+			mStateManager.sendToCoreService(torchIntent);
 		}
 		if (mStateManager.getCameraUp()) {
 			mStateManager.setCameraUp(false);

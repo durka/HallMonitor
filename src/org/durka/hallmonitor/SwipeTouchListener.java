@@ -51,21 +51,21 @@ public class SwipeTouchListener implements OnTouchListener {
 			Intent hangUpCallIntent = new Intent(ctx, CoreService.class);
 			hangUpCallIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_HANGUP_CALL);
-			ctx.startService(hangUpCallIntent);
+			mStateManager.sendToCoreService(hangUpCallIntent);
 			break;
 		case MODE_ALARM:
 			Log.d(LOG_TAG, "Swipe Left, dismiss... I am wake");
 			Intent alarmDismiss = new Intent(ctx, CoreService.class);
 			alarmDismiss.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_DISMISS_ALARM);
-			ctx.startService(alarmDismiss);
+			mStateManager.sendToCoreService(alarmDismiss);
 			break;
 		case MODE_TORCH:
 			Log.d(LOG_TAG, "Swipe Left, toggle torch");
 			Intent torchIntent = new Intent(ctx, CoreService.class);
 			torchIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_TORCH_TOGGLE);
-			ctx.startService(torchIntent);
+			mStateManager.sendToCoreService(torchIntent);
 			break;
 		case MODE_CAMERA:
 			Log.d(LOG_TAG, "Swipe Left, toggle camera");
@@ -88,14 +88,14 @@ public class SwipeTouchListener implements OnTouchListener {
 			Intent pickUpCallIntent = new Intent(ctx, CoreService.class);
 			pickUpCallIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_PICKUP_CALL);
-			ctx.startService(pickUpCallIntent);
+			mStateManager.sendToCoreService(pickUpCallIntent);
 			break;
 		case MODE_ALARM:
 			Log.d(LOG_TAG, "Swipe Right, snooze alarm");
 			Intent torchIntent = new Intent(ctx, CoreService.class);
 			torchIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_SNOOZE_ALARM);
-			ctx.startService(torchIntent);
+			mStateManager.sendToCoreService(torchIntent);
 			break;
 		case MODE_TORCH:
 			Log.d(LOG_TAG, "Swipe Right, toggle torch only Left");
@@ -299,7 +299,7 @@ public class SwipeTouchListener implements OnTouchListener {
 			Intent mIntent = new Intent(ctx, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_AUTO_BLACKSCREEN);
-			ctx.startService(mIntent);
+			mStateManager.sendToCoreService(mIntent);
 
 			// End our touch event
 			mActivePointerId = MotionEvent.INVALID_POINTER_ID;
@@ -323,7 +323,7 @@ public class SwipeTouchListener implements OnTouchListener {
 			Intent mIntent = new Intent(ctx, CoreService.class);
 			mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
 					CoreApp.CS_TASK_AUTO_BLACKSCREEN);
-			ctx.startService(mIntent);
+			mStateManager.sendToCoreService(mIntent);
 
 			mActivePointerId = MotionEvent.INVALID_POINTER_ID;
 			break;

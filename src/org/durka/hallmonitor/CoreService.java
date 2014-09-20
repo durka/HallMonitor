@@ -14,10 +14,14 @@
  */
 package org.durka.hallmonitor;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import android.app.ActivityManager;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
@@ -28,6 +32,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.SystemClock;
+import android.os.UserHandle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -43,6 +48,7 @@ public class CoreService extends Service {
 	private Boolean lastTouchCoverRequest;
 	private LocalBroadcastManager mLocalBroadcastManager;
 	private CoreService localCoreService;
+	private Method startActivityAsUser;
 
 	@Override
 	public void onCreate() {
@@ -52,6 +58,7 @@ public class CoreService extends Service {
 		mStateManager = ((CoreApp) getApplicationContext()).getStateManager();
 
 		Log.d(LOG_TAG + ".oC", "Register special actions");
+		mStateManager.registerCoreService(this);
 
 		mStateManager.registerCoreReceiver();
 
@@ -65,6 +72,14 @@ public class CoreService extends Service {
 		mTouchCoverLooper = thread.getLooper();
 		mTouchCoverHandler = new TouchCoverHandler(mTouchCoverLooper);
 		lastTouchCoverRequest = mStateManager.getCoverClosed();
+
+		try {
+			startActivityAsUser = ((ContextWrapper) this).getClass().getMethod(
+					"startActivityAsUser", Intent.class, UserHandle.class);
+			Log.d(LOG_TAG, "startActivityAsUser registred");
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -76,6 +91,7 @@ public class CoreService extends Service {
 	@Override
 	public void onDestroy() {
 		mStateManager.unregisterCoreReceiver();
+		mStateManager.unregisterCoreService();
 
 		Log.d(LOG_TAG + ".oD", "Core service stopped");
 
@@ -476,11 +492,28 @@ public class CoreService extends Service {
 				mStateManager.setBlackScreenTime(0);
 			}
 
-			localCoreService.startActivity(new Intent(localCoreService, DefaultActivity.class)
-					.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-							| Intent.FLAG_ACTIVITY_NO_ANIMATION
-							| Intent.FLAG_ACTIVITY_CLEAR_TOP
-							| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
+			if (startActivityAsUser != null) {
+				try {
+					startActivityAsUser
+							.invoke(localCoreService,
+									new Intent(localCoreService,
+											DefaultActivity.class)
+											.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+													| Intent.FLAG_ACTIVITY_NO_ANIMATION
+													| Intent.FLAG_ACTIVITY_CLEAR_TOP
+													| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS),
+									android.os.Process.myUserHandle());
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			} else {
+				Log.w(LOG_TAG, "No startActivityAsUser registred");
+			}
+
 			Log.d(LOG_TAG + ".bDATF", "Started activity.");
 
 			if (!noBlackScreen) {

@@ -17,6 +17,8 @@ package org.durka.hallmonitor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,6 +29,7 @@ import android.app.admin.DevicePolicyManager;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -40,6 +43,7 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.os.UserHandle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
@@ -93,6 +97,8 @@ public class CoreStateManager {
 	private boolean defaultActivityStarting = false;
 
 	private CoreReceiver mCoreReceiver;
+	private CoreService mCoreService;
+	private Method startCoreServiceAsUser;
 
 	private static long blackscreen_time = 0;
 
@@ -428,6 +434,24 @@ public class CoreStateManager {
 		}
 	}
 
+	public void registerCoreService(CoreService mService) {
+		mCoreService = mService;
+		try {
+			startCoreServiceAsUser = ((ContextWrapper) mCoreService).getClass()
+					.getMethod("startServiceAsUser", Intent.class,
+							UserHandle.class);
+			Log.d(LOG_TAG, "CoreService registred");
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void unregisterCoreService() {
+		mCoreService = null;
+		startCoreServiceAsUser = null;
+		Log.d(LOG_TAG, "CoreService unregistred");
+	}
+
 	public synchronized boolean setDefaultActivity(
 			DefaultActivity activityInstance) {
 		if (defaultActivity == null) {
@@ -577,6 +601,23 @@ public class CoreStateManager {
 
 	public HMAppWidgetManager getHMAppWidgetManager() {
 		return hmAppWidgetManager;
+	}
+
+	public void sendToCoreService(Intent mIntent) {
+		if (startCoreServiceAsUser != null) {
+			try {
+				startCoreServiceAsUser.invoke(mCoreService, mIntent,
+						android.os.Process.myUserHandle());
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		} else {
+			Log.w(LOG_TAG, "No CoreService registred");
+		}
 	}
 
 	/**
