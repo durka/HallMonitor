@@ -77,16 +77,14 @@
   <!-- preferences internal service screen -->
   <string name="pref_realhall">Use Real Hall</string>
   <string name="pref_realhall_summary">Use real hall sensor.</string>
-  <string name="pref_realhall_requirement">Proximity is enable or Root is disable, please disable Proximity and enable Root to use Real Hall</string>
   <string name="pref_proximity">Use Proximity sensor</string>
   <string name="pref_proximity_summary">Use proximity sensor.</string>
-  <string name="pref_proximity_requirement">Real Hall is enable, please disable it to use Proximity</string>
   
   <!-- preferences display options screen -->
   <string name="pref_layout">Layouts</string>
   <string name="pref_layout_summary">Switch between default layout and an alternative layout.</string>
   <string name="pref_realfullscreen">Use Real FullScreen</string>
-  <string name="pref_realfullscreen_summary">Hide all system bar: navigation bar,... Require Disable buttons off.</string>
+  <string name="pref_realfullscreen_summary">Hide all system bar: navigation bar,&#8230; Require Disable buttons off.</string>
   <string name="pref_realfullscreen_enabled">Real FullScreen is enable, please disable it to use Disable button</string>
   <string name="pref_default_bgcolor">Background color</string>
   <string name="pref_default_bgcolor_summary">Background of the view you will see through the closed cover</string>
@@ -151,6 +149,10 @@
   <!-- random strings -->
   <string name="hall_file">/sys/devices/virtual/sec/sec_key/hall_detect</string>
   <string name="unknown_caller">Unknown caller</string>
+
+  <!-- dummy strings -->
+  <string name="battery_percent_sample">999</string>
+  <string name="full_datetime_sample">11:36 PM Aug 22, 2014</string>
   
   <!-- unused strings -->
   <string name="title_activity_window">WindowActivity</string>
