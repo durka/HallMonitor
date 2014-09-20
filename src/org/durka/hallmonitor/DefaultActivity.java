@@ -57,6 +57,8 @@ public class DefaultActivity extends Activity {
 	private String daId;
 	private BroadcastReceiver mMessageReceiver;
 
+	private int allLayoutParams;
+
 	/**
 	 * Refresh the display taking account of device and application state
 	 */
@@ -535,9 +537,8 @@ public class DefaultActivity extends Activity {
 		if (mStateManager.getPreference().getBoolean("pref_realfullscreen",
 				false)) {
 			// Remove notification bar
-			getWindow().clearFlags(
-					WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			allLayoutParams |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+
 			// Remove navigation bar
 			View decorView = getWindow().getDecorView();
 			decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -594,21 +595,19 @@ public class DefaultActivity extends Activity {
 		setRealFullscreen();
 
 		if (mStateManager.getHardwareAccelerated()) {
-			getWindow().addFlags(
-					WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+			allLayoutParams |= WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
 
 		}
 
 		// Keep screen on during display
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		allLayoutParams |= WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+				| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+				// Display before lock screen
+				| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+				// Enable multitouch started outside view
+				| WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
 
-		// Display before lock screen
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-
-		// Enable multitouch started outside view
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_SPLIT_TOUCH);
-
+		getWindow().addFlags(allLayoutParams);
 		setMainLayout();
 
 		// get the views we need
