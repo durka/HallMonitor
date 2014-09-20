@@ -495,32 +495,32 @@ public class DefaultActivity extends Activity {
 	}
 
 	public void startCamera() {
+		Log.d(LOG_TAG, "starting camera");
 		mStateManager.setCameraUp(true);
+		mStateManager.setBlackScreenTime(0);
+		getWindow().addFlags(
+				WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 		if (mStateManager.getTorchOn()
 				&& mStateManager.getPreference().getBoolean(
 						"pref_flash_controls_alternative", false)) {
 			mStateManager.turnOffFlash();
 			torchButton.setImageResource(R.drawable.ic_appwidget_torch_off);
 		}
-		/*
-		 * Intent mIntent = new Intent(this, CoreService.class);
-		 * mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-		 * CoreApp.CS_TASK_CANCEL_BLACKSCREEN); startService(mIntent);
-		 */
-		mStateManager.setBlackScreenTime(0);
 		findViewById(R.id.default_camera).setVisibility(View.VISIBLE);
 		displayCamera();
-		Log.d("LOG_TAG + daId.hm-cam", "started camera");
+		Log.d(LOG_TAG, "started camera");
 	}
 
 	public void captureCamera(View view) {
-		Log.d("LOG_TAG + daId.hm-cam", "say cheese");
+		Log.d(LOG_TAG, "camera say cheese");
 		((CameraPreview) findViewById(R.id.default_camera)).capture();
 	}
 
 	public void stopCamera(View view) {
 		stopCamera();
-		Log.d("LOG_TAG + daId.hm-cam", "closed camera");
+		Log.d(LOG_TAG, "closed camera");
 	}
 
 	public void stopCamera() {
