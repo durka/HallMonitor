@@ -113,9 +113,9 @@ public class CoreStateManager {
 		// Enable access to sleep mode
 		systemApp = (mAppContext.getApplicationInfo().flags & (ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0;
 		if (systemApp) {
-			Log.d(LOG_TAG + ".init", "We are a system app.");
+			Log.d(LOG_TAG, "We are a system app.");
 		} else {
-			Log.d(LOG_TAG + ".init", "We are not a system app.");
+			Log.d(LOG_TAG, "We are not a system app.");
 			preference_all.edit()
 					.putBoolean("pref_internal_power_management", false)
 					.commit();
@@ -242,12 +242,10 @@ public class CoreStateManager {
 						"Hall effect sensor device file not found!");
 			}
 			boolean isClosed = (status.compareTo("CLOSE") == 0);
-			Log.d(LOG_TAG + ".cover_closed", "Cover closed state is: "
-					+ isClosed);
+			Log.d(LOG_TAG, "Cover closed state is: " + isClosed);
 			return isClosed;
 		} else {
-			Log.d(LOG_TAG + ".cover_closed", "Cover closed state is: "
-					+ cover_closed);
+			Log.d(LOG_TAG, "Cover closed state is: " + cover_closed);
 			return cover_closed;
 		}
 	}
@@ -324,10 +322,9 @@ public class CoreStateManager {
 		ComponentName me = new ComponentName(mAppContext, AdminReceiver.class);
 		adminApp = dpm.isAdminActive(me);
 		if (adminApp) {
-			Log.d(LOG_TAG + ".init", "We are an admin.");
+			Log.d(LOG_TAG, "We are an admin.");
 		} else {
-			Log.d(LOG_TAG + ".init",
-					"We are not an admin so cannot do anything.");
+			Log.d(LOG_TAG, "We are not an admin so cannot do anything.");
 		}
 		refreshLockMode();
 	}
@@ -351,9 +348,9 @@ public class CoreStateManager {
 			preference_all.edit().putBoolean("pref_runasroot", false).commit();
 		}
 		if (rootApp) {
-			Log.d(LOG_TAG + ".init", "We are root.");
+			Log.d(LOG_TAG, "We are root.");
 		} else {
-			Log.d(LOG_TAG + ".init", "We are not root.");
+			Log.d(LOG_TAG, "We are not root.");
 		}
 	}
 
@@ -530,8 +527,8 @@ public class CoreStateManager {
 		int widgetId = preference_all.getInt(widgetType + "_widget_id", -1);
 		if (widgetId != -1) {
 			if (!hmAppWidgetManager.doesWidgetExist(widgetType)) {
-				Log.d(LOG_TAG + ".sWC", "creating " + widgetType
-						+ " widget with id=" + widgetId);
+				Log.d(LOG_TAG, "creating " + widgetType + " widget with id="
+						+ widgetId);
 				Intent data = new Intent();
 				data.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
 
@@ -552,11 +549,10 @@ public class CoreStateManager {
 	 */
 	public void registerWidget(String widgetType) {
 
-		Log.d(LOG_TAG + ".register_widget", "Register widget called for type: "
-				+ widgetType);
+		Log.d(LOG_TAG, "Register widget called for type: " + widgetType);
 		// hand off to the HM App Widget Manager for processing
 		if (widget_settings_ongoing) {
-			Log.d(LOG_TAG + ".register_widget", "skipping, already inflight");
+			Log.d(LOG_TAG, "skipping, already inflight");
 		} else {
 			hmAppWidgetManager.registerWidget(widgetType);
 		}
@@ -574,8 +570,7 @@ public class CoreStateManager {
 	 */
 	public void unregisterWidget(String widgetType) {
 
-		Log.d(LOG_TAG + ".unregister_widget",
-				"unregister widget called for type: " + widgetType);
+		Log.d(LOG_TAG, "unregister widget called for type: " + widgetType);
 		// hand off to the HM App Widget Manager for processing
 		hmAppWidgetManager.unregisterWidget(widgetType);
 	}
@@ -589,7 +584,7 @@ public class CoreStateManager {
 	 * 
 	 */
 	public void startServices() {
-		Log.d(LOG_TAG + ".start_service", "Start service called.");
+		Log.d(LOG_TAG, "Start all services called.");
 
 		mAppContext.startService(new Intent(mAppContext, CoreService.class));
 		if (preference_all.getBoolean("pref_internalservice", false)) {
@@ -623,7 +618,7 @@ public class CoreStateManager {
 
 	public void stopServices(boolean override_keep_admin) {
 
-		Log.d(LOG_TAG + ".stop_service", "Stop service called.");
+		Log.d(LOG_TAG, "Stop all services called.");
 
 		if (getServiceRunning(ViewCoverHallService.class)) {
 			mAppContext.stopService(new Intent(mAppContext,
@@ -669,7 +664,7 @@ public class CoreStateManager {
 	 */
 	public boolean getServiceRunning(@SuppressWarnings("rawtypes") Class svc) {
 
-		Log.d(LOG_TAG + ".service_running", "Is service running called.");
+		Log.d(LOG_TAG, "Is service running called.");
 
 		ActivityManager manager = (ActivityManager) mAppContext
 				.getSystemService(Context.ACTIVITY_SERVICE);
@@ -677,14 +672,12 @@ public class CoreStateManager {
 				.getRunningServices(Integer.MAX_VALUE)) {
 			if (svc.getName().equals(service.service.getClassName())) {
 				// the service is running
-				Log.d(LOG_TAG + ".Is.service_running", "The " + svc.getName()
-						+ " is running.");
+				Log.d(LOG_TAG, "The " + svc.getName() + " is running.");
 				return true;
 			}
 		}
 		// the service must not be running
-		Log.d(LOG_TAG + ".service_running", "The " + svc.getName()
-				+ " service is NOT running.");
+		Log.d(LOG_TAG, "The " + svc.getName() + " service is NOT running.");
 		return false;
 	}
 
@@ -702,7 +695,7 @@ public class CoreStateManager {
 		p.setFlashMode(Parameters.FLASH_MODE_TORCH);
 		camera.setParameters(p);
 		camera.startPreview();
-		Log.d(LOG_TAG + ".TA.tOnF", "turned on!");
+		Log.d(LOG_TAG, "Flash turned on!");
 	}
 
 	// Turn Off Flash
@@ -715,7 +708,7 @@ public class CoreStateManager {
 		if (camera != null) {
 			camera.release();
 			camera = null;
-			Log.d(LOG_TAG + ".TA.tOffF", "turned off and camera released!");
+			Log.d(LOG_TAG, "Flash turned off and camera released!");
 		}
 		setTorchOn(false);
 	}
