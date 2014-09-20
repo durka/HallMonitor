@@ -8,22 +8,25 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 
 public class NotificationAdapter extends BaseAdapter {
-	
+
+	private final String LOG_TAG = "Hall.NA";
+
 	private StatusBarNotification[] notifs;
-	private Context that;
-	
+	private final Context that;
+
 	public NotificationAdapter(Context ctx, StatusBarNotification[] n) {
 		that = ctx;
 		notifs = n;
 	}
-	
+
 	public void update(StatusBarNotification[] n) {
 		notifs = n;
-		Log.d("NA.upd", "update: " + Integer.toString(n.length) + " notifications");
+		Log.d(LOG_TAG + ".upd", "update: " + Integer.toString(n.length)
+				+ " notifications");
 	}
 
 	@Override
@@ -45,14 +48,19 @@ public class NotificationAdapter extends BaseAdapter {
 	public View getView(int position, View convert, ViewGroup parent) {
 		ImageView view;
 		if (convert != null) {
-			view = (ImageView)convert;
+			view = (ImageView) convert;
 		} else {
 			view = new ImageView(that);
-			int size = (int) that.getResources().getDimension(R.dimen.icon_dimension);
-			view.setLayoutParams(new GridView.LayoutParams(size, size));
-			view.setPadding(0, 0, 0, 0);
+			// int size = (int)
+			// that.getResources().getDimension(R.dimen.icon_dimension);
+			// view.setLayoutParams(new GridView.LayoutParams(size, size));
+			view.setScaleType(ScaleType.CENTER_INSIDE);
 			try {
-				view.setImageDrawable(that.createPackageContext(notifs[position].getPackageName(), 0).getResources().getDrawable(notifs[position].getNotification().icon));
+				view.setImageDrawable(that
+						.createPackageContext(
+								notifs[position].getPackageName(), 0)
+						.getResources()
+						.getDrawable(notifs[position].getNotification().icon));
 			} catch (NotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -63,7 +71,6 @@ public class NotificationAdapter extends BaseAdapter {
 		}
 
 		return view;
-	}	    		
-
+	}
 
 }

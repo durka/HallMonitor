@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <org.durka.hallmonitor.PreferenceSwitchable android:key="pref_layout"
+                                              android:title="@string/pref_layout"
+                                              android:summary="@string/pref_layout_summary"
+                                              android:defaultValue="false" />
+  <org.durka.hallmonitor.PreferenceSwitchable android:key="pref_realfullscreen"
+                                              android:title="@string/pref_realfullscreen"
+                                              android:summary="@string/pref_realfullscreen_summary"
+                                              android:defaultValue="false" />
+  <afzkl.development.colorpickerview.preference.ColorPickerPreference android:key="pref_default_bgcolor"
+                                                                      android:title="@string/pref_default_bgcolor"
+                                                                      android:summary="@string/pref_default_bgcolor_summary"
+                                                                      android:defaultValue="0xFFA5C8F2" />
+  <afzkl.development.colorpickerview.preference.ColorPickerPreference android:key="pref_default_fgcolor"
+                                                                      android:title="@string/pref_default_fgcolor"
+                                                                      android:summary="@string/pref_default_fgcolor_summary"
+                                                                      android:defaultValue="0xFF33B5E5" />
+  <org.durka.hallmonitor.PreferenceSwitchable android:key="pref_datetime"
+                                              android:title="@string/pref_datetime"
+                                              android:summary="@string/pref_datetime_summary"
+                                              android:defaultValue="false" />
+</PreferenceScreen>

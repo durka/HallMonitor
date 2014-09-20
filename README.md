@@ -33,11 +33,24 @@ If you test this on something other than the above (including another carrier's 
 
 Installation / Usage
 --------------------
+
+STABLE RELEASE
 The current release is: [0.4.1](https://github.com/durka/HallMonitor/tree/0.4.1) (see [changelog](https://github.com/durka/HallMonitor/blob/0.4.1/CHANGELOG.md))
 
 - The easiest way to install the latest stable version is through [F-Droid](https://f-droid.org/), an "app store" for open source. Here is [Hall Monitor's entry](https://f-droid.org/repository/browse/?fdid=org.durka.hallmonitor).
 - You can download [`bin/HallMonitor-debug.apk`](https://github.com/durka/HallMonitor/blob/0.4.1/bin/HallMonitor-debug.apk?raw=true) from one of the tagged versions, and install it on your phone assuming you have sideloading turned on.
 - You can clone the repository at a tagged version and build from source. It's configured as an Eclipse project, but I haven't even used any external libraries yet, so it "should" be "simple" to build with another system such as Android Studio or ant.
+
+CUSTOM RELEASE (manusfreedom)
+- You can download [`HallMonitor.apk`](https://github.com/manusfreedom/HallMonitor/tree/master/download/debug) install it on your phone assuming you have sideloading turned on.
+But becareful, you can not install it over a system version!!!
+- Install in your ROM as system app, use HallMonitor.zip in Recovery mode (https://github.com/manusfreedom/HallMonitor/tree/master/download/CM_SystemApp)
+- To update system app, you must copy to time as root the HallMonitor.apk in /system/app
+
+To switch from one to another you need to completly clean your system (to remove trace of signature):
+- Uninstall HallMonitor
+- Delete all folders&files named : org.durka.hallmonitor in your /data folder.
+	
 
 Limitations / Known Issues
 --------------------------
@@ -74,3 +87,16 @@ This should serve as quick guide if you're trying to find your way around my cod
     - ViewCoverService: the most important file, really, outside of [`Functions.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/Functions.java), is [`ViewCoverService.java`](https://github.com/durka/HallMonitor/blob/master/src/org/durka/hallmonitor/ViewCoverService.java). This is the service that runs all the time and receives events from the proximity sensor, so it can check the hall effect sensor state, and react to view cover events.
 
 Happy hacking! File an issue or contact me at [android@alexburka.com](mailto:android@alexburka.com) with any questions.
+
+Compiling
+---------
+
+To compile for OS system (install using recovery):
+- In AndroidManifest.xml, just after package="org.durka.hallmonitor add (section manifest):
+coreApp="true"
+android:sharedUserId="android.uid.system"
+- In build_signed_system.bat change MODE to release:
+SET MODE=release
+- In build_signed_system.sh change MODE to release:
+MODE=release
+

@@ -1,3 +1,94 @@
+- 2.0.2 beta
+	Major code update:
+		- Boost performance
+
+	Fixes:
+		- Fix possible crash turning on/off torch
+		- Fix camera log
+		- Fix not all but main security warning in log
+		- Fix screen off during alert/activity
+
+	Know issues:
+		- Alternative layout broken
+
+	Next big beta (2.1.0):
+		- Gesture/Swipe over the cover (bottom&left to: open camera, hang up call, snooze alarm / bottom right to: toggle torch, pickup call, dismiss alarm / bottom top to: pop-up menu)
+		- Pop-up menu like habeIchVergessen propose (using over cover touch): https://github.com/durka/HallMonitor/issues/18
+		- Network connectivity indicator (WIFI/2G/3G/4G): https://github.com/durka/HallMonitor/issues/24
+		- Add landscape layout to avoid rotate animation & rotate background app
+
+- 2.0.1 beta
+	Major code update:
+		- Clean/Reorder preferences
+		- Clean/Reorder strings
+		- Better preferences change/update
+		- Better preferences dependencies
+	
+	Feature:
+		- Support 3 modes:
+			Lock (require admin)
+			OS PowerManagement
+			Internal/HallMonitor Powermanagement (require system app)
+
+	Fixes:
+		- Fix CM 11 LID support
+		- Fix widget crash (to confirm)
+
+	Know issues:
+		- Alternative layout broken
+
+	Next big beta (2.1.0):
+		- Gesture/Swipe over the cover (bottom&left to: open camera, hang up call, snooze alarm / bottom right to: toggle torch, pickup call, dismiss alarm / bottom top to: pop-up menu)
+		- Pop-up menu like habeIchVergessen propose (using over cover touch): https://github.com/durka/HallMonitor/issues/18
+		- Network connectivity indicator (WIFI/2G/3G/4G): https://github.com/durka/HallMonitor/issues/24
+		- Add landscape layout to avoid rotate animation & rotate background app
+
+- 2.0.0 beta
+	Major code update:
+		- Rewrite many code to exclude much as possible from UI thread
+		- Add share value between application parts
+	
+	Feature:
+		- Normally support last CM 11 LID action (to test): turn off Use internal service
+		- Support 4x1 widget (from my test)
+		- Add lock mode option when system app (fixed to lock mode if not system app)
+		- New Input Controls menu under Optional Features
+		- Pick Up & Hang Up a call without use command line
+
+	Fixes:
+		- https://github.com/durka/HallMonitor/issues/33 (to test)
+		- Fix swipe
+
+	Know issues:
+		- Alternative layout broken
+		- Must force restart application (through Configuration activity) to get widget content updated after the first attachment
+
+	Next beta (2.1.0):
+		- Gesture/Swipe over the cover (bottom&left to: open camera, hang up call, snooze alarm / bottom right to: toggle torch, pickup call, dismiss alarm / bottom top to: pop-up menu)
+		- Pop-up menu like habeIchVergessen propose (using over cover touch): https://github.com/durka/HallMonitor/issues/18
+		- Network connectivity indicator (WIFI/2G/3G/4G): https://github.com/durka/HallMonitor/issues/24
+		- Add landscape layout to avoid rotate animation & rotate background app
+
+- 0.5.1
+	Features
+		- Add serrano3gxx support (thank habeIchVergessen)
+
+- 0.5.0
+	Features
+		- Add Swipe for Torch
+		- Add Swipe for Alarm
+		- Add Swipe for Phone (fix)
+		- Re-add Real Fullscreen (only for software navigation bar)
+
+	Fixes
+		- Try re-fix (#37) Last used app shows up randomly
+		- Remove duplicate torch button
+		- At init unable to turn on directly Torch Control
+		- Torch icon on CM display correctly (is on/off too when activated outside HallMonitor)
+		- Clean Alarm code
+		- Cover mode sensitivity after displaying not before
+		- Better debug tag
+
 - 0.4.2
 	Features
 		- Added a new alternative layout
@@ -7,8 +98,7 @@
 		- Stopped TimerTask when receiving a call
 	Partial Fixes
 		- Incoming call screen now works 99% times in both layouts when the screen is off and the cover closed. Does not work if the screen is on and the cover closed (need to open and close the cover manually)
-		- Alternative and media widgets works for 4x1 widgets and for some 4x2 widget, but
-only on alternative layout
+		- Alternative and media widgets works for 4x1 widgets and for some 4x2 widget, but only on alternative layout
 - 0.4.1
 	- Fixes
 		- Touch screen sensitivity now works on S4 Mini Dual Sim

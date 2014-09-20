@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/pref_input_settings">
+        <org.durka.hallmonitor.PreferenceSwitchable
+            android:key="pref_torch_input"
+            android:title="@string/pref_torch_input"
+            android:summary="@string/pref_torch_input_summary"
+            android:defaultValue="false" />
+        <org.durka.hallmonitor.PreferenceSwitchable
+            android:key="pref_camera_input"
+            android:title="@string/pref_camera_input"
+            android:summary="@string/pref_camera_input_summary"
+            android:defaultValue="false" />
+        <org.durka.hallmonitor.PreferenceSwitchable
+            android:key="pref_alarm_input"
+            android:title="@string/pref_alarm_input"
+            android:summary="@string/pref_alarm_input_summary"
+            android:defaultValue="false" />
+        <org.durka.hallmonitor.PreferenceSwitchable
+            android:key="pref_incoming_call_input"
+            android:title="@string/pref_incoming_call_input"
+            android:summary="@string/pref_incoming_call_input_summary"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+</PreferenceScreen>
