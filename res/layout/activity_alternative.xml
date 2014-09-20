@@ -242,14 +242,12 @@
                       android:layout_height="30dp"
                       android:layout_alignParentBottom="true"
                       android:layout_marginBottom="0dp"
-                      android:background="#55000088"
                       android:visibility="gone"></RelativeLayout>
       <RelativeLayout android:id="@+id/swipe_camera"
                       android:layout_width="match_parent"
                       android:layout_height="30dp"
                       android:layout_alignParentBottom="true"
                       android:layout_marginBottom="30dp"
-                      android:background="#55008800"
                       android:visibility="gone"></RelativeLayout>
     </RelativeLayout>
   </RelativeLayout>
