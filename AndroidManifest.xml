@@ -61,8 +61,7 @@
               android:configChanges="orientation|keyboardHidden|screenSize"
               android:launchMode="singleTask"
               android:theme="@style/FullscreenTheme"
-              android:excludeFromRecents="true">
-    </activity>
+              android:excludeFromRecents="true"></activity>
     <service android:name="org.durka.hallmonitor.CoreService" />
     <service android:name="org.durka.hallmonitor.ViewCoverHallService" />
     <service android:name="org.durka.hallmonitor.ViewCoverProximityService" />
@@ -87,13 +86,13 @@
         <action android:name="android.intent.action.QUICKBOOT_POWERON" />
         <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
       </intent-filter>
-      <intent-filter>
+      <intent-filter android:priority="900">
         <action android:name="com.android.deskclock.ALARM_ALERT" />
         <action android:name="com.android.deskclock.ALARM_SNOOZE" />
         <action android:name="com.android.deskclock.ALARM_DISMISS" />
         <action android:name="com.android.deskclock.ALARM_DONE" />
       </intent-filter>
-      <intent-filter>
+      <intent-filter android:priority="900">
         <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
         <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
       </intent-filter>
@@ -101,7 +100,7 @@
         <action android:name="net.cactii.flash2.TOGGLE_FLASHLIGHT" />
         <action android:name="net.cactii.flash2.TORCH_STATE_CHANGED" />
       </intent-filter>
-      <intent-filter>
+      <intent-filter android:priority="900">
         <action android:name="android.intent.action.PHONE_STATE" />
       </intent-filter>
     </receiver>

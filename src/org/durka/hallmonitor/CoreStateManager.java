@@ -410,6 +410,7 @@ public class CoreStateManager {
 			 */
 			mCoreReceiver = new CoreReceiver();
 			IntentFilter intfil = new IntentFilter();
+			intfil.setPriority(990);
 			intfil.addAction(Intent.ACTION_HEADSET_PLUG);
 			intfil.addAction(Intent.ACTION_SCREEN_ON);
 			intfil.addAction(Intent.ACTION_SCREEN_OFF);
