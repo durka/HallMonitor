@@ -120,6 +120,7 @@ public class CoreService extends Service {
 					boolean sendTouchCoverRequest = intent.getBooleanExtra(
 							CoreApp.CS_EXTRA_STATE, false);
 					if (sendTouchCoverRequest != lastTouchCoverRequest) {
+						mStateManager.acquireCPUGlobal();
 						lastTouchCoverRequest = sendTouchCoverRequest;
 						Message msgTCH = mTouchCoverHandler.obtainMessage();
 						msgTCH.arg1 = startId;
@@ -142,6 +143,7 @@ public class CoreService extends Service {
 					}
 					break;
 				case CoreApp.CS_TASK_LAUNCH_ACTIVITY:
+					mStateManager.acquireCPUGlobal();
 					if (intent.getBooleanExtra(CoreApp.CS_EXTRA_STATE, false)) {
 						msgArg2 = 1;
 					}
@@ -203,6 +205,7 @@ public class CoreService extends Service {
 							"...Sensitivity reverted, sanity is restored!");
 				}
 			}
+			mStateManager.releaseCPUGlobal();
 		}
 	}
 
@@ -302,6 +305,7 @@ public class CoreService extends Service {
 						"android.permission.CALL_PRIVILEGED");
 				break;
 			case CoreApp.CS_TASK_INCOMMING_CALL:
+				mStateManager.acquireCPUDA();
 				wait_package_front_launched(CoreApp.PACKAGE_PHONE_APP);
 				if (mStateManager.getCoverClosed()) {
 					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
@@ -335,6 +339,7 @@ public class CoreService extends Service {
 				}
 				break;
 			case CoreApp.CS_TASK_LAUNCH_ACTIVITY:
+				mStateManager.acquireCPUDA();
 				boolean noBlackScreen = false;
 				if (msg.arg2 == 1) {
 					noBlackScreen = true;
@@ -342,6 +347,7 @@ public class CoreService extends Service {
 				Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
 						+ ": Launch activity / " + noBlackScreen);
 				bringDefaultActivityToFront(noBlackScreen);
+				mStateManager.releaseCPUGlobal();
 				break;
 			case CoreApp.CS_TASK_AUTO_BLACKSCREEN:
 				// already request running
@@ -490,6 +496,7 @@ public class CoreService extends Service {
 		private void bringDefaultActivityToFront(boolean noBlackScreen) {
 
 			Log.d(LOG_TAG + ".bDATF", "Launching default activity");
+			mStateManager.acquireCPUDA();
 
 			if (noBlackScreen) {
 				mStateManager.setBlackScreenTime(0);

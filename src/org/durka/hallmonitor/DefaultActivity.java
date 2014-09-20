@@ -586,6 +586,8 @@ public class DefaultActivity extends Activity {
 			return;
 		}
 
+		mStateManager.acquireCPUDA();
+
 		mStateManager.closeConfigurationActivity();
 
 		// Remove title bar
@@ -728,8 +730,10 @@ public class DefaultActivity extends Activity {
 		super.onWindowFocusChanged(hasWindowFocus);
 
 		if (hasWindowFocus) {
+			mStateManager.acquireCPUDA();
 			Log.d(LOG_TAG + daId + ".onWFC", "Get focus.");
 		} else {
+			mStateManager.releaseCPUDA();
 			Log.d(LOG_TAG + daId + ".onWFC", "No focus.");
 		}
 
@@ -737,6 +741,7 @@ public class DefaultActivity extends Activity {
 
 	@Override
 	protected void onStart() {
+		mStateManager.acquireCPUDA();
 		Log.d(LOG_TAG + daId + ".onStart", "starting");
 		mStateManager.setDefaultActivityStarting(true);
 
@@ -745,6 +750,7 @@ public class DefaultActivity extends Activity {
 
 	@Override
 	protected void onResume() {
+		mStateManager.acquireCPUDA();
 		Log.d(LOG_TAG + daId + ".onResume", "resuming");
 		mStateManager.setDefaultActivityStarting(true);
 
@@ -790,6 +796,8 @@ public class DefaultActivity extends Activity {
 		mainView.requestFocus();
 
 		super.onResume();
+
+		mStateManager.releaseCPUDA();
 	}
 
 	@Override
@@ -802,6 +810,7 @@ public class DefaultActivity extends Activity {
 		mStateManager.sendToCoreService(mIntent);
 		homeKeyLocker.unlock();
 
+		mStateManager.releaseCPUDA();
 		super.onPause();
 	}
 
@@ -834,6 +843,7 @@ public class DefaultActivity extends Activity {
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(
 				mMessageReceiver);
+		mStateManager.releaseCPUDA();
 		mStateManager.setDefaultActivity(null);
 		super.onDestroy();
 	}

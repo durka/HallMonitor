@@ -42,6 +42,7 @@ import android.hardware.Camera.Parameters;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
 import android.os.UserHandle;
 import android.preference.PreferenceManager;
@@ -105,6 +106,9 @@ public class CoreStateManager {
 	private String actionCover = CoreReceiver.ACTION_LID_STATE_CHANGED;
 
 	private final PowerManager mPowerManager;
+	private final WakeLock daPartialWakeLock;
+	private final WakeLock globalPartialWakeLock;
+	private int globalPartialWakeLockCount;
 
 	private static AtomicInteger idCounter = new AtomicInteger();
 
@@ -112,6 +116,12 @@ public class CoreStateManager {
 		mAppContext = context;
 		mPowerManager = (PowerManager) mAppContext
 				.getSystemService(Context.POWER_SERVICE);
+		daPartialWakeLock = mPowerManager.newWakeLock(
+				PowerManager.PARTIAL_WAKE_LOCK, "CoreStateManager");
+		daPartialWakeLock.setReferenceCounted(false);
+		globalPartialWakeLock = mPowerManager.newWakeLock(
+				PowerManager.PARTIAL_WAKE_LOCK, "CoreReceiver");
+		globalPartialWakeLock.setReferenceCounted(true);
 
 		preference_all = PreferenceManager
 				.getDefaultSharedPreferences(mAppContext);
@@ -628,6 +638,8 @@ public class CoreStateManager {
 	public void startServices() {
 		Log.d(LOG_TAG, "Start all services called.");
 
+		acquireCPUGlobal();
+
 		mAppContext.startService(new Intent(mAppContext, CoreService.class));
 		if (preference_all.getBoolean("pref_internalservice", false)) {
 			if (preference_all.getBoolean("pref_realhall", false)) {
@@ -648,6 +660,8 @@ public class CoreStateManager {
 					CoreApp.CS_TASK_LAUNCH_ACTIVITY);
 			mAppContext.startService(mIntent);
 		}
+
+		releaseCPUGlobal();
 	}
 
 	/**
@@ -796,6 +810,32 @@ public class CoreStateManager {
 
 	public static String createID() {
 		return String.valueOf(idCounter.getAndIncrement());
+	}
+
+	public void acquireCPUDA() {
+		daPartialWakeLock.acquire();
+	}
+
+	public void releaseCPUDA() {
+		if (daPartialWakeLock.isHeld()) {
+			daPartialWakeLock.release();
+		}
+	}
+
+	public void acquireCPUGlobal() {
+		globalPartialWakeLock.acquire();
+		globalPartialWakeLockCount++;
+		Log.d(LOG_TAG, "globalPartialWakeLockCount="
+				+ globalPartialWakeLockCount);
+	}
+
+	public void releaseCPUGlobal() {
+		if (globalPartialWakeLock.isHeld()) {
+			globalPartialWakeLock.release();
+			globalPartialWakeLockCount--;
+			Log.d(LOG_TAG, "globalPartialWakeLockCount="
+					+ globalPartialWakeLockCount);
+		}
 	}
 
 	public boolean getInActivity() {

@@ -81,6 +81,8 @@ public class CoreReceiver extends BroadcastReceiver {
 			return;
 		}
 
+		mStateManager.acquireCPUGlobal();
+
 		if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
 
 			Log.d(LOG_TAG + ".screen", "Screen on event received.");
@@ -282,5 +284,6 @@ public class CoreReceiver extends BroadcastReceiver {
 				mNotificationManager.cancel(42);
 			}
 		}
+		mStateManager.releaseCPUGlobal();
 	}
 }
