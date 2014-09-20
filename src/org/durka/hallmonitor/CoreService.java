@@ -42,10 +42,12 @@ public class CoreService extends Service {
 	private TouchCoverHandler mTouchCoverHandler;
 	private Boolean lastTouchCoverRequest;
 	private LocalBroadcastManager mLocalBroadcastManager;
+	private CoreService localCoreService;
 
 	@Override
 	public void onCreate() {
 		Log.d(LOG_TAG + ".oC", "Core service creating");
+		localCoreService = this;
 
 		mStateManager = ((CoreApp) getApplicationContext()).getStateManager();
 
@@ -87,7 +89,6 @@ public class CoreService extends Service {
 						false)) {
 			Message msg = Message.obtain();
 			msg.arg1 = startId;
-			msg.obj = this;
 			msg.what = CoreApp.CS_TASK_MAINLAUNCH;
 			ServiceThread svcThread = new ServiceThread(msg);
 			svcThread.start();
@@ -137,7 +138,6 @@ public class CoreService extends Service {
 				Message msg = Message.obtain();
 				msg.arg1 = startId;
 				msg.arg2 = msgArg2;
-				msg.obj = this;
 				msg.what = requestedTaskMode;
 				ServiceThread svcThread = new ServiceThread(msg);
 				svcThread.start();
@@ -189,6 +189,7 @@ public class CoreService extends Service {
 
 	private class ServiceThread extends Thread {
 		private final Message msg;
+		private Message internalMsg;
 
 		public ServiceThread(Message msgSend) {
 			super();
@@ -197,31 +198,32 @@ public class CoreService extends Service {
 
 		@Override
 		public void run() {
+			runCustom(msg);
+		}
+
+		public void runCustom(Message msg) {
 			Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1 + ": started");
 
-			Context ctx;
 			switch (msg.what) {
 			case CoreApp.CS_TASK_TORCH_STATE:
-				ctx = (Context) msg.obj;
 				Intent torchDAIntent = new Intent(
 						CoreApp.DA_ACTION_TORCH_STATE_CHANGED);
 				if (msg.arg2 == 1) {
 					mStateManager.setTorchOn(true);
 					torchDAIntent.putExtra(CoreApp.DA_EXTRA_STATE, true);
 					if (mStateManager.getCoverClosed()) {
-						bringDefaultActivityToFront(ctx, true);
+						bringDefaultActivityToFront(true);
 					}
 				} else {
 					mStateManager.setTorchOn(false);
 					torchDAIntent.putExtra(CoreApp.DA_EXTRA_STATE, false);
 					if (mStateManager.getCoverClosed()) {
-						bringDefaultActivityToFront(ctx, false);
+						bringDefaultActivityToFront(false);
 					}
 				}
 				mLocalBroadcastManager.sendBroadcastSync(torchDAIntent);
 				break;
 			case CoreApp.CS_TASK_TORCH_TOGGLE:
-				ctx = (Context) msg.obj;
 				if (mStateManager.getPreference().getBoolean(
 						"pref_flash_controls", false)) {
 					Intent intent = new Intent(CoreReceiver.TOGGLE_FLASHLIGHT);
@@ -234,28 +236,25 @@ public class CoreService extends Service {
 						"pref_flash_controls_alternative", false)) {
 					if (!mStateManager.getTorchOn()) {
 						mStateManager.turnOnFlash();
-						Intent mIntent = new Intent(ctx, CoreService.class);
-						mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-								CoreApp.CS_TASK_TORCH_STATE);
-						mIntent.putExtra(CoreApp.CS_EXTRA_STATE, true);
-						startService(mIntent);
+						internalMsg = msg;
+						internalMsg.what = CoreApp.CS_TASK_TORCH_STATE;
+						internalMsg.arg2 = 1;
+						runCustom(internalMsg);
 					} else {
 						mStateManager.turnOffFlash();
-						Intent mIntent = new Intent(ctx, CoreService.class);
-						mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-								CoreApp.CS_TASK_TORCH_STATE);
-						mIntent.putExtra(CoreApp.CS_EXTRA_STATE, false);
-						startService(mIntent);
+						internalMsg = msg;
+						internalMsg.what = CoreApp.CS_TASK_TORCH_STATE;
+						internalMsg.arg2 = 0;
+						runCustom(internalMsg);
 					}
 				}
 				break;
 			case CoreApp.CS_TASK_HEADSET_PLUG:
-				ctx = (Context) msg.obj;
 				Intent headSetIntent = new Intent(
 						CoreApp.DA_ACTION_WIDGET_REFRESH);
 				mLocalBroadcastManager.sendBroadcastSync(headSetIntent);
 				if (mStateManager.getCoverClosed()) {
-					bringDefaultActivityToFront(ctx, false);
+					bringDefaultActivityToFront(false);
 				}
 				break;
 			case CoreApp.CS_TASK_HANGUP_CALL:
@@ -284,17 +283,15 @@ public class CoreService extends Service {
 						"android.permission.CALL_PRIVILEGED");
 				break;
 			case CoreApp.CS_TASK_INCOMMING_CALL:
-				ctx = (Context) msg.obj;
-				wait_package_front_launched(ctx, CoreApp.PACKAGE_PHONE_APP);
+				wait_package_front_launched(CoreApp.PACKAGE_PHONE_APP);
 				if (mStateManager.getCoverClosed()) {
 					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
 							+ ": the screen is closed. screen my calls");
 
-					bringDefaultActivityToFront(ctx, true);
+					bringDefaultActivityToFront(true);
 				}
 				break;
 			case CoreApp.CS_TASK_SNOOZE_ALARM:
-				ctx = (Context) msg.obj;
 				// Broadcast alarm snooze event
 				Intent alarmSnooze = new Intent(
 						CoreReceiver.ALARM_SNOOZE_ACTION);
@@ -302,7 +299,6 @@ public class CoreService extends Service {
 						android.os.Process.myUserHandle());
 				break;
 			case CoreApp.CS_TASK_DISMISS_ALARM:
-				ctx = (Context) msg.obj;
 				// Broadcast alarm Dismiss event
 				Intent alarmDismiss = new Intent(
 						CoreReceiver.ALARM_DISMISS_ACTION);
@@ -310,27 +306,25 @@ public class CoreService extends Service {
 						android.os.Process.myUserHandle());
 				break;
 			case CoreApp.CS_TASK_INCOMMING_ALARM:
-				ctx = (Context) msg.obj;
-				wait_package_front_launched(ctx, CoreApp.PACKAGE_ALARM_APP);
+				mStateManager.acquireCPUDA();
+				wait_package_front_launched(CoreApp.PACKAGE_ALARM_APP);
 				if (mStateManager.getCoverClosed()) {
 					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
 							+ ": the screen is closed. screen alarm");
 
-					bringDefaultActivityToFront(ctx, true);
+					bringDefaultActivityToFront(true);
 				}
 				break;
 			case CoreApp.CS_TASK_LAUNCH_ACTIVITY:
-				ctx = (Context) msg.obj;
 				boolean noBlackScreen = false;
 				if (msg.arg2 == 1) {
 					noBlackScreen = true;
 				}
 				Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
 						+ ": Launch activity / " + noBlackScreen);
-				bringDefaultActivityToFront(ctx, noBlackScreen);
+				bringDefaultActivityToFront(noBlackScreen);
 				break;
 			case CoreApp.CS_TASK_AUTO_BLACKSCREEN:
-				ctx = (Context) msg.obj;
 				// already request running
 				if (mStateManager.getBlackScreenTime() > 0) {
 					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
@@ -354,7 +348,7 @@ public class CoreService extends Service {
 					Log.d(LOG_TAG + ".handler",
 							"Thread " + msg.arg1 + ": Launch blackscreen at: "
 									+ mStateManager.getBlackScreenTime());
-					launchBlackScreen(ctx);
+					launchBlackScreen();
 					mStateManager.setBlackScreenTime(0);
 				} else {
 					Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
@@ -364,8 +358,7 @@ public class CoreService extends Service {
 			case CoreApp.CS_TASK_WAKEUP_DEVICE:
 				Log.d(LOG_TAG + ".handler", "Thread " + msg.arg1
 						+ ": Launch wakeup");
-				ctx = (Context) msg.obj;
-				wakeUpDevice(ctx);
+				wakeUpDevice();
 				break;
 			case CoreApp.CS_TASK_MAINLAUNCH:
 				if (!mStateManager.getMainLaunched()) {
@@ -399,9 +392,9 @@ public class CoreService extends Service {
 			// the service in the middle of handling another job
 		}
 
-		private void wait_package_front_launched(Context ctx, String pacakgeName) {
+		private void wait_package_front_launched(String pacakgeName) {
 			Log.d(LOG_TAG + ".wpl", "Wait launch of " + pacakgeName);
-			ActivityManager am = (ActivityManager) ctx
+			ActivityManager am = (ActivityManager) localCoreService
 					.getSystemService(Context.ACTIVITY_SERVICE);
 			long maxWaitTime = System.currentTimeMillis() + 10 * 1000;
 			while (System.currentTimeMillis() < maxWaitTime) {
@@ -419,11 +412,11 @@ public class CoreService extends Service {
 			}
 		}
 
-		private void launchBlackScreen(Context ctx) {
+		private void launchBlackScreen() {
 			if (mStateManager.getCoverClosed()) {
 				Log.d(LOG_TAG + ".lBS", "Cover closed.");
 				if (mStateManager.getLockMode()) {
-					final DevicePolicyManager dpm = (DevicePolicyManager) ctx
+					final DevicePolicyManager dpm = (DevicePolicyManager) localCoreService
 							.getSystemService(Context.DEVICE_POLICY_SERVICE);
 					Log.d(LOG_TAG + ".lBS", "Lock now.");
 					dpm.lockNow();
@@ -451,7 +444,7 @@ public class CoreService extends Service {
 			}
 		}
 
-		private void wakeUpDevice(Context ctx) {
+		private void wakeUpDevice() {
 			if (mStateManager.getInternalPowerManagement()) {
 				if (!mStateManager.getPowerManager().isScreenOn()) {
 					Log.d(LOG_TAG + ".wUD", "WakeUp device.");
@@ -469,14 +462,13 @@ public class CoreService extends Service {
 						.newWakeLock(
 								PowerManager.FULL_WAKE_LOCK
 										| PowerManager.ACQUIRE_CAUSES_WAKEUP,
-								ctx.getString(R.string.app_name));
+								localCoreService.getString(R.string.app_name));
 				wl.acquire();
 				wl.release();
 			}
 		}
 
-		private void bringDefaultActivityToFront(Context ctx,
-				boolean noBlackScreen) {
+		private void bringDefaultActivityToFront(boolean noBlackScreen) {
 
 			Log.d(LOG_TAG + ".bDATF", "Launching default activity");
 
@@ -484,26 +476,18 @@ public class CoreService extends Service {
 				mStateManager.setBlackScreenTime(0);
 			}
 
-			// if (!mStateManager.getDefaultActivityStarting()) {
-			// bring up the default activity window
-			// we are using the show when locked flag as we'll re-use this
-			// method to show the screen on power button press
-			ctx.startActivity(new Intent(ctx, DefaultActivity.class)
+			localCoreService.startActivity(new Intent(localCoreService, DefaultActivity.class)
 					.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 							| Intent.FLAG_ACTIVITY_NO_ANIMATION
 							| Intent.FLAG_ACTIVITY_CLEAR_TOP
 							| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
 			Log.d(LOG_TAG + ".bDATF", "Started activity.");
-			// } else {
-			// Log.d(LOG_TAG + ".bDATF", "Activity already starting.");
-			// }
 
 			if (!noBlackScreen) {
 				// step 2: wait for the delay period and turn the screen off
-				Intent mIntent = new Intent(ctx, CoreService.class);
-				mIntent.putExtra(CoreApp.CS_EXTRA_TASK,
-						CoreApp.CS_TASK_AUTO_BLACKSCREEN);
-				ctx.startService(mIntent);
+				internalMsg = msg;
+				internalMsg.what = CoreApp.CS_TASK_AUTO_BLACKSCREEN;
+				this.runCustom(internalMsg);
 			}
 		}
 	}
