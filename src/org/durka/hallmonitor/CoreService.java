@@ -49,6 +49,8 @@ public class CoreService extends Service {
 	private LocalBroadcastManager mLocalBroadcastManager;
 	private CoreService localCoreService;
 	private Method startActivityAsUser;
+	private Intent launchDefaultActivity;
+	private UserHandle mUserHandle;
 
 	@Override
 	public void onCreate() {
@@ -80,6 +82,14 @@ public class CoreService extends Service {
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		}
+
+		launchDefaultActivity = new Intent(localCoreService,
+				DefaultActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_NO_ANIMATION
+				| Intent.FLAG_ACTIVITY_CLEAR_TOP
+				| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+
+		mUserHandle = android.os.Process.myUserHandle();
 	}
 
 	@Override
@@ -252,8 +262,7 @@ public class CoreService extends Service {
 					intent.putExtra("strobe", false);
 					intent.putExtra("period", 100);
 					intent.putExtra("bright", false);
-					sendBroadcastAsUser(intent,
-							android.os.Process.myUserHandle());
+					sendBroadcastAsUser(intent, mUserHandle);
 				} else if (mStateManager.getPreference().getBoolean(
 						"pref_flash_controls_alternative", false)) {
 					if (!mStateManager.getTorchOn()) {
@@ -318,15 +327,13 @@ public class CoreService extends Service {
 				// Broadcast alarm snooze event
 				Intent alarmSnooze = new Intent(
 						CoreReceiver.ALARM_SNOOZE_ACTION);
-				sendBroadcastAsUser(alarmSnooze,
-						android.os.Process.myUserHandle());
+				sendBroadcastAsUser(alarmSnooze, mUserHandle);
 				break;
 			case CoreApp.CS_TASK_DISMISS_ALARM:
 				// Broadcast alarm Dismiss event
 				Intent alarmDismiss = new Intent(
 						CoreReceiver.ALARM_DISMISS_ACTION);
-				sendBroadcastAsUser(alarmDismiss,
-						android.os.Process.myUserHandle());
+				sendBroadcastAsUser(alarmDismiss, mUserHandle);
 				break;
 			case CoreApp.CS_TASK_INCOMMING_ALARM:
 				mStateManager.acquireCPUDA();
@@ -504,15 +511,8 @@ public class CoreService extends Service {
 
 			if (startActivityAsUser != null) {
 				try {
-					startActivityAsUser
-							.invoke(localCoreService,
-									new Intent(localCoreService,
-											DefaultActivity.class)
-											.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-													| Intent.FLAG_ACTIVITY_NO_ANIMATION
-													| Intent.FLAG_ACTIVITY_CLEAR_TOP
-													| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS),
-									android.os.Process.myUserHandle());
+					startActivityAsUser.invoke(localCoreService,
+							launchDefaultActivity, mUserHandle);
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {
